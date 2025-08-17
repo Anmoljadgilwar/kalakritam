@@ -25,5 +25,10 @@ name = "kalakritam-api-production"
 [env.staging]
 name = "kalakritam-api-staging"
 
+# R2 bucket for image storage
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "kalakritam"
+
 # No D1 database needed - using external Neon via proxy
 # No KV storage needed - no sample data fallback

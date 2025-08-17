@@ -197,9 +197,6 @@ const AdminContact = () => {
           <div className="header-content">
             <h1 className="admin-gallery-title">Contact Management</h1>
             <p className="admin-gallery-subtitle">Manage Customer Inquiries & Messages</p>
-            <button onClick={() => navigateWithLoading('/admin/portal')} className="back-btn">
-              ← Back to Admin Portal
-            </button>
           </div>
           <div className="header-actions">
             <div className="contact-stats">

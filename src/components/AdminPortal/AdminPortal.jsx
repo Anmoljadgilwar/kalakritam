@@ -26,7 +26,7 @@ const AdminPortal = () => {
       
       // Fetch all data in parallel
       const [artworksRes, workshopsRes, eventsRes, artistsRes] = await Promise.allSettled([
-        galleryApi.getAll(),
+        galleryApi.getArtworks(),
         workshopsApi.getAll(),
         eventsApi.getAll(),
         artistsApi.getAll()
@@ -46,14 +46,6 @@ const AdminPortal = () => {
       // Keep default values on error
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleLogout = () => {
-    if (confirm('Are you sure you want to logout?')) {
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('adminUser');
-      navigateWithLoading('/admin/login');
     }
   };
 
@@ -117,11 +109,6 @@ const AdminPortal = () => {
       <main className="admin-portal-content">
         <section className="admin-portal-hero">
           <div className="admin-portal-badge">Admin Portal</div>
-          <div className="admin-header-actions">
-            <button onClick={handleLogout} className="logout-btn">
-              🚪 Logout
-            </button>
-          </div>
           <h1 className="admin-portal-title">Kalakritam Content Management</h1>
           <p className="admin-portal-subtitle">Comprehensive Administration Dashboard</p>
           <div className="admin-portal-description">

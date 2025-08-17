@@ -6,7 +6,7 @@ import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import SEOFieldsComponent from '../SEOFieldsComponent';
 import FileUpload from '../FileUpload';
-import { artistsApi } from '../../lib/adminApi';
+import { artistsApi, uploadApi } from '../../lib/adminApi';
 import { config } from '../../config/environment';
 import '../AdminGallery/AdminGallery.css';
 import './AdminArtists.css';
@@ -126,7 +126,26 @@ const AdminArtists = () => {
     if (!confirm('Are you sure you want to delete this artist profile?')) return;
     
     try {
+      // Find the artist to get the image URL before deleting
+      const artistToDelete = artists.find(artist => artist.id === artistId);
+      
       await artistsApi.delete(artistId);
+      
+      // If the artist had an image, try to delete it from R2
+      if (artistToDelete && artistToDelete.imageUrl) {
+        try {
+          const imageKey = uploadApi.extractImageKey(artistToDelete.imageUrl);
+          if (imageKey) {
+            console.log('🗑️ Deleting R2 image:', imageKey);
+            await uploadApi.deleteImage(imageKey);
+            console.log('✅ R2 image deleted successfully');
+          }
+        } catch (imageDeleteError) {
+          console.warn('⚠️ Failed to delete R2 image:', imageDeleteError);
+          // Don't fail the whole operation if image deletion fails
+        }
+      }
+      
       setArtists(artists.filter(artist => artist.id !== artistId));
       toast.success('Artist deleted successfully');
     } catch (err) {
@@ -139,6 +158,38 @@ const AdminArtists = () => {
     e.preventDefault();
     
     try {
+      const loadingId = toast.dataSaving(`${modalMode === 'create' ? 'Creating' : 'Updating'} artist...`);
+      
+      let imageUrl = formData.imageUrl; // Use existing image URL if no new file
+      let oldImageToDelete = null;
+      
+      // If there's a new image file to upload
+      if (imageFile) {
+        try {
+          // If we're updating and there's an existing image, mark it for deletion
+          if (modalMode === 'edit' && selectedArtist && selectedArtist.imageUrl && 
+              selectedArtist.imageUrl !== formData.imageUrl) {
+            oldImageToDelete = selectedArtist.imageUrl;
+          }
+          
+          toast.info('Uploading image to R2 storage...');
+          const uploadResult = await uploadApi.uploadImage(imageFile, 'artists');
+          
+          if (uploadResult.success) {
+            imageUrl = uploadResult.data.url; // Use the R2 URL from data object
+            toast.success('Image uploaded successfully');
+            console.log('R2 Image URL:', imageUrl);
+          } else {
+            throw new Error(uploadResult.message || 'Image upload failed');
+          }
+        } catch (uploadError) {
+          toast.dismiss(loadingId);
+          console.error('Image upload error:', uploadError);
+          toast.error(`Image upload failed: ${uploadError.message}`);
+          return; // Don't continue if image upload fails
+        }
+      }
+      
       // Prepare data with correct field mapping for database
       let socialLinksData = '';
       try {
@@ -157,7 +208,7 @@ const AdminArtists = () => {
         email: formData.email,
         phone: formData.phone,
         website: formData.website,
-        image_url: formData.imageUrl || '',
+        image_url: imageUrl || '',
         social_links: socialLinksData,
         featured: formData.featured,
         active: formData.active,
@@ -170,14 +221,17 @@ const AdminArtists = () => {
         og_description: formData.ogDescription,
         og_image: formData.ogImage
       };
-
-      const loadingId = toast.dataSaving(`${modalMode === 'create' ? 'Creating' : 'Updating'} artist...`);
       
       let result;
       if (modalMode === 'create') {
         result = await artistsApi.create(artistData);
       } else {
-        result = await artistsApi.update(selectedArtist.id, artistData);
+        // Include old image URL for deletion if a new image was uploaded
+        const updateData = {
+          ...artistData,
+          oldImageUrl: (imageFile && selectedArtist?.imageUrl) ? selectedArtist.imageUrl : undefined
+        };
+        result = await artistsApi.update(selectedArtist.id, updateData);
       }
 
       toast.dismiss(loadingId);
@@ -277,9 +331,6 @@ const AdminArtists = () => {
           <div className="header-content">
             <h1 className="admin-gallery-title">Artist Management</h1>
             <p className="admin-gallery-subtitle">Manage Artist Profiles & Portfolios</p>
-            <button onClick={() => navigateWithLoading('/admin/portal')} className="back-btn">
-              ← Back to Admin Portal
-            </button>
           </div>
           <div className="header-actions">
             <button onClick={handleCreate} className="create-btn">

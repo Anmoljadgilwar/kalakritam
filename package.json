@@ -4,19 +4,24 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "build:prod": "NODE_ENV=production vite build --mode production",
+    "build:analyze": "vite build && npx vite-bundle-analyzer dist",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "vite preview --host --port 4173"
+    "start": "vite preview --host --port 4173",
+    "dev:fast": "vite --force --host"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.1",
     "@react-three/drei": "^10.6.1",
     "@react-three/fiber": "^9.3.0",
+    "@tsndr/cloudflare-worker-jwt": "^3.2.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.1",
     "gsap": "^3.13.0",
+    "hono": "^4.9.2",
     "html2canvas": "^1.4.1",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.1",

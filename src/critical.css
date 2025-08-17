@@ -1,0 +1,149 @@
+/* Critical CSS for above-the-fold content */
+
+/* Base reset and container styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  background-color: #000000;
+  color: white;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+#root {
+  height: 100%;
+}
+
+/* App container */
+.app {
+  min-height: 100vh;
+  background-color: #000000;
+  position: relative;
+}
+
+/* Particles background - critical for initial render */
+.app-particles-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Main content container */
+.app-content {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+}
+
+/* Loading spinner - critical for initial load */
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(195, 143, 33, 0.3);
+  border-top: 3px solid #c38f21;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Header styles - critical for navigation */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
+}
+
+/* Navigation styles - critical for user interaction */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  font-family: 'Samarkan', serif;
+  font-size: 1.5rem;
+  color: #c38f21;
+  text-decoration: none;
+  letter-spacing: 2px;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+.nav-link {
+  color: #d4af85;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-weight: 500;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #c38f21;
+}
+
+/* Intro video container - critical for homepage */
+.intro-video-container {
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Lazy loading fallback - critical for performance */
+.lazy-loading-fallback {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #000000;
+  color: #c38f21;
+  font-size: 1.2rem;
+  font-family: 'Samarkan', serif;
+}
+
+/* Typography - critical for readability */
+.samarkan,
+[style*="Samarkan"] {
+  letter-spacing: 0.05em !important;
+}

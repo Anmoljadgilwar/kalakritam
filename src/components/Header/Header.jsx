@@ -97,15 +97,15 @@ const Header = ({ currentPage = 'home' }) => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Close dropdown when clicking outside
+  // Close sidebar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Check if click is outside both the mobile menu button and the dropdown
+      // Check if click is outside both the mobile menu button and the sidebar
       const mobileMenuButton = mobileMenuRef.current;
-      const mobileNavDropdown = document.querySelector('.mobile-navigation');
+      const mobileSidebar = document.querySelector('.mobile-sidebar');
       
       if (mobileMenuButton && !mobileMenuButton.contains(event.target) &&
-          mobileNavDropdown && !mobileNavDropdown.contains(event.target)) {
+          mobileSidebar && !mobileSidebar.contains(event.target)) {
         setIsMobileMenuOpen(false);
       }
     };
@@ -169,29 +169,47 @@ const Header = ({ currentPage = 'home' }) => {
         </div>
       )}
 
-      {/* Mobile Navigation Dropdown - Only render on mobile */}
+      {/* Mobile Sidebar - Only render on mobile */}
       {isMobile && (
-        <nav className={`mobile-navigation ${isMobileMenuOpen ? 'open' : ''}`}>
-          <div className="mobile-nav-links">
-            {navItems.map((item) => (
+        <>
+          {/* Overlay */}
+          {isMobileMenuOpen && (
+            <div 
+              className="mobile-sidebar-overlay"
+              onClick={() => setIsMobileMenuOpen(false)}
+            ></div>
+          )}
+          
+          {/* Sidebar */}
+          <nav className={`mobile-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
+            <div className="sidebar-header">
+              <h3>Navigation</h3>
               <button 
-                key={item.path}
-                onClick={() => handleNavigation(item.path)} 
-                className={`mobile-nav-link ${currentPage === item.path.slice(1) ? 'active' : ''}`}
+                className="close-sidebar-btn"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Close sidebar"
               >
-                {item.label}
+                ×
               </button>
-            ))}
-          </div>
-        </nav>
-      )}
-
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div 
-          className="mobile-menu-overlay"
-          onClick={() => setIsMobileMenuOpen(false)}
-        ></div>
+            </div>
+            <div className="sidebar-nav-links">
+              {navItems.map((item) => (
+                <button 
+                  key={item.path}
+                  onClick={() => handleNavigation(item.path)} 
+                  className={`sidebar-nav-link ${currentPage === item.path.slice(1) ? 'active' : ''}`}
+                >
+                  <span className="nav-icon">•</span>
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            <div className="sidebar-footer">
+              <p>Kalakritam</p>
+              <small>Art Gallery & Cultural Hub</small>
+            </div>
+          </nav>
+        </>
       )}
     </header>
   );

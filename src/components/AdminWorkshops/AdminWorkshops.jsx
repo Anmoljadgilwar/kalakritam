@@ -6,21 +6,13 @@ import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import SEOFieldsComponent from '../SEOFieldsComponent';
 import FileUpload from '../FileUpload';
-import { workshopsApi } from '../../lib/adminApi';
+import { workshopsApi, uploadApi } from '../../lib/adminApi';
 import { config } from '../../config/environment';
 import '../AdminGallery/AdminGallery.css';
 import './AdminWorkshops.css';
 
 const AdminWorkshops = () => {
   const { navigateWithLoading } = useNavigationWithLoading();
-
-  const handleLogout = () => {
-    if (confirm('Are you sure you want to logout?')) {
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('adminUser');
-      navigateWithLoading('/admin/login');
-    }
-  };
 
   const [workshops, setWorkshops] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -160,6 +152,31 @@ const AdminWorkshops = () => {
     e.preventDefault();
     
     try {
+      const loadingId = toast.dataSaving(`${modalMode === 'create' ? 'Creating' : 'Updating'} workshop...`);
+      
+      let imageUrl = formData.imageUrl; // Use existing image URL if no new file
+      
+      // If there's a new image file to upload
+      if (imageFile) {
+        try {
+          toast.info('Uploading image to R2 storage...');
+          const uploadResult = await uploadApi.uploadImage(imageFile, 'workshops');
+          
+          if (uploadResult.success) {
+            imageUrl = uploadResult.data.url; // Use the R2 URL from data object
+            toast.success('Image uploaded successfully');
+            console.log('R2 Image URL:', imageUrl);
+          } else {
+            throw new Error(uploadResult.message || 'Image upload failed');
+          }
+        } catch (uploadError) {
+          toast.dismiss(loadingId);
+          console.error('Image upload error:', uploadError);
+          toast.error(`Image upload failed: ${uploadError.message}`);
+          return; // Don't continue if image upload fails
+        }
+      }
+      
       // Prepare data with correct field mapping for database
       const workshopData = {
         title: formData.title,
@@ -171,7 +188,7 @@ const AdminWorkshops = () => {
         price: parseFloat(formData.price) || 0,
         max_participants: parseInt(formData.maxParticipants) || 0,
         current_participants: parseInt(formData.currentParticipants) || 0,
-        image_url: formData.imageUrl || '',
+        image_url: imageUrl || '',
         featured: formData.featured,
         active: formData.active,
         // SEO fields
@@ -185,12 +202,15 @@ const AdminWorkshops = () => {
       };
 
       let result;
-      const loadingId = toast.dataSaving(`${modalMode === 'create' ? 'Creating' : 'Updating'} workshop...`);
-      
       if (modalMode === 'create') {
         result = await workshopsApi.create(workshopData);
       } else {
-        result = await workshopsApi.update(selectedWorkshop.id, workshopData);
+        // Include old image URL for deletion if a new image was uploaded
+        const updateData = {
+          ...workshopData,
+          oldImageUrl: (imageFile && selectedWorkshop?.imageUrl) ? selectedWorkshop.imageUrl : undefined
+        };
+        result = await workshopsApi.update(selectedWorkshop.id, updateData);
       }
 
       toast.dismiss(loadingId);
@@ -198,6 +218,7 @@ const AdminWorkshops = () => {
       setIsModalOpen(false);
       fetchWorkshops(); // Refresh the list
     } catch (err) {
+      if (typeof loadingId !== 'undefined') toast.dismiss(loadingId);
       console.error('Error saving workshop:', err);
       toast.error(`Failed to ${modalMode} workshop: ${err.message}`);
     }
@@ -289,14 +310,6 @@ const AdminWorkshops = () => {
           <div className="header-content">
             <h1 className="admin-gallery-title">Workshop Management</h1>
             <p className="admin-gallery-subtitle">Manage Workshops & Learning Programs</p>
-            <div className="header-nav-buttons">
-              <button onClick={() => navigateWithLoading('/admin/portal')} className="back-btn">
-                ← Back to Admin Portal
-              </button>
-              <button onClick={handleLogout} className="logout-btn">
-                🚪 Logout
-              </button>
-            </div>
           </div>
           <div className="header-actions">
             <button onClick={handleCreate} className="create-btn">

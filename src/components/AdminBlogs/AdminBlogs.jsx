@@ -6,7 +6,7 @@ import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import SEOFieldsComponent from '../SEOFieldsComponent';
 import FileUpload from '../FileUpload';
-import { blogsApi } from '../../lib/adminApi';
+import { blogsApi, uploadApi } from '../../lib/adminApi';
 import { config } from '../../config/environment';
 import '../AdminGallery/AdminGallery.css';
 import './AdminBlogs.css';
@@ -158,6 +158,31 @@ const AdminBlogs = () => {
     e.preventDefault();
     
     try {
+      const loadingId = toast.dataSaving(`${modalMode === 'create' ? 'Creating' : 'Updating'} blog...`);
+      
+      let imageUrl = formData.imageUrl; // Use existing image URL if no new file
+      
+      // If there's a new image file to upload
+      if (imageFile) {
+        try {
+          toast.info('Uploading image to R2 storage...');
+          const uploadResult = await uploadApi.uploadImage(imageFile, 'blogs');
+          
+          if (uploadResult.success) {
+            imageUrl = uploadResult.data.url; // Use the R2 URL from data object
+            toast.success('Image uploaded successfully');
+            console.log('R2 Image URL:', imageUrl);
+          } else {
+            throw new Error(uploadResult.message || 'Image upload failed');
+          }
+        } catch (uploadError) {
+          toast.dismiss(loadingId);
+          console.error('Image upload error:', uploadError);
+          toast.error(`Image upload failed: ${uploadError.message}`);
+          return; // Don't continue if image upload fails
+        }
+      }
+      
       // Prepare data with correct field mapping for database
       const tagsArray = formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
       
@@ -168,7 +193,7 @@ const AdminBlogs = () => {
         author: formData.author,
         category: formData.category,
         tags: tagsArray,
-        image_url: formData.imageUrl || '',
+        image_url: imageUrl || '',
         published: formData.published,
         featured: formData.featured,
         read_time: formData.readTime,
@@ -181,14 +206,17 @@ const AdminBlogs = () => {
         og_description: formData.ogDescription,
         og_image: formData.ogImage
       };
-
-      const loadingId = toast.dataSaving(`${modalMode === 'create' ? 'Creating' : 'Updating'} blog...`);
       
       let result;
       if (modalMode === 'create') {
         result = await blogsApi.create(blogData);
       } else {
-        result = await blogsApi.update(selectedBlog.id, blogData);
+        // Include old image URL for deletion if a new image was uploaded
+        const updateData = {
+          ...blogData,
+          oldImageUrl: (imageFile && selectedBlog?.imageUrl) ? selectedBlog.imageUrl : undefined
+        };
+        result = await blogsApi.update(selectedBlog.id, updateData);
       }
 
       toast.dismiss(loadingId);
@@ -302,9 +330,6 @@ const AdminBlogs = () => {
           <div className="header-content">
             <h1 className="admin-gallery-title">Blog Management</h1>
             <p className="admin-gallery-subtitle">Manage Art Blog Posts & Articles</p>
-            <button onClick={() => navigateWithLoading('/admin/portal')} className="back-btn">
-              ← Back to Admin Portal
-            </button>
           </div>
           <div className="header-actions">
             <button onClick={handleCreate} className="create-btn">

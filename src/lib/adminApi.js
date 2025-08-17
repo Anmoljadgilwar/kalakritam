@@ -7,16 +7,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null) => {
   try {
     const token = localStorage.getItem('adminToken');
     
-    // Automatically prepend /admin/ to endpoints if not already present
-    const apiEndpoint = endpoint.startsWith('admin/') ? endpoint : `admin/${endpoint}`;
-    const url = `${config.apiBaseUrl}/${apiEndpoint}`;
-    
-    console.log('API Call Debug:', {
-      endpoint: apiEndpoint,
-      method,
-      data,
-      url
-    });
+    // Use endpoint as-is since it already includes admin/ prefix where needed
+    const url = `${config.apiBaseUrl}/${endpoint}`;
     
     const headers = {
       'Content-Type': 'application/json',
@@ -31,7 +23,6 @@ export const apiCall = async (endpoint, method = 'GET', data = null) => {
       method,
       headers,
       mode: 'cors',
-      credentials: 'omit',
       credentials: 'include', // Essential for CORS with credentials
     };
     
@@ -42,13 +33,8 @@ export const apiCall = async (endpoint, method = 'GET', data = null) => {
     const response = await fetch(url, requestOptions);
     const result = await response.json();
     
-    console.log('API Response Debug:', {
-      status: response.status,
-      result
-    });
-    
     if (!response.ok) {
-      throw new Error(result.error || result.message || 'API request failed');
+      throw new Error(result.error || result.message || `HTTP ${response.status}: ${response.statusText}`);
     }
     
     return result;
@@ -58,84 +44,538 @@ export const apiCall = async (endpoint, method = 'GET', data = null) => {
   }
 };
 
-// Upload API function
+// Gallery API functions
+export const galleryApi = {
+  getArtworks: () => apiCall('admin/gallery'),
+  addArtwork: (artwork) => apiCall('admin/gallery', 'POST', artwork),
+  updateArtwork: async (id, artwork) => {
+    // If there's an old image and a new one, delete the old one
+    if (artwork.oldImageUrl && artwork.imageUrl && artwork.oldImageUrl !== artwork.imageUrl) {
+      try {
+        await uploadApi.deleteImage(artwork.oldImageUrl);
+        console.log('✅ Old artwork image deleted successfully');
+      } catch (error) {
+        console.warn('⚠️ Failed to delete old artwork image:', error);
+        // Continue with update even if image deletion fails
+      }
+      
+      // Remove oldImageUrl from the data sent to backend
+      const { oldImageUrl, ...updateData } = artwork;
+      return apiCall(`admin/gallery/${id}`, 'PUT', updateData);
+    }
+    
+    return apiCall(`admin/gallery/${id}`, 'PUT', artwork);
+  },
+  deleteArtwork: async (id) => {
+    try {
+      // First get the artwork to find the image URL
+      const artworks = await galleryApi.getArtworks();
+      const artwork = artworks.data?.find(item => item.id === id);
+      
+      console.log('🔍 Found artwork for deletion:', artwork);
+      
+      // Delete the artwork record
+      const result = await apiCall(`admin/gallery/${id}`, 'DELETE');
+      
+      // If successful and artwork had an image, delete it from R2
+      if (result.success && artwork) {
+        // Try multiple possible field names for the image URL
+        const imageUrl = artwork.imageUrl || artwork.image_url || artwork.imageURL;
+        
+        console.log('🖼️ Image URL to delete:', imageUrl);
+        
+        if (imageUrl) {
+          try {
+            await uploadApi.deleteImage(imageUrl);
+            console.log('✅ Artwork image deleted from R2 successfully');
+          } catch (imageError) {
+            console.warn('⚠️ Failed to delete artwork image from R2:', imageError);
+            // Don't fail the whole operation if image deletion fails
+          }
+        } else {
+          console.log('ℹ️ No image URL found for artwork, skipping image deletion');
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to delete artwork:', error);
+      throw error;
+    }
+  },
+};
+
+// Workshops API functions
+export const workshopsApi = {
+  getAll: () => apiCall('admin/workshops'),
+  create: (workshop) => apiCall('admin/workshops', 'POST', workshop),
+  update: async (id, workshop) => {
+    // If there's an old image and a new one, delete the old one
+    if (workshop.oldImageUrl && workshop.imageUrl && workshop.oldImageUrl !== workshop.imageUrl) {
+      try {
+        await uploadApi.deleteImage(workshop.oldImageUrl);
+        console.log('✅ Old workshop image deleted successfully');
+      } catch (error) {
+        console.warn('⚠️ Failed to delete old workshop image:', error);
+      }
+      
+      // Remove oldImageUrl from the data sent to backend
+      const { oldImageUrl, ...updateData } = workshop;
+      return apiCall(`admin/workshops/${id}`, 'PUT', updateData);
+    }
+    
+    return apiCall(`admin/workshops/${id}`, 'PUT', workshop);
+  },
+  delete: async (id) => {
+    try {
+      // First get the workshop to find the image URL
+      const workshops = await workshopsApi.getAll();
+      const workshop = workshops.data?.find(item => item.id === id);
+      
+      console.log('🔍 Found workshop for deletion:', workshop);
+      
+      // Delete the workshop record
+      const result = await apiCall(`admin/workshops/${id}`, 'DELETE');
+      
+      // If successful and workshop had an image, delete it from R2
+      if (result.success && workshop) {
+        // Try multiple possible field names for the image URL
+        const imageUrl = workshop.imageUrl || workshop.image_url || workshop.imageURL;
+        
+        console.log('🖼️ Image URL to delete:', imageUrl);
+        
+        if (imageUrl) {
+          try {
+            await uploadApi.deleteImage(imageUrl);
+            console.log('✅ Workshop image deleted from R2 successfully');
+          } catch (imageError) {
+            console.warn('⚠️ Failed to delete workshop image from R2:', imageError);
+          }
+        } else {
+          console.log('ℹ️ No image URL found for workshop, skipping image deletion');
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to delete workshop:', error);
+      throw error;
+    }
+  },
+};
+
+// Events API functions
+export const eventsApi = {
+  getAll: () => apiCall('admin/events'),
+  addEvent: (event) => apiCall('admin/events', 'POST', event),
+  updateEvent: async (id, event) => {
+    // If there's an old image and a new one, delete the old one
+    if (event.oldImageUrl && event.imageUrl && event.oldImageUrl !== event.imageUrl) {
+      try {
+        await uploadApi.deleteImage(event.oldImageUrl);
+        console.log('✅ Old event image deleted successfully');
+      } catch (error) {
+        console.warn('⚠️ Failed to delete old event image:', error);
+      }
+      
+      // Remove oldImageUrl from the data sent to backend
+      const { oldImageUrl, ...updateData } = event;
+      return apiCall(`admin/events/${id}`, 'PUT', updateData);
+    }
+    
+    return apiCall(`admin/events/${id}`, 'PUT', event);
+  },
+  deleteEvent: async (id) => {
+    try {
+      // First get the event to find the image URL
+      const events = await eventsApi.getAll();
+      const event = events.data?.find(item => item.id === id);
+      
+      console.log('🔍 Found event for deletion:', event);
+      
+      // Delete the event record
+      const result = await apiCall(`admin/events/${id}`, 'DELETE');
+      
+      // If successful and event had an image, delete it from R2
+      if (result.success && event) {
+        // Try multiple possible field names for the image URL
+        const imageUrl = event.imageUrl || event.image_url || event.imageURL;
+        
+        console.log('🖼️ Image URL to delete:', imageUrl);
+        
+        if (imageUrl) {
+          try {
+            await uploadApi.deleteImage(imageUrl);
+            console.log('✅ Event image deleted from R2 successfully');
+          } catch (imageError) {
+            console.warn('⚠️ Failed to delete event image from R2:', imageError);
+          }
+        } else {
+          console.log('ℹ️ No image URL found for event, skipping image deletion');
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to delete event:', error);
+      throw error;
+    }
+  },
+};
+
+// Artists API functions
+export const artistsApi = {
+  getAll: () => apiCall('admin/artists'),
+  create: (artist) => apiCall('admin/artists', 'POST', artist),
+  update: async (id, artist) => {
+    // If there's an old image and a new one, delete the old one
+    if (artist.oldImageUrl && artist.imageUrl && artist.oldImageUrl !== artist.imageUrl) {
+      try {
+        await uploadApi.deleteImage(artist.oldImageUrl);
+        console.log('✅ Old artist image deleted successfully');
+      } catch (error) {
+        console.warn('⚠️ Failed to delete old artist image:', error);
+      }
+      
+      // Remove oldImageUrl from the data sent to backend
+      const { oldImageUrl, ...updateData } = artist;
+      return apiCall(`admin/artists/${id}`, 'PUT', updateData);
+    }
+    
+    return apiCall(`admin/artists/${id}`, 'PUT', artist);
+  },
+  delete: async (id) => {
+    try {
+      // First get the artist to find the image URL
+      const artists = await artistsApi.getAll();
+      const artist = artists.data?.find(item => item.id === id);
+      
+      console.log('🔍 Found artist for deletion:', artist);
+      
+      // Delete the artist record
+      const result = await apiCall(`admin/artists/${id}`, 'DELETE');
+      
+      // If successful and artist had an image, delete it from R2
+      if (result.success && artist) {
+        // Try multiple possible field names for the image URL
+        const imageUrl = artist.imageUrl || artist.image_url || artist.imageURL;
+        
+        console.log('🖼️ Image URL to delete:', imageUrl);
+        
+        if (imageUrl) {
+          try {
+            await uploadApi.deleteImage(imageUrl);
+            console.log('✅ Artist image deleted from R2 successfully');
+          } catch (imageError) {
+            console.warn('⚠️ Failed to delete artist image from R2:', imageError);
+          }
+        } else {
+          console.log('ℹ️ No image URL found for artist, skipping image deletion');
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to delete artist:', error);
+      throw error;
+    }
+  },
+};
+
+// Blogs API functions
+export const blogsApi = {
+  getAll: () => apiCall('admin/blogs'),
+  create: (blog) => apiCall('admin/blogs', 'POST', blog),
+  update: async (id, blog) => {
+    // If there's an old image and a new one, delete the old one
+    if (blog.oldImageUrl && blog.imageUrl && blog.oldImageUrl !== blog.imageUrl) {
+      try {
+        await uploadApi.deleteImage(blog.oldImageUrl);
+        console.log('✅ Old blog image deleted successfully');
+      } catch (error) {
+        console.warn('⚠️ Failed to delete old blog image:', error);
+      }
+      
+      // Remove oldImageUrl from the data sent to backend
+      const { oldImageUrl, ...updateData } = blog;
+      return apiCall(`admin/blogs/${id}`, 'PUT', updateData);
+    }
+    
+    return apiCall(`admin/blogs/${id}`, 'PUT', blog);
+  },
+  delete: async (id) => {
+    try {
+      // First get the blog to find the image URL
+      const blogs = await blogsApi.getAll();
+      const blog = blogs.data?.find(item => item.id === id);
+      
+      console.log('🔍 Found blog for deletion:', blog);
+      
+      // Delete the blog record
+      const result = await apiCall(`admin/blogs/${id}`, 'DELETE');
+      
+      // If successful and blog had an image, delete it from R2
+      if (result.success && blog) {
+        // Try multiple possible field names for the image URL
+        const imageUrl = blog.imageUrl || blog.image_url || blog.imageURL;
+        
+        console.log('🖼️ Image URL to delete:', imageUrl);
+        
+        if (imageUrl) {
+          try {
+            await uploadApi.deleteImage(imageUrl);
+            console.log('✅ Blog image deleted from R2 successfully');
+          } catch (imageError) {
+            console.warn('⚠️ Failed to delete blog image from R2:', imageError);
+          }
+        } else {
+          console.log('ℹ️ No image URL found for blog, skipping image deletion');
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to delete blog:', error);
+      throw error;
+    }
+  },
+};
+
+// Contacts API functions (consolidated and fixed)
+export const contactsApi = {
+  getAll: () => apiCall('admin/contacts'),
+  update: (id, contact) => apiCall(`admin/contacts/${id}`, 'PUT', contact),
+  delete: (id) => apiCall(`admin/contacts/${id}`, 'DELETE'),
+  markAsRead: (id) => apiCall(`admin/contacts/${id}/read`, 'PUT'),
+  reply: (replyData) => apiCall('admin/contacts/reply', 'POST', replyData),
+};
+
+// Upload API functions
 export const uploadApi = {
-  uploadImage: async (file) => {
+  uploadImage: async (file, folder = 'general') => {
     try {
       const token = localStorage.getItem('adminToken');
-      const formData = new FormData();
-      formData.append('image', file);
       
-      const response = await fetch(`${config.apiBaseUrl}/admin/upload`, {
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+      
+      // Validate file
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Please select a valid image file');
+      }
+      
+      // Check file size (5MB limit to match backend)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('File size must be less than 5MB');
+      }
+      
+      console.log('🔼 Starting image upload:', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        folder: folder,
+        endpoint: `${config.apiBaseUrl}/upload/image`
+      });
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', folder); // Add folder parameter
+      
+      const response = await fetch(`${config.apiBaseUrl}/upload/image`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
-        credentials: 'include',
         body: formData,
       });
       
       const result = await response.json();
       
+      console.log('📤 Upload response received:', {
+        status: response.status,
+        result
+      });
+      
       if (!response.ok) {
-        throw new Error(result.error || result.message || 'Upload failed');
+        throw new Error(result.message || 'Image upload failed');
+      }
+      
+      // Validate the response structure
+      if (result.success && result.data && result.data.url) {
+        console.log('✅ Image uploaded successfully to R2:', result.data.url);
+      } else {
+        console.warn('⚠️ Unexpected response structure:', result);
       }
       
       return result;
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error('❌ Image upload error:', error);
+      throw error;
+    }
+  },
+
+  uploadTicketPDF: async (pdfBlob, ticketId) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+      
+      // Check file size (10MB limit for PDFs)
+      if (pdfBlob.size > 10 * 1024 * 1024) {
+        throw new Error('PDF file size must be less than 10MB');
+      }
+      
+      console.log('🎫 Starting ticket PDF upload:', {
+        ticketId: ticketId,
+        fileSize: pdfBlob.size,
+        fileType: pdfBlob.type,
+        folder: 'tickets',
+        endpoint: `${config.apiBaseUrl}/upload/pdf`
+      });
+      
+      const formData = new FormData();
+      formData.append('file', pdfBlob, `ticket_${ticketId}.pdf`);
+      formData.append('folder', 'tickets');
+      formData.append('ticketId', ticketId);
+      
+      const response = await fetch(`${config.apiBaseUrl}/upload/pdf`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      
+      const result = await response.json();
+      
+      console.log('🎫 Ticket PDF upload response:', {
+        status: response.status,
+        result
+      });
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Ticket PDF upload failed');
+      }
+      
+      if (result.success && result.data && result.data.url) {
+        console.log('✅ Ticket PDF uploaded successfully to R2:', result.data.url);
+      } else {
+        console.warn('⚠️ Unexpected response structure:', result);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Ticket PDF upload error:', error);
+      throw error;
+    }
+  },
+
+  // Utility function to safely extract R2 URL from upload result
+  getImageUrl: (uploadResult) => {
+    if (uploadResult && uploadResult.success && uploadResult.data && uploadResult.data.url) {
+      return uploadResult.data.url;
+    }
+    console.warn('⚠️ Invalid upload result structure:', uploadResult);
+    return null;
+  },
+  
+  // Utility function to extract image key from R2 URL for deletion
+  extractImageKey: (imageUrl) => {
+    if (!imageUrl) return null;
+    
+    try {
+      // Handle different URL formats
+      // Format 1: https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/folder/filename.jpg
+      // Format 2: https://custom-domain.com/folder/filename.jpg
+      const url = new URL(imageUrl);
+      const pathname = url.pathname;
+      
+      // Remove leading slash and return the path (includes folder/filename)
+      return pathname.startsWith('/') ? pathname.substring(1) : pathname;
+    } catch (error) {
+      console.warn('⚠️ Failed to extract image key from URL:', imageUrl, error);
+      return null;
+    }
+  },
+  
+  deleteImage: async (imageUrl) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+      
+      // Extract the image key from the URL
+      const imageKey = uploadApi.extractImageKey(imageUrl);
+      
+      if (!imageKey) {
+        throw new Error('Invalid image URL - cannot extract key for deletion');
+      }
+      
+      console.log('🗑️ Deleting image:', {
+        originalUrl: imageUrl,
+        extractedKey: imageKey
+      });
+      
+      const response = await fetch(`${config.apiBaseUrl}/upload/image/${encodeURIComponent(imageKey)}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const result = await response.json();
+      
+      console.log('🗑️ Delete response:', {
+        status: response.status,
+        result
+      });
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Image deletion failed');
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Image deletion error:', error);
+      throw error;
+    }
+  },
+  
+  generatePresignedUrl: async (filename, contentType) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+      
+      const response = await fetch(`${config.apiBaseUrl}/upload/presigned-url`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ filename, contentType }),
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to generate presigned URL');
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Presigned URL generation error:', error);
       throw error;
     }
   }
-};
-
-// Gallery API functions
-export const galleryApi = {
-  getArtworks: () => apiCall('gallery'),
-  addArtwork: (artwork) => apiCall('gallery', 'POST', artwork),
-  updateArtwork: (id, artwork) => apiCall(`gallery/${id}`, 'PUT', artwork),
-  deleteArtwork: (id) => apiCall(`gallery/${id}`, 'DELETE'),
-};
-
-// Workshops API functions
-export const workshopsApi = {
-  getAll: () => apiCall('workshops'),
-  create: (workshop) => apiCall('workshops', 'POST', workshop),
-  update: (id, workshop) => apiCall(`workshops/${id}`, 'PUT', workshop),
-  delete: (id) => apiCall(`workshops/${id}`, 'DELETE'),
-};
-
-// Events API functions
-export const eventsApi = {
-  getAll: () => apiCall('events'),
-  addEvent: (event) => apiCall('events', 'POST', event),
-  updateEvent: (id, event) => apiCall(`events/${id}`, 'PUT', event),
-  deleteEvent: (id) => apiCall(`events/${id}`, 'DELETE'),
-};
-
-// Artists API functions
-export const artistsApi = {
-  getAll: () => apiCall('artists'),
-  create: (artist) => apiCall('artists', 'POST', artist),
-  update: (id, artist) => apiCall(`artists/${id}`, 'PUT', artist),
-  delete: (id) => apiCall(`artists/${id}`, 'DELETE'),
-};
-
-// Blogs API functions
-export const blogsApi = {
-  getAll: () => apiCall('blogs'),
-  create: (blog) => apiCall('blogs', 'POST', blog),
-  update: (id, blog) => apiCall(`blogs/${id}`, 'PUT', blog),
-  delete: (id) => apiCall(`blogs/${id}`, 'DELETE'),
-};
-
-// Contacts API functions (consolidated and fixed)
-export const contactsApi = {
-  getAll: () => apiCall('contacts'),
-  update: (id, contact) => apiCall(`contacts/${id}`, 'PUT', contact),
-  delete: (id) => apiCall(`contacts/${id}`, 'DELETE'),
-  markAsRead: (id) => apiCall(`contacts/${id}/read`, 'PUT'),
-  reply: (replyData) => apiCall('contacts/reply', 'POST', replyData),
 };
 
 // Tickets API functions
@@ -157,11 +597,58 @@ export const ticketsApi = {
       }
     }
   },
-  create: (ticket) => apiCall('admin/tickets', 'POST', ticket),
+  create: async (ticket) => {
+    // Create the ticket record - no automatic PDF generation
+    const response = await apiCall('admin/tickets', 'POST', ticket);
+    return response;
+  },
   update: (id, ticket) => apiCall(`admin/tickets/${id}`, 'PUT', ticket),
-  delete: (id) => apiCall(`admin/tickets/${id}`, 'DELETE'),
+  updatePartial: (id, updates) => apiCall(`admin/tickets/${id}`, 'PATCH', updates),
+  delete: async (id) => {
+    try {
+      // First get the ticket to find the PDF URL
+      const tickets = await ticketsApi.getAll();
+      const ticket = tickets.data?.find(item => item.id === id);
+      
+      console.log('🔍 Found ticket for deletion:', ticket);
+      
+      // Delete the ticket record
+      const result = await apiCall(`admin/tickets/${id}`, 'DELETE');
+      
+      // If successful and ticket had a PDF, delete it from R2
+      if (result.success && ticket) {
+        const pdfUrl = ticket.url;
+        
+        console.log('🎫 PDF URL to delete:', pdfUrl);
+        
+        if (pdfUrl) {
+          try {
+            await uploadApi.deleteImage(pdfUrl); // Uses same delete function
+            console.log('✅ Ticket PDF deleted from R2 successfully');
+          } catch (pdfError) {
+            console.warn('⚠️ Failed to delete ticket PDF from R2:', pdfError);
+          }
+        } else {
+          console.log('ℹ️ No PDF URL found for ticket, skipping PDF deletion');
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to delete ticket:', error);
+      throw error;
+    }
+  },
   verify: (ticketCode) => apiCall('tickets/verify', 'POST', { code: ticketCode }),
   verifyById: (ticketId) => apiCall(`tickets/verify/${ticketId}`, 'GET'),
+  
+  // Helper function to generate PDF blob (to be implemented)
+  generatePDFBlob: async (ticket) => {
+    // This will be implemented to generate PDF blob from ticket data
+    // For now, return null to avoid breaking existing functionality
+    console.log('🎫 PDF generation requested for ticket:', ticket.ticket_number);
+    return null;
+  },
 };
 
 // Authentication API functions

@@ -6,6 +6,7 @@ import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import Particles from '../Particles';
+import LazyImage from '../LazyImage';
 import './Gallery.css';
 
 const Gallery = () => {
@@ -135,6 +136,9 @@ const Gallery = () => {
         />
       </div>
       
+      {/* Blur Overlay Layer */}
+      <div className="gallery-blur-overlay"></div>
+      
       {/* Video Logo */}
       <VideoLogo />
       
@@ -176,22 +180,20 @@ const Gallery = () => {
             {filteredArtworks.map(artwork => (
               <div key={artwork.id} className="artwork-card universal-card">
                 <div className="artwork-image-container universal-card-image-container">
-                  <img 
+                  <LazyImage
                     src={artwork.imageUrl} 
                     alt={artwork.title}
                     className="artwork-image universal-card-image"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      const placeholder = e.target.parentNode.querySelector('.artwork-image-placeholder');
-                      if (placeholder) {
-                        placeholder.style.display = 'flex';
-                      }
+                    placeholder={
+                      <div className="artwork-image-placeholder universal-card-image-placeholder">
+                        <div className="universal-card-logo-text">Kalakritam</div>
+                        <div className="universal-card-image-not-available">Loading...</div>
+                      </div>
+                    }
+                    onError={() => {
+                      console.log(`Failed to load image: ${artwork.imageUrl}`);
                     }}
                   />
-                  <div className="artwork-image-placeholder universal-card-image-placeholder" style={{ display: 'none' }}>
-                    <div className="universal-card-logo-text">Kalakritam</div>
-                    <div className="universal-card-image-not-available">Image not available</div>
-                  </div>
                   <div className="artwork-overlay universal-card-overlay">
                     <div className="artwork-overlay-content universal-card-overlay-content">
                       <h3>{artwork.title}</h3>

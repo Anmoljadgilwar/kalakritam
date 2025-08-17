@@ -1,37 +1,40 @@
 import { useEffect } from 'react';
+import { performanceMonitor } from '../utils/performance';
 
 export const usePerformanceTracking = (componentName) => {
   useEffect(() => {
     // Track component mount time for performance monitoring
-    const startTime = performance.now();
+    const markName = `${componentName}-mount-start`;
+    performanceMonitor.mark(markName);
     
     return () => {
-      const endTime = performance.now();
-      const loadTime = endTime - startTime;
+      const measureName = `${componentName}-mount-duration`;
+      const duration = performanceMonitor.measure(measureName, markName);
       
-      // Log performance metrics (can be sent to analytics service)
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`${componentName} loaded in ${loadTime.toFixed(2)}ms`);
+      // Log performance metrics only in development
+      if (process.env.NODE_ENV === 'development' && duration !== null) {
+        console.log(`${componentName} mounted in ${duration.toFixed(2)}ms`);
       }
       
       // You can also track to analytics services here
-      // analytics.track('component_load_time', {
+      // analytics.track('component_mount_time', {
       //   component: componentName,
-      //   loadTime: loadTime
+      //   duration: duration
       // });
     };
   }, [componentName]);
 };
 
 export const measureLazyLoadTime = (componentName) => {
-  const startTime = performance.now();
+  const markName = `${componentName}-lazy-start`;
+  performanceMonitor.mark(markName);
   
   return () => {
-    const endTime = performance.now();
-    const lazyLoadTime = endTime - startTime;
+    const measureName = `${componentName}-lazy-duration`;
+    const duration = performanceMonitor.measure(measureName, markName);
     
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`${componentName} lazy loaded in ${lazyLoadTime.toFixed(2)}ms`);
+    if (process.env.NODE_ENV === 'development' && duration !== null) {
+      console.log(`${componentName} lazy loaded in ${duration.toFixed(2)}ms`);
     }
   };
 };

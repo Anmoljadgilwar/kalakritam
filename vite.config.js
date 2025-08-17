@@ -3,7 +3,16 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react({
+    // Enable Babel for better optimizations
+    babel: {
+      compact: true,
+      plugins: [
+        // Remove console.log in production
+        ...(process.env.NODE_ENV === 'production' ? [['transform-remove-console', { exclude: ['error', 'warn'] }]] : [])
+      ]
+    }
+  })],
   define: {
     global: 'globalThis',
   },
@@ -14,18 +23,55 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
-        manualChunks: {
-          // Vendor chunks for better caching
-          vendor: ['react', 'react-dom', 'react-router-dom']
+        manualChunks: (id) => {
+          // Better chunk splitting strategy
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'react-vendor';
+            }
+            if (id.includes('three') || id.includes('@react-three') || id.includes('ogl')) {
+              return 'graphics-vendor';
+            }
+            if (id.includes('gsap')) {
+              return 'animation-vendor';
+            }
+            return 'vendor';
+          }
+          // Split admin components into separate chunk
+          if (id.includes('/Admin')) {
+            return 'admin';
+          }
         }
       }
     },
     // Optimize chunk size
-    chunkSizeWarningLimit: 1000,
-    // Target modern browsers for better compatibility
-    target: 'es2015',
-    // Use esbuild for minification (faster and included with Vite)
-    minify: 'esbuild'
+    chunkSizeWarningLimit: 800,
+    // Target modern browsers for better performance
+    target: 'es2020',
+    // Use esbuild for minification (faster)
+    minify: 'esbuild',
+    // Enable source maps for debugging but smaller in production
+    sourcemap: process.env.NODE_ENV === 'development',
+    // Optimize CSS
+    cssMinify: true,
+    // Preload modules
+    modulePreload: {
+      polyfill: false
+    }
+  },
+  // Optimize dependencies
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'gsap'
+    ],
+    exclude: [
+      'ogl',
+      '@react-three/fiber',
+      '@react-three/drei'
+    ]
   },
   // Optimize for development
   server: {
@@ -33,8 +79,18 @@ export default defineConfig({
     hmr: {
       overlay: false
     },
-    headers: {
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' https: wss: ws:; frame-src 'self' https:; object-src 'none'; base-uri 'self';"
-    }
+    // Enable pre-bundling for faster dev server
+    force: false
+  },
+  // Enable experimental features for better performance
+  esbuild: {
+    // Tree shake unused code
+    treeShaking: true,
+    // Minify identifiers
+    minifyIdentifiers: true,
+    // Minify syntax
+    minifySyntax: true,
+    // Minify whitespace
+    minifyWhitespace: true
   }
 })

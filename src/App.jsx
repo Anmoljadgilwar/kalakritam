@@ -181,23 +181,34 @@ const preloadComponent = (componentImport) => {
   componentImportFunc();
 };
 
-// Smart preloading strategy - preload Home and Gallery after initial load
+// Smart preloading strategy - reduced timeout and selective preloading
 setTimeout(() => {
+  // Only preload the most commonly visited components
   preloadComponent(() => import('./components/Home'));
   preloadComponent(() => import('./components/Gallery'));
-}, 3000);
+}, 2000); // Reduced from 3000ms
 
-// Preload on user interaction hints
+// Optimized preloading on user interaction hints
 if (typeof window !== 'undefined') {
+  let preloadTimeouts = new Map();
+  
   window.addEventListener('mouseover', (e) => {
     // Preload components when user hovers over navigation links
     const target = e.target.closest('a');
     if (target) {
       const href = target.getAttribute('href');
-      switch (href) {
-        case '/workshops':
-          preloadComponent(() => import('./components/Workshops'));
-          break;
+      
+      // Clear existing timeout for this href
+      if (preloadTimeouts.has(href)) {
+        clearTimeout(preloadTimeouts.get(href));
+      }
+      
+      // Set a small delay to avoid preloading on quick mouse movements
+      const timeoutId = setTimeout(() => {
+        switch (href) {
+          case '/workshops':
+            preloadComponent(() => import('./components/Workshops'));
+            break;
         case '/artists':
           preloadComponent(() => import('./components/Artists'));
           break;
@@ -210,12 +221,16 @@ if (typeof window !== 'undefined') {
         case '/artblogs':
           preloadComponent(() => import('./components/ArtBlogs'));
           break;
-        case '/contact':
-          preloadComponent(() => import('./components/Contact'));
-          break;
-      }
+          case '/contact':
+            preloadComponent(() => import('./components/Contact'));
+            break;
+        }
+        preloadTimeouts.delete(href);
+      }, 300); // 300ms delay
+      
+      preloadTimeouts.set(href, timeoutId);
     }
-  }, { once: true });
+  });
 }
 
 // Lazy loading fallback component
