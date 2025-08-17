@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
+import { 
+  getMobileParticleConfig, 
+  getOptimizedImageUrl, 
+  getMobileBlurConfig,
+  shouldOptimizeForMobile,
+  getNetworkOptimizations,
+  getBatteryOptimizations,
+  mobileMemoryOptimization
+} from '../../utils/mobileOptimizations';
+import { mobilePerformanceMonitor } from '../../utils/mobilePerformanceMonitor';
 import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
@@ -18,6 +28,54 @@ const Workshops = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const fetchCalled = useRef(false);
+  
+  // Mobile optimization states
+  const [isMobile, setIsMobile] = useState(shouldOptimizeForMobile());
+  const [particleConfig, setParticleConfig] = useState(getMobileParticleConfig());
+  const [blurConfig, setBlurConfig] = useState(getMobileBlurConfig());
+  const [networkOptimizations, setNetworkOptimizations] = useState({});
+  const [batteryOptimizations, setBatteryOptimizations] = useState({});
+
+  // Initialize mobile optimizations
+  useEffect(() => {
+    const initializeOptimizations = async () => {
+      const networkOpts = getNetworkOptimizations();
+      const batteryOpts = await getBatteryOptimizations();
+      
+      setNetworkOptimizations(networkOpts);
+      setBatteryOptimizations(batteryOpts);
+      
+      if (batteryOpts.disableParticles || networkOpts.delayNonCritical) {
+        setParticleConfig({ ...particleConfig, particleCount: 0 });
+      }
+    };
+    
+    initializeOptimizations();
+    
+    const handleResize = () => {
+      const newIsMobile = shouldOptimizeForMobile();
+      if (newIsMobile !== isMobile) {
+        setIsMobile(newIsMobile);
+        setParticleConfig(getMobileParticleConfig());
+        setBlurConfig(getMobileBlurConfig());
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    if (isMobile) {
+      const cleanupInterval = setInterval(() => {
+        mobileMemoryOptimization.cleanup();
+      }, 30000);
+      
+      return () => {
+        clearInterval(cleanupInterval);
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobile]);
 
   useEffect(() => {
     if (!fetchCalled.current) {
@@ -105,21 +163,23 @@ const Workshops = () => {
   }
 
   return (
-    <div className="workshops-container">
-      {/* Particles Background */}
-      <div className="workshops-particles-background">
-        <Particles
-          particleColors={['#c38f21', '#ffffff', '#c38f21']}
-          particleCount={1000}
-          particleSpread={10}
-          speed={0.2}
-          particleBaseSize={200}
-          moveParticlesOnHover={true}
-          particleHoverFactor={2}
-          alphaParticles={true}
-          disableRotation={false}
-        />
-      </div>
+    <div className="workshops-container" data-connection={networkOptimizations.lowerQuality ? 'slow' : 'fast'}>
+      {/* Particles Background - Optimized for mobile */}
+      {particleConfig.particleCount > 0 && (
+        <div className="workshops-particles-background">
+          <Particles
+            particleColors={['#c38f21', '#ffffff', '#c38f21']}
+            particleCount={particleConfig.particleCount}
+            particleSpread={particleConfig.particleSpread}
+            speed={particleConfig.speed}
+            particleBaseSize={particleConfig.particleBaseSize}
+            moveParticlesOnHover={particleConfig.moveParticlesOnHover}
+            particleHoverFactor={particleConfig.particleHoverFactor}
+            alphaParticles={particleConfig.alphaParticles}
+            disableRotation={particleConfig.disableRotation}
+          />
+        </div>
+      )}
       
       {/* Video Logo */}
       <VideoLogo />

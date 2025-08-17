@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
+import { useMobileOptimizations } from '../../hooks/useMobileOptimizations';
 import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
-import Particles from '../Particles';
+import OptimizedParticles from '../OptimizedParticles';
 import { config } from '../../config/environment';
 import './Events.css';
 

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
+import { useMobileOptimizations } from '../../hooks/useMobileOptimizations';
 import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
-import Particles from '../Particles';
+import OptimizedParticles from '../OptimizedParticles';
 import { config } from '../../config/environment';
 import './Contact.css';
 
@@ -17,6 +18,9 @@ const Contact = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Mobile optimizations
+  const { particleConfig, networkOptimizations } = useMobileOptimizations('contact');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -89,21 +93,13 @@ const Contact = () => {
   };
 
   return (
-    <div className="contact-container">
-      {/* Particles Background */}
-      <div className="contact-particles-background">
-        <Particles
-          particleColors={['#c38f21', '#ffffff', '#c38f21']}
-          particleCount={1000}
-          particleSpread={10}
-          speed={0.2}
-          particleBaseSize={200}
-          moveParticlesOnHover={true}
-          particleHoverFactor={2}
-          alphaParticles={true}
-          disableRotation={false}
-        />
-      </div>
+    <div className="contact-container" data-connection={networkOptimizations.lowerQuality ? 'slow' : 'fast'}>
+      {/* Particles Background - Optimized for mobile */}
+      <OptimizedParticles 
+        particleConfig={particleConfig}
+        networkOptimizations={networkOptimizations}
+        className="contact-particles-background"
+      />
       
       {/* Video Logo */}
       <VideoLogo />

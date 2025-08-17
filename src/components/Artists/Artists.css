@@ -1,4 +1,6 @@
 /* Artists Page CSS */
+/* Import mobile optimizations */
+@import '../../mobile-optimizations.css';
 
 /* Container */
 .artists-container {

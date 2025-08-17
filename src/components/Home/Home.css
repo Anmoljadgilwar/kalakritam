@@ -1,5 +1,7 @@
 /* Import Universal Card Styles */
 @import '../UniversalCard/UniversalCard.css';
+/* Import mobile optimizations */
+@import '../../mobile-optimizations.css';
 
 .home-container {
   min-height: 100vh;

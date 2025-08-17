@@ -1,5 +1,7 @@
 /* Import Universal Card Styles */
 @import '../UniversalCard/UniversalCard.css';
+/* Import mobile optimizations */
+@import '../../mobile-optimizations.css';
 
 /* Gallery Container */
 .gallery-container {
@@ -217,6 +219,19 @@
   gap: 30px;
   padding: 20px 0;
   justify-items: center;
+  /* Mobile optimization */
+  contain: layout style;
+}
+
+/* Mobile-specific grid optimizations */
+@media (max-width: 768px) {
+  .gallery-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    padding: 1rem 0 !important;
+    /* Use CSS containment for better performance */
+    contain: layout style paint;
+  }
 }
 
 .artwork-overlay-content h3 {

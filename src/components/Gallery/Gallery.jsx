@@ -2,6 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { config } from '../../config/environment';
 import { toast } from '../../utils/notifications.js';
+import { 
+  getMobileParticleConfig, 
+  getOptimizedImageUrl, 
+  getMobileBlurConfig,
+  shouldOptimizeForMobile,
+  getNetworkOptimizations,
+  getBatteryOptimizations,
+  mobileMemoryOptimization
+} from '../../utils/mobileOptimizations';
+import { mobilePerformanceMonitor } from '../../utils/mobilePerformanceMonitor';
 import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
@@ -18,6 +28,57 @@ const Gallery = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const fetchCalled = useRef(false);
+  
+  // Mobile optimization states
+  const [isMobile, setIsMobile] = useState(shouldOptimizeForMobile());
+  const [particleConfig, setParticleConfig] = useState(getMobileParticleConfig());
+  const [blurConfig, setBlurConfig] = useState(getMobileBlurConfig());
+  const [networkOptimizations, setNetworkOptimizations] = useState({});
+  const [batteryOptimizations, setBatteryOptimizations] = useState({});
+
+  // Initialize mobile optimizations
+  useEffect(() => {
+    const initializeOptimizations = async () => {
+      const networkOpts = getNetworkOptimizations();
+      const batteryOpts = await getBatteryOptimizations();
+      
+      setNetworkOptimizations(networkOpts);
+      setBatteryOptimizations(batteryOpts);
+      
+      // Update particle config based on optimizations
+      if (batteryOpts.disableParticles || networkOpts.delayNonCritical) {
+        setParticleConfig({ ...particleConfig, particleCount: 0 });
+      }
+    };
+    
+    initializeOptimizations();
+    
+    // Handle window resize for mobile detection
+    const handleResize = () => {
+      const newIsMobile = shouldOptimizeForMobile();
+      if (newIsMobile !== isMobile) {
+        setIsMobile(newIsMobile);
+        setParticleConfig(getMobileParticleConfig());
+        setBlurConfig(getMobileBlurConfig());
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Set up memory cleanup for mobile
+    if (isMobile) {
+      const cleanupInterval = setInterval(() => {
+        mobileMemoryOptimization.cleanup();
+      }, 30000); // Clean up every 30 seconds
+      
+      return () => {
+        clearInterval(cleanupInterval);
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobile]);
 
   useEffect(() => {
     if (!fetchCalled.current) {
@@ -29,6 +90,11 @@ const Gallery = () => {
   const fetchArtworks = async () => {
     try {
       setLoading(true);
+      
+      // Start performance monitoring
+      if (isMobile) {
+        mobilePerformanceMonitor.startLoadTime();
+      }
       
       // Show loading notification
       const loadingId = toast.dataLoading('Loading gallery...');
@@ -48,6 +114,13 @@ const Gallery = () => {
           imageUrl: config.transformImageUrl(artwork.image_url || artwork.imageUrl)
         }));
         setArtworks(transformedData);
+        
+        // Set up performance monitoring
+        if (isMobile) {
+          mobilePerformanceMonitor.setTotalImages(transformedData.length);
+          mobilePerformanceMonitor.endLoadTime();
+        }
+        
         toast.dataLoaded(`Loaded ${transformedData.length} artworks`);
       } else {
         setError('Failed to load artworks');
@@ -120,24 +193,32 @@ const Gallery = () => {
   }
 
   return (
-    <div className="gallery-container">
-      {/* Particles Background */}
-      <div className="gallery-particles-background">
-        <Particles
-          particleColors={['#c38f21', '#ffffff', '#c38f21']}
-          particleCount={1000}
-          particleSpread={10}
-          speed={0.2}
-          particleBaseSize={200}
-          moveParticlesOnHover={true}
-          particleHoverFactor={2}
-          alphaParticles={true}
-          disableRotation={false}
-        />
-      </div>
+    <div className="gallery-container" data-connection={networkOptimizations.lowerQuality ? 'slow' : 'fast'}>
+      {/* Particles Background - Optimized for mobile */}
+      {particleConfig.particleCount > 0 && (
+        <div className="gallery-particles-background">
+          <Particles
+            particleColors={['#c38f21', '#ffffff', '#c38f21']}
+            particleCount={particleConfig.particleCount}
+            particleSpread={particleConfig.particleSpread}
+            speed={particleConfig.speed}
+            particleBaseSize={particleConfig.particleBaseSize}
+            moveParticlesOnHover={particleConfig.moveParticlesOnHover}
+            particleHoverFactor={particleConfig.particleHoverFactor}
+            alphaParticles={particleConfig.alphaParticles}
+            disableRotation={particleConfig.disableRotation}
+          />
+        </div>
+      )}
       
-      {/* Blur Overlay Layer */}
-      <div className="gallery-blur-overlay"></div>
+      {/* Blur Overlay Layer - Optimized for mobile */}
+      <div 
+        className="gallery-blur-overlay"
+        style={{
+          backdropFilter: blurConfig.backdropFilter,
+          background: blurConfig.background
+        }}
+      ></div>
       
       {/* Video Logo */}
       <VideoLogo />
@@ -181,17 +262,24 @@ const Gallery = () => {
               <div key={artwork.id} className="artwork-card universal-card">
                 <div className="artwork-image-container universal-card-image-container">
                   <LazyImage
-                    src={artwork.imageUrl} 
+                    src={getOptimizedImageUrl(artwork.imageUrl, isMobile)} 
                     alt={artwork.title}
                     className="artwork-image universal-card-image"
                     placeholder={
                       <div className="artwork-image-placeholder universal-card-image-placeholder">
                         <div className="universal-card-logo-text">Kalakritam</div>
-                        <div className="universal-card-image-not-available">Loading...</div>
+                        <div className="universal-card-image-not-available">
+                          {networkOptimizations.lowerQuality ? 'Loading...' : 'Loading...'}
+                        </div>
                       </div>
                     }
                     onError={() => {
                       console.log(`Failed to load image: ${artwork.imageUrl}`);
+                    }}
+                    onLoad={() => {
+                      if (isMobile) {
+                        mobilePerformanceMonitor.trackImageLoad();
+                      }
                     }}
                   />
                   <div className="artwork-overlay universal-card-overlay">

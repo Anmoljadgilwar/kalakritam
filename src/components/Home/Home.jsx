@@ -2,6 +2,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
+import { 
+  getMobileParticleConfig, 
+  getMobileBlurConfig,
+  shouldOptimizeForMobile,
+  getNetworkOptimizations,
+  getBatteryOptimizations,
+  mobileMemoryOptimization
+} from '../../utils/mobileOptimizations';
+import { mobilePerformanceMonitor } from '../../utils/mobilePerformanceMonitor';
 import Header from '../Header';
 import Footer from '../Footer';
 import Particles from '../Particles';
@@ -13,6 +22,65 @@ const Home = () => {
   const navigate = useNavigate();
   const { navigateWithLoading } = useNavigationWithLoading();
   const toastShown = useRef(false);
+  
+  // Mobile optimization states
+  const [isMobile, setIsMobile] = useState(shouldOptimizeForMobile());
+  const [particleConfig, setParticleConfig] = useState(getMobileParticleConfig());
+  const [blurConfig, setBlurConfig] = useState(getMobileBlurConfig());
+  const [networkOptimizations, setNetworkOptimizations] = useState({});
+  const [batteryOptimizations, setBatteryOptimizations] = useState({});
+
+  // Initialize mobile optimizations
+  useEffect(() => {
+    const initializeOptimizations = async () => {
+      if (isMobile) {
+        mobilePerformanceMonitor.startLoadTime();
+      }
+      
+      const networkOpts = getNetworkOptimizations();
+      const batteryOpts = await getBatteryOptimizations();
+      
+      setNetworkOptimizations(networkOpts);
+      setBatteryOptimizations(batteryOpts);
+      
+      // Update particle config based on optimizations
+      if (batteryOpts.disableParticles || networkOpts.delayNonCritical) {
+        setParticleConfig({ ...particleConfig, particleCount: 0 });
+      }
+      
+      if (isMobile) {
+        mobilePerformanceMonitor.endLoadTime();
+      }
+    };
+    
+    initializeOptimizations();
+    
+    // Handle window resize for mobile detection
+    const handleResize = () => {
+      const newIsMobile = shouldOptimizeForMobile();
+      if (newIsMobile !== isMobile) {
+        setIsMobile(newIsMobile);
+        setParticleConfig(getMobileParticleConfig());
+        setBlurConfig(getMobileBlurConfig());
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Set up memory cleanup for mobile
+    if (isMobile) {
+      const cleanupInterval = setInterval(() => {
+        mobileMemoryOptimization.cleanup();
+      }, 30000);
+      
+      return () => {
+        clearInterval(cleanupInterval);
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobile]);
 
   // Navigation handler with toast feedback
   const handleNavigation = (path, sectionName) => {
@@ -121,21 +189,23 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="home-container">
-      {/* Particles Background */}
-      <div className="home-particles-background">
-        <Particles
-          particleColors={['#c38f21', '#ffffff', '#c38f21']}
-          particleCount={1000}
-          particleSpread={10}
-          speed={0.2}
-          particleBaseSize={200}
-          moveParticlesOnHover={true}
-          particleHoverFactor={2}
-          alphaParticles={true}
-          disableRotation={false}
-        />
-      </div>
+    <div className="home-container" data-connection={networkOptimizations.lowerQuality ? 'slow' : 'fast'}>
+      {/* Particles Background - Optimized for mobile */}
+      {particleConfig.particleCount > 0 && (
+        <div className="home-particles-background">
+          <Particles
+            particleColors={['#c38f21', '#ffffff', '#c38f21']}
+            particleCount={particleConfig.particleCount}
+            particleSpread={particleConfig.particleSpread}
+            speed={particleConfig.speed}
+            particleBaseSize={particleConfig.particleBaseSize}
+            moveParticlesOnHover={particleConfig.moveParticlesOnHover}
+            particleHoverFactor={particleConfig.particleHoverFactor}
+            alphaParticles={particleConfig.alphaParticles}
+            disableRotation={particleConfig.disableRotation}
+          />
+        </div>
+      )}
       
       {/* Video Logo in top-left corner */}
       {showVideoLogo && (

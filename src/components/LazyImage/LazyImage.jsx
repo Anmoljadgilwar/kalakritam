@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { getMobileLazyConfig, shouldOptimizeForMobile } from '../../utils/mobileOptimizations';
 import './LazyImage.css';
 
 const LazyImage = ({ 
@@ -14,6 +15,10 @@ const LazyImage = ({
   const [isInView, setIsInView] = useState(false);
   const [hasError, setHasError] = useState(false);
   const imgRef = useRef();
+  
+  // Get mobile-optimized lazy loading configuration
+  const lazyConfig = getMobileLazyConfig();
+  const isMobile = shouldOptimizeForMobile();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -24,8 +29,8 @@ const LazyImage = ({
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '50px'
+        threshold: lazyConfig.threshold,
+        rootMargin: lazyConfig.rootMargin
       }
     );
 
@@ -38,12 +43,12 @@ const LazyImage = ({
 
   const handleLoad = () => {
     setIsLoaded(true);
-    onLoad();
+    onLoad && onLoad();
   };
 
   const handleError = () => {
     setHasError(true);
-    onError();
+    onError && onError();
   };
 
   return (
@@ -56,7 +61,8 @@ const LazyImage = ({
           onLoad={handleLoad}
           onError={handleError}
           loading="lazy"
-          decoding="async"
+          decoding={isMobile ? "sync" : "async"}
+          fetchpriority={isMobile ? "low" : "auto"}
         />
       )}
       

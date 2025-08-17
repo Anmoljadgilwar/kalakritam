@@ -1,5 +1,7 @@
 /* Workshops Page CSS */
 @import '../UniversalCard/UniversalCard.css';
+/* Import mobile optimizations */
+@import '../../mobile-optimizations.css';
 
 /* Container */
 .workshops-container {

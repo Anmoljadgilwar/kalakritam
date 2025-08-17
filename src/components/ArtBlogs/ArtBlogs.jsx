@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
+import { useMobileOptimizations } from '../../hooks/useMobileOptimizations';
 import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
-import Particles from '../Particles';
+import OptimizedParticles from '../OptimizedParticles';
 import { config } from '../../config/environment';
 import '../Gallery/Gallery.css';
 import './ArtBlogs.css';
@@ -13,6 +14,9 @@ const ArtBlogs = () => {
   const { navigateWithLoading } = useNavigationWithLoading();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedBlog, setSelectedBlog] = useState(null);
+  
+  // Mobile optimizations
+  const { particleConfig, networkOptimizations } = useMobileOptimizations('artblogs');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -119,21 +123,13 @@ const ArtBlogs = () => {
   };
 
   return (
-    <div className="artblogs-container">
-      {/* Particles Background */}
-      <div className="artblogs-particles-background">
-        <Particles
-          particleColors={['#c38f21', '#ffffff', '#c38f21']}
-          particleCount={1000}
-          particleSpread={10}
-          speed={0.2}
-          particleBaseSize={200}
-          moveParticlesOnHover={true}
-          particleHoverFactor={2}
-          alphaParticles={true}
-          disableRotation={false}
-        />
-      </div>
+    <div className="artblogs-container" data-connection={networkOptimizations.lowerQuality ? 'slow' : 'fast'}>
+      {/* Particles Background - Optimized for mobile */}
+      <OptimizedParticles 
+        particleConfig={particleConfig}
+        networkOptimizations={networkOptimizations}
+        className="artblogs-particles-background"
+      />
       
       {/* Video Logo */}
       <VideoLogo />
