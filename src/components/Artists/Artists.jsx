@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
-import { useLoading } from '../../contexts/LoadingContext';
 import { toast } from '../../utils/notifications.js';
 import { useMobileOptimizations } from '../../hooks/useMobileOptimizations';
+import { getMobileBlurConfig } from '../../utils/mobileOptimizations';
 import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
@@ -12,16 +12,18 @@ import './Artists.css';
 import '../Gallery/Gallery.css'; // Import Gallery CSS for modal styles
 
 const Artists = () => {
-  const { navigateWithLoading, showLoading, hideLoading } = useNavigationWithLoading();
+  const { navigateWithLoading } = useNavigationWithLoading();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedArtist, setSelectedArtist] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [artists, setArtists] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const fetchCalled = useRef(false);
   
   // Mobile optimizations
   const { particleConfig, networkOptimizations, getOptimizedImageUrl, trackImageLoad, setTotalImages } = useMobileOptimizations('artists');
+  const [blurConfig, setBlurConfig] = useState(getMobileBlurConfig());
 
   useEffect(() => {
     if (!fetchCalled.current) {
@@ -32,7 +34,7 @@ const Artists = () => {
 
   const fetchArtists = async () => {
     try {
-      showLoading();
+      setLoading(true);
       const loadingId = toast.dataLoading('Loading artists...');
       
       const response = await fetch(`${config.apiBaseUrl}/artists`);
@@ -52,7 +54,7 @@ const Artists = () => {
       setError('Failed to connect to server');
       toast.serverError('Failed to connect to server');
     } finally {
-      hideLoading();
+      setLoading(false);
     }
   };
 
@@ -73,6 +75,22 @@ const Artists = () => {
   const filteredArtists = selectedCategory === 'all' 
     ? artists 
     : artists.filter(artist => (artist.specialization || 'general') === selectedCategory);
+
+  if (loading) {
+    return (
+      <div className="artists-container">
+        <VideoLogo />
+        <Header currentPage="artists" />
+        <div className="artists-page-content">
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Loading artists...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -101,6 +119,15 @@ const Artists = () => {
         networkOptimizations={networkOptimizations}
         className="artists-particles-background"
       />
+      
+      {/* Blur Overlay Layer - Optimized for mobile */}
+      <div 
+        className="artists-blur-overlay"
+        style={{
+          backdropFilter: blurConfig.backdropFilter,
+          background: blurConfig.background
+        }}
+      ></div>
       
       {/* Video Logo */}
       <VideoLogo />

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
 import { useMobileOptimizations } from '../../hooks/useMobileOptimizations';
+import { getMobileBlurConfig } from '../../utils/mobileOptimizations';
 import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
@@ -21,6 +22,7 @@ const Contact = () => {
   
   // Mobile optimizations
   const { particleConfig, networkOptimizations } = useMobileOptimizations('contact');
+  const [blurConfig, setBlurConfig] = useState(getMobileBlurConfig());
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -100,6 +102,15 @@ const Contact = () => {
         networkOptimizations={networkOptimizations}
         className="contact-particles-background"
       />
+      
+      {/* Blur Overlay Layer - Optimized for mobile */}
+      <div 
+        className="contact-blur-overlay"
+        style={{
+          backdropFilter: blurConfig.backdropFilter,
+          background: blurConfig.background
+        }}
+      ></div>
       
       {/* Video Logo */}
       <VideoLogo />

@@ -1,6 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
+import { 
+  getMobileBlurConfig,
+  shouldOptimizeForMobile
+} from '../../utils/mobileOptimizations';
 import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
@@ -10,6 +14,9 @@ import './About.css';
 const About = () => {
   const { navigateWithLoading } = useNavigationWithLoading();
   const toastShown = useRef(false);
+  
+  // Mobile optimization states
+  const [blurConfig, setBlurConfig] = useState(getMobileBlurConfig());
 
   useEffect(() => {
     // SEO meta tags for About page
@@ -62,6 +69,15 @@ const About = () => {
           disableRotation={false}
         />
       </div>
+      
+      {/* Blur Overlay Layer - Optimized for mobile */}
+      <div 
+        className="about-blur-overlay"
+        style={{
+          backdropFilter: blurConfig.backdropFilter,
+          background: blurConfig.background
+        }}
+      ></div>
       
       {/* Video Logo */}
       <VideoLogo />

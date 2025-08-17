@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
 import AdminHeader from '../AdminHeader';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import SEOFieldsComponent from '../SEOFieldsComponent';
 import FileUpload from '../FileUpload';
-import Loading from '../Loading';
+import AdminLoading from '../AdminLoading';
 import { galleryApi, uploadApi } from '../../lib/adminApi';
 import { config } from '../../config/environment';
 import './AdminGallery.css';
 
 const AdminGallery = () => {
-  const { navigateWithLoading } = useNavigationWithLoading();
-
   const [artworks, setArtworks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -283,7 +280,7 @@ const AdminGallery = () => {
   };
 
   if (loading) {
-    return <Loading />;
+    return <AdminLoading message="Loading artworks..." />;
   }
 
   if (error) {

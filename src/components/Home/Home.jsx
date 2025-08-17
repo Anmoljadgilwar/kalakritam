@@ -207,6 +207,15 @@ const Home = () => {
         </div>
       )}
       
+      {/* Blur Overlay Layer - Optimized for mobile */}
+      <div 
+        className="home-blur-overlay"
+        style={{
+          backdropFilter: blurConfig.backdropFilter,
+          background: blurConfig.background
+        }}
+      ></div>
+      
       {/* Video Logo in top-left corner */}
       {showVideoLogo && (
         <div className="video-logo-container">

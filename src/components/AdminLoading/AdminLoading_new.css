@@ -1,0 +1,56 @@
+/* Admin Loading Styles - Simple Circular Spinner */
+.admin-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(5px);
+}
+
+.admin-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.admin-loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(195, 143, 33, 0.3);
+  border-top: 4px solid #c38f21;
+  border-radius: 50%;
+  animation: adminSpin 1s linear infinite;
+}
+
+@keyframes adminSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.admin-loading-text {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .admin-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+  
+  .admin-loading-text {
+    font-size: 14px;
+  }
+}

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
-import { useLoading } from '../../contexts/LoadingContext';
 import { config } from '../../config/environment';
 import { toast } from '../../utils/notifications.js';
 import { 
@@ -22,11 +21,11 @@ import './Gallery.css';
 
 const Gallery = () => {
   const { navigateWithLoading } = useNavigationWithLoading();
-  const { showLoading, hideLoading } = useLoading();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedArtwork, setSelectedArtwork] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [artworks, setArtworks] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const fetchCalled = useRef(false);
   
@@ -90,7 +89,7 @@ const Gallery = () => {
 
   const fetchArtworks = async () => {
     try {
-      showLoading('Loading gallery...');
+      setLoading(true);
       
       // Start performance monitoring
       if (isMobile) {
@@ -133,7 +132,7 @@ const Gallery = () => {
       setError(errorMessage);
       toast.serverError(errorMessage);
     } finally {
-      hideLoading();
+      setLoading(false);
     }
   };
 
@@ -157,6 +156,22 @@ const Gallery = () => {
   const filteredArtworks = selectedCategory === 'all' 
     ? artworks 
     : artworks.filter(artwork => artwork.category === selectedCategory);
+
+  if (loading) {
+    return (
+      <div className="gallery-container">
+        <VideoLogo />
+        <Header currentPage="gallery" />
+        <div className="gallery-page-content">
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Loading artworks...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (error) {
     return (

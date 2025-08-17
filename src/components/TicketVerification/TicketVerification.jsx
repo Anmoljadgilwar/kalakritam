@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
-import Loading from '../Loading';
 import { config } from '../../config/environment';
 import './TicketVerification.css';
 
@@ -107,7 +106,19 @@ const TicketVerification = () => {
   };
 
   if (loading) {
-    return <Loading />;
+    return (
+      <div className="ticket-verification-container">
+        <VideoLogo />
+        <Header />
+        <main className="ticket-verification-content">
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Verifying ticket...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (

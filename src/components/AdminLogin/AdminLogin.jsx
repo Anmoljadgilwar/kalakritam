@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { authApi } from '../../lib/adminApi';
 import { toast } from '../../utils/notifications.js';
 import VideoLogo from '../VideoLogo';
@@ -7,7 +6,6 @@ import Orb from '../Orb';
 import './AdminLogin.css';
 
 const AdminLogin = () => {
-  const { navigateWithLoading } = useNavigationWithLoading();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -40,7 +38,7 @@ const AdminLogin = () => {
       const result = await authApi.verifyToken();
       if (result.success) {
         // Token is valid, redirect to portal
-        navigateWithLoading('/admin/portal');
+        window.location.href = '/admin/portal';
       }
     } catch (error) {
       // Token is invalid, remove it
@@ -132,7 +130,7 @@ const AdminLogin = () => {
         
         // Redirect to admin portal home page
         setTimeout(() => {
-          navigateWithLoading('/admin/portal');
+          window.location.href = '/admin/portal';
         }, 1000);
       } else {
         // Handle specific error messages
@@ -314,7 +312,7 @@ const AdminLogin = () => {
 
           <div className="admin-login-footer">
             <button 
-              onClick={() => navigateWithLoading('/home')} 
+              onClick={() => window.location.href = '/home'} 
               className="back-to-home-btn"
               disabled={isLoading}
             >

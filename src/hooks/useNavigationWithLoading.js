@@ -3,19 +3,21 @@ import { useCallback } from 'react';
 import { useLoading } from '../contexts/LoadingContext.jsx';
 
 export const useNavigationWithLoading = () => {
-  const { isLoading, setIsLoading, showLoading, hideLoading } = useLoading();
+  const { isLoading, setIsLoading } = useLoading();
   const navigate = useNavigate();
 
   const navigateWithLoading = useCallback((path) => {
-    showLoading('Loading page...');
+    setIsLoading(true);
     
-    // Show loading for at least 500ms for smooth transition, then navigate
+    // Show loading for at least 800ms for smooth transition
     setTimeout(() => {
       navigate(path);
-      // Don't hide loading here - let the destination component handle it
-      // This prevents double loading by keeping one loading state throughout
-    }, 500);
-  }, [navigate, showLoading]);
+      // Hide loading after navigation
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 200);
+    }, 800);
+  }, [navigate, setIsLoading]);
 
-  return { isLoading, navigateWithLoading, showLoading, hideLoading };
+  return { isLoading, navigateWithLoading };
 };

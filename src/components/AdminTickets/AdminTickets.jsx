@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
 import AdminHeader from '../AdminHeader';
 import Footer from '../Footer';
@@ -39,7 +38,6 @@ const generateTicketId = () => {
 };
 
 const AdminTickets = () => {
-  const { navigateWithLoading } = useNavigationWithLoading();
   const [activeTab, setActiveTab] = useState('generate');
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);

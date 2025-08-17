@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
 import AdminHeader from '../AdminHeader';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
-import Loading from '../Loading';
+import AdminLoading from '../AdminLoading';
 import { contactsApi } from '../../lib/adminApi';
 import { config } from '../../config/environment';
 import '../AdminGallery/AdminGallery.css';
 import './AdminContact.css';
 
 const AdminContact = () => {
-  const { navigateWithLoading } = useNavigationWithLoading();
-
   const handleLogout = () => {
     if (confirm('Are you sure you want to logout?')) {
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminUser');
-      navigateWithLoading('/admin/login');
+      window.location.href = '/admin/login';
     }
   };
 
@@ -154,7 +151,7 @@ const AdminContact = () => {
   };
 
   if (loading) {
-    return <Loading />;
+    return <AdminLoading message="Loading inquiries..." />;
   }
 
   if (error) {

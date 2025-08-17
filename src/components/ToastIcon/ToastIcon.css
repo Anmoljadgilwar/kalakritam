@@ -28,8 +28,7 @@
   flex-shrink: 0;
 }
 
-/* Spinning animation for loading icons - DISABLED */
-/* 
+/* Spinning animation for loading icons */
 .toast-icon-spin {
   animation: toast-spin 1s linear infinite;
 }
@@ -42,7 +41,6 @@
     transform: rotate(360deg);
   }
 }
-*/
 
 /* Icon color variations for different notification types */
 .notification.success .toast-icon-svg {
@@ -73,9 +71,9 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  /* .toast-icon-spin {
+  .toast-icon-spin {
     animation: none;
-  } */
+  }
   
   .toast-icon-svg:hover {
     transform: none;

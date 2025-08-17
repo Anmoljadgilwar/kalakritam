@@ -61,7 +61,7 @@
   width: 100%;
   max-width: 300px;
   max-height: 200px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 6px;
   display: block;
   margin: 0 auto;

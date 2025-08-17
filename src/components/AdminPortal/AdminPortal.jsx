@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import AdminHeader from '../AdminHeader';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
-import Loading from '../Loading';
+import AdminLoading from '../AdminLoading';
 import { galleryApi, workshopsApi, eventsApi, artistsApi } from '../../lib/adminApi';
 import './AdminPortal.css';
 
 const AdminPortal = () => {
-  const { navigateWithLoading } = useNavigationWithLoading();
   const [stats, setStats] = useState({
     artworks: 0,
     workshops: 0,
@@ -102,6 +100,10 @@ const AdminPortal = () => {
     }
   ];
 
+  if (loading) {
+    return <AdminLoading message="Loading admin dashboard..." />;
+  }
+
   return (
     <div className="admin-portal-container">
       <VideoLogo />
@@ -124,7 +126,7 @@ const AdminPortal = () => {
               <div 
                 key={index}
                 className="admin-module-card"
-                onClick={() => navigateWithLoading(module.path)}
+                onClick={() => window.location.href = module.path}
               >
                 <div className="module-icon" style={{ color: module.color }}>
                   {module.icon}
@@ -144,10 +146,7 @@ const AdminPortal = () => {
 
         <section className="admin-quick-stats">
           <h2>Quick Overview</h2>
-          {loading ? (
-            <Loading />
-          ) : (
-            <div className="stats-grid">
+          <div className="stats-grid">
               <div className="stat-card">
                 <div className="stat-icon">🖼️</div>
                 <div className="stat-info">
@@ -177,7 +176,6 @@ const AdminPortal = () => {
                 </div>
               </div>
             </div>
-          )}
         </section>
       </main>
       

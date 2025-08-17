@@ -2,22 +2,27 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
 import { useMobileOptimizations } from '../../hooks/useMobileOptimizations';
+import { getMobileBlurConfig } from '../../utils/mobileOptimizations';
 import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import OptimizedParticles from '../OptimizedParticles';
-import Particles from '../Particles';
 import { config } from '../../config/environment';
 import './Events.css';
 
 const Events = () => {
-  const { navigateWithLoading, showLoading, hideLoading } = useNavigationWithLoading();
+  const { navigateWithLoading } = useNavigationWithLoading();
   const [selectedView, setSelectedView] = useState('upcoming');
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const fetchCalled = useRef(false);
+  
+  // Mobile optimizations
+  const { particleConfig, networkOptimizations } = useMobileOptimizations('events');
+  const [blurConfig, setBlurConfig] = useState(getMobileBlurConfig());
 
   useEffect(() => {
     if (!fetchCalled.current) {
@@ -28,7 +33,7 @@ const Events = () => {
 
   const fetchEvents = async () => {
     try {
-      showLoading();
+      setLoading(true);
       const loadingId = toast.dataLoading('Loading events...');
       
       const response = await fetch(`${config.apiBaseUrl}/events`);
@@ -53,9 +58,25 @@ const Events = () => {
       setError('Failed to connect to server');
       toast.serverError('Failed to connect to server');
     } finally {
-      hideLoading();
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="events-container">
+        <VideoLogo />
+        <Header currentPage="events" />
+        <div className="events-page-content">
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Loading events...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -93,20 +114,21 @@ const Events = () => {
 
   return (
     <div className="events-container">
-      {/* Particles Background */}
-      <div className="events-particles-background">
-        <Particles
-          particleColors={['#c38f21', '#ffffff', '#c38f21']}
-          particleCount={1000}
-          particleSpread={10}
-          speed={0.2}
-          particleBaseSize={200}
-          moveParticlesOnHover={true}
-          particleHoverFactor={2}
-          alphaParticles={true}
-          disableRotation={false}
-        />
-      </div>
+      {/* Particles Background - Optimized for mobile */}
+      <OptimizedParticles 
+        particleConfig={particleConfig}
+        networkOptimizations={networkOptimizations}
+        className="events-particles-background"
+      />
+      
+      {/* Blur Overlay Layer - Optimized for mobile */}
+      <div 
+        className="events-blur-overlay"
+        style={{
+          backdropFilter: blurConfig.backdropFilter,
+          background: blurConfig.background
+        }}
+      ></div>
       
       {/* Video Logo */}
       <VideoLogo />

@@ -1,15 +1,12 @@
 import React from 'react';
-import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import './AdminHeader.css';
 
 const AdminHeader = ({ currentPage = 'portal' }) => {
-  const { navigateWithLoading } = useNavigationWithLoading();
-
   const handleLogout = () => {
     if (confirm('Are you sure you want to logout?')) {
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminUser');
-      navigateWithLoading('/admin/login');
+      window.location.href = '/admin/login';
     }
   };
 
@@ -40,7 +37,7 @@ const AdminHeader = ({ currentPage = 'portal' }) => {
             {adminNavItems.map(item => (
               <button 
                 key={item.path}
-                onClick={() => navigateWithLoading(item.path)} 
+                onClick={() => window.location.href = item.path} 
                 className={`admin-nav-link ${currentPage === item.path ? 'active' : ''}`}
                 title={item.label}
               >

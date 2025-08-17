@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
 import AdminHeader from '../AdminHeader';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import SEOFieldsComponent from '../SEOFieldsComponent';
 import FileUpload from '../FileUpload';
-import Loading from '../Loading';
+import AdminLoading from '../AdminLoading';
 import { workshopsApi, uploadApi } from '../../lib/adminApi';
 import { config } from '../../config/environment';
 import '../AdminGallery/AdminGallery.css';
 import './AdminWorkshops.css';
 
 const AdminWorkshops = () => {
-  const { navigateWithLoading } = useNavigationWithLoading();
-
   const [workshops, setWorkshops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,6 +43,14 @@ const AdminWorkshops = () => {
   });
 
   useEffect(() => {
+    // Check if user is authenticated before fetching data
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      // No token, redirect to login
+      window.location.href = '/admin/login';
+      return;
+    }
+    
     fetchWorkshops();
   }, []);
 
@@ -267,7 +272,7 @@ const AdminWorkshops = () => {
   };
 
   if (loading) {
-    return <Loading />;
+    return <AdminLoading message="Loading workshops..." />;
   }
 
   if (error) {

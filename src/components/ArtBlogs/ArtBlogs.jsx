@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigationWithLoading } from '../../hooks/useNavigationWithLoading';
 import { toast } from '../../utils/notifications.js';
 import { useMobileOptimizations } from '../../hooks/useMobileOptimizations';
+import { getMobileBlurConfig } from '../../utils/mobileOptimizations';
 import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
@@ -11,14 +12,16 @@ import '../Gallery/Gallery.css';
 import './ArtBlogs.css';
 
 const ArtBlogs = () => {
-  const { navigateWithLoading, showLoading, hideLoading } = useNavigationWithLoading();
+  const { navigateWithLoading } = useNavigationWithLoading();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedBlog, setSelectedBlog] = useState(null);
   
   // Mobile optimizations
   const { particleConfig, networkOptimizations } = useMobileOptimizations('artblogs');
+  const [blurConfig, setBlurConfig] = useState(getMobileBlurConfig());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const fetchCalled = useRef(false);
 
@@ -31,7 +34,7 @@ const ArtBlogs = () => {
 
   const fetchBlogs = async () => {
     try {
-      showLoading();
+      setLoading(true);
       const loadingId = toast.dataLoading('Loading blog posts...');
       
       const response = await fetch(`${config.apiBaseUrl}/blogs`);
@@ -51,9 +54,25 @@ const ArtBlogs = () => {
       setError('Failed to connect to server');
       toast.serverError('Failed to connect to server');
     } finally {
-      hideLoading();
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="artblogs-container">
+        <VideoLogo />
+        <Header currentPage="artblogs" />
+        <div className="artblogs-content">
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Loading blog posts...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -113,6 +132,15 @@ const ArtBlogs = () => {
         networkOptimizations={networkOptimizations}
         className="artblogs-particles-background"
       />
+      
+      {/* Blur Overlay Layer - Optimized for mobile */}
+      <div 
+        className="artblogs-blur-overlay"
+        style={{
+          backdropFilter: blurConfig.backdropFilter,
+          background: blurConfig.background
+        }}
+      ></div>
       
       {/* Video Logo */}
       <VideoLogo />
