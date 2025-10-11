@@ -4,12 +4,12 @@ import './ArtPartyBanner.css';
 // Continuous sliding banner for landscape images
 // Props:
 // - images: string[] of image URLs (recommended landscape)
-// - height: optional CSS size to override default aspect-ratio height
+// - height: CSS size for slide height (e.g., '260px')
 // - speedSec: number of seconds for one full loop
 // - gap: CSS size for gap between slides (e.g., '16px')
 const ArtPartyBanner = ({
   images = ['/images/og-image.jpg', '/images/twitter-card.jpg'],
-  height,
+  height = '260px',
   speedSec = 40,
   gap = '16px',
 }) => {
@@ -21,7 +21,7 @@ const ArtPartyBanner = ({
     <div
       className="ap-banner-marquee"
       style={{
-        ...(height ? { ['--ap-height']: height } : {}),
+        ['--ap-height']: height,
         ['--ap-gap']: gap,
         ['--ap-duration']: `${speedSec}s`,
       }}
