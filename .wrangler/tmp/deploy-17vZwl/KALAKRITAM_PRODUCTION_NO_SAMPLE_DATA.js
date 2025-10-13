@@ -15212,6 +15212,260 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
       }, 500);
     }
   }));
+  app2.get("/admin/tickets", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const { page = 1, limit = 10, search, status, event_id } = c.req.query();
+    try {
+      let whereConditions = [];
+      let params = [];
+      let paramIndex = 1;
+      if (status) {
+        whereConditions.push(`status = $${paramIndex++}`);
+        params.push(status);
+      }
+      if (event_id) {
+        whereConditions.push(`event_id = $${paramIndex++}`);
+        params.push(event_id);
+      }
+      if (search) {
+        whereConditions.push(`(customer_name ILIKE $${paramIndex++} OR customer_email ILIKE $${paramIndex++} OR ticket_number ILIKE $${paramIndex++})`);
+        params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+      }
+      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
+      const countQuery = `SELECT COUNT(*) as total FROM tickets ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = countResult.success ? parseInt(countResult.data[0]?.total || 0) : 0;
+      const offset = (page - 1) * limit;
+      params.push(limit, offset);
+      const query = `
+        SELECT id, ticket_number, customer_name, customer_email, customer_phone,
+               event_name, event_id, number_of_tickets, amount_paid, 
+               event_timings, venue, qr_code_url, url, status, is_verified, 
+               verified_at, verified_by, created_at, updated_at
+        FROM tickets 
+        ${whereClause}
+        ORDER BY created_at DESC 
+        LIMIT $${paramIndex++} OFFSET $${paramIndex++}
+      `;
+      const result = await db.query(query, params);
+      const tickets = result.success ? result.data : [];
+      return c.json({
+        success: true,
+        message: "Tickets fetched successfully",
+        data: tickets,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      });
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to fetch tickets",
+        error: error3.message
+      }, 500);
+    }
+  }));
+  app2.post("/admin/tickets", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const ticketData = await c.req.json();
+    try {
+      const id = crypto.randomUUID();
+      const now = (/* @__PURE__ */ new Date()).toISOString();
+      const ticketNumber = ticketData.ticket_number || `TKT-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+      const query = `
+        INSERT INTO tickets (
+          id, ticket_number, customer_name, customer_email, customer_phone,
+          event_name, event_id, number_of_tickets, amount_paid, 
+          event_timings, venue, qr_code_url, url, status, is_verified, 
+          created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+        RETURNING *
+      `;
+      const result = await db.query(query, [
+        id,
+        ticketNumber,
+        ticketData.customer_name,
+        ticketData.customer_email,
+        ticketData.customer_phone || null,
+        ticketData.event_name || null,
+        ticketData.event_id || null,
+        ticketData.number_of_tickets || 1,
+        ticketData.amount_paid || null,
+        ticketData.event_timings || null,
+        ticketData.venue || null,
+        ticketData.qr_code_url || null,
+        ticketData.url || null,
+        ticketData.status || "valid",
+        ticketData.is_verified || false,
+        now,
+        now
+      ]);
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Ticket created successfully",
+          data: result.data[0]
+        }, 201);
+      } else {
+        throw new Error("Failed to create ticket");
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to create ticket",
+        error: error3.message
+      }, 500);
+    }
+  }));
+  app2.put("/admin/tickets/:id", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const id = c.req.param("id");
+    const ticketData = await c.req.json();
+    try {
+      const now = (/* @__PURE__ */ new Date()).toISOString();
+      const query = `
+        UPDATE tickets SET
+          customer_name = $2, customer_email = $3, customer_phone = $4,
+          event_name = $5, event_id = $6, number_of_tickets = $7,
+          amount_paid = $8, event_timings = $9, venue = $10, 
+          qr_code_url = $11, url = $12, status = $13, is_verified = $14, updated_at = $15
+        WHERE id = $1
+        RETURNING *
+      `;
+      const result = await db.query(query, [
+        id,
+        ticketData.customer_name,
+        ticketData.customer_email,
+        ticketData.customer_phone || null,
+        ticketData.event_name || null,
+        ticketData.event_id || null,
+        ticketData.number_of_tickets || 1,
+        ticketData.amount_paid || null,
+        ticketData.event_timings || null,
+        ticketData.venue || null,
+        ticketData.qr_code_url || null,
+        ticketData.url || null,
+        ticketData.status || "valid",
+        ticketData.is_verified || false,
+        now
+      ]);
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Ticket updated successfully",
+          data: result.data[0]
+        });
+      } else {
+        throw new Error("Failed to update ticket or ticket not found");
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to update ticket",
+        error: error3.message
+      }, 500);
+    }
+  }));
+  app2.patch("/admin/tickets/:id", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const id = c.req.param("id");
+    const updates = await c.req.json();
+    try {
+      const now = (/* @__PURE__ */ new Date()).toISOString();
+      const updateFields = [];
+      const params = [id];
+      let paramIndex = 2;
+      if (updates.url !== void 0) {
+        updateFields.push(`url = $${paramIndex++}`);
+        params.push(updates.url);
+      }
+      if (updates.customer_name !== void 0) {
+        updateFields.push(`customer_name = $${paramIndex++}`);
+        params.push(updates.customer_name);
+      }
+      if (updates.customer_email !== void 0) {
+        updateFields.push(`customer_email = $${paramIndex++}`);
+        params.push(updates.customer_email);
+      }
+      if (updates.customer_phone !== void 0) {
+        updateFields.push(`customer_phone = $${paramIndex++}`);
+        params.push(updates.customer_phone);
+      }
+      if (updates.event_name !== void 0) {
+        updateFields.push(`event_name = $${paramIndex++}`);
+        params.push(updates.event_name);
+      }
+      if (updates.venue !== void 0) {
+        updateFields.push(`venue = $${paramIndex++}`);
+        params.push(updates.venue);
+      }
+      if (updates.amount_paid !== void 0) {
+        updateFields.push(`amount_paid = $${paramIndex++}`);
+        params.push(updates.amount_paid);
+      }
+      if (updates.status !== void 0) {
+        updateFields.push(`status = $${paramIndex++}`);
+        params.push(updates.status);
+      }
+      updateFields.push(`updated_at = $${paramIndex++}`);
+      params.push(now);
+      if (updateFields.length === 1) {
+        return c.json({
+          success: false,
+          message: "No fields to update"
+        }, 400);
+      }
+      const query = `
+        UPDATE tickets SET ${updateFields.join(", ")}
+        WHERE id = $1
+        RETURNING *
+      `;
+      const result = await db.query(query, params);
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Ticket updated successfully",
+          data: result.data[0]
+        });
+      } else {
+        throw new Error("Failed to update ticket or ticket not found");
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to update ticket",
+        error: error3.message
+      }, 500);
+    }
+  }));
+  app2.delete("/admin/tickets/:id", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const id = c.req.param("id");
+    try {
+      const query = `DELETE FROM tickets WHERE id = $1 RETURNING *`;
+      const result = await db.query(query, [id]);
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Ticket deleted successfully"
+        });
+      } else {
+        return c.json({
+          success: false,
+          message: "Ticket not found"
+        }, 404);
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to delete ticket",
+        error: error3.message
+      }, 500);
+    }
+  }));
   app2.use("/admin/*", authenticateToken);
   app2.get("/admin/dashboard", catchAsync(async (c) => {
     const db = createDatabase(c.env);
@@ -16191,6 +16445,49 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
       }, 500);
     }
   }));
+  // Public ArtParty images endpoint (no auth)
+  app2.get("/artparty/images", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    try {
+      // Ensure images table exists
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS images (
+          id UUID PRIMARY KEY,
+          title VARCHAR(255),
+          description TEXT,
+          image_url TEXT,
+          alt_text VARCHAR(255),
+          category VARCHAR(100),
+          tags JSONB DEFAULT '[]',
+          featured BOOLEAN DEFAULT false,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      const featuredOnly = c.req.query("featured");
+      const params = ["artparty"]; // $1 category
+      let where = "WHERE LOWER(category) = LOWER($1) AND image_url IS NOT NULL";
+      if (featuredOnly === "true") {
+        where += " AND featured = true";
+      }
+      const query = `
+        SELECT id, title, image_url, alt_text, featured, created_at
+        FROM images
+        ${where}
+        ORDER BY featured DESC, created_at DESC
+        LIMIT 50
+      `;
+      const result = await db.query(query, params);
+      const items = result.success ? result.data : [];
+      return c.json({
+        success: true,
+        message: "ArtParty images fetched",
+        data: items
+      });
+    } catch (error3) {
+      return c.json({ success: false, message: "Failed to fetch ArtParty images", error: error3.message }, 500);
+    }
+  }));
   app2.get("/admin/artists", catchAsync(async (c) => {
     const db = createDatabase(c.env);
     const { page = 1, limit = 10, search, featured } = c.req.query();
@@ -16565,6 +16862,229 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
       }, 500);
     }
   }));
+  // Admin Images (ArtParty Images) CRUD Endpoints
+  app2.get("/admin/images", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const { page = 1, limit = 20, search, category, featured } = c.req.query();
+    try {
+      // Ensure images table exists
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS images (
+          id UUID PRIMARY KEY,
+          title VARCHAR(255),
+          description TEXT,
+          image_url TEXT,
+          alt_text VARCHAR(255),
+          category VARCHAR(100),
+          tags JSONB DEFAULT '[]',
+          featured BOOLEAN DEFAULT false,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      let whereConditions = [];
+      let params = [];
+      let paramIndex = 1;
+      if (category) {
+        whereConditions.push(`LOWER(category) = LOWER($${paramIndex++})`);
+        params.push(category);
+      }
+      if (featured !== void 0) {
+        whereConditions.push(`featured = $${paramIndex++}`);
+        params.push(featured === "true");
+      }
+      if (search) {
+        whereConditions.push(`(title ILIKE $${paramIndex++} OR description ILIKE $${paramIndex++} OR alt_text ILIKE $${paramIndex++})`);
+        params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+      }
+      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
+      const countQuery = `SELECT COUNT(*) as total FROM images ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = countResult.success ? parseInt(countResult.data[0]?.total || 0) : 0;
+      const offset = (page - 1) * limit;
+      params.push(limit, offset);
+      const query = `
+        SELECT id, title, description, image_url, alt_text, category,
+               tags, featured, created_at, updated_at
+        FROM images
+        ${whereClause}
+        ORDER BY featured DESC, created_at DESC
+        LIMIT $${paramIndex++} OFFSET $${paramIndex++}
+      `;
+      const result = await db.query(query, params);
+      const items = result.success ? result.data : [];
+      return c.json({
+        success: true,
+        message: "Images fetched successfully",
+        data: items,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      });
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to fetch images",
+        error: error3.message
+      }, 500);
+    }
+  }));
+  app2.post("/admin/images", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const body = await c.req.json();
+    try {
+      // Ensure images table exists
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS images (
+          id UUID PRIMARY KEY,
+          title VARCHAR(255),
+          description TEXT,
+          image_url TEXT,
+          alt_text VARCHAR(255),
+          category VARCHAR(100),
+          tags JSONB DEFAULT '[]',
+          featured BOOLEAN DEFAULT false,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      const id = crypto.randomUUID();
+      const now = (new Date()).toISOString();
+      const query = `
+        INSERT INTO images (
+          id, title, description, image_url, alt_text, category,
+          tags, featured, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        RETURNING *
+      `;
+      const result = await db.query(query, [
+        id,
+        body.title || null,
+        body.description || null,
+        body.image_url || body.imageUrl || null,
+        body.altText || null,
+        body.category || 'artparty',
+        Array.isArray(body.tags) ? JSON.stringify(body.tags) : (body.tags || []),
+        body.featured || false,
+        now,
+        now
+      ]);
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Image created successfully",
+          data: result.data[0]
+        }, 201);
+      } else {
+        throw new Error("Failed to create image");
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to create image",
+        error: error3.message
+      }, 500);
+    }
+  }));
+  app2.put("/admin/images/:id", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const id = c.req.param("id");
+    const body = await c.req.json();
+    try {
+      // Ensure images table exists
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS images (
+          id UUID PRIMARY KEY,
+          title VARCHAR(255),
+          description TEXT,
+          image_url TEXT,
+          alt_text VARCHAR(255),
+          category VARCHAR(100),
+          tags JSONB DEFAULT '[]',
+          featured BOOLEAN DEFAULT false,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      const now = (new Date()).toISOString();
+      const query = `
+        UPDATE images SET
+          title = $2, description = $3, image_url = $4, alt_text = $5,
+          category = $6, tags = $7, featured = $8, updated_at = $9
+        WHERE id = $1
+        RETURNING *
+      `;
+      const result = await db.query(query, [
+        id,
+        body.title || null,
+        body.description || null,
+        body.image_url || body.imageUrl || null,
+        body.altText || null,
+        body.category || 'artparty',
+        Array.isArray(body.tags) ? JSON.stringify(body.tags) : (body.tags || []),
+        body.featured || false,
+        now
+      ]);
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Image updated successfully",
+          data: result.data[0]
+        });
+      } else {
+        throw new Error("Failed to update image or image not found");
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to update image",
+        error: error3.message
+      }, 500);
+    }
+  }));
+  app2.delete("/admin/images/:id", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const id = c.req.param("id");
+    try {
+      // Ensure images table exists
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS images (
+          id UUID PRIMARY KEY,
+          title VARCHAR(255),
+          description TEXT,
+          image_url TEXT,
+          alt_text VARCHAR(255),
+          category VARCHAR(100),
+          tags JSONB DEFAULT '[]',
+          featured BOOLEAN DEFAULT false,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      const query = `DELETE FROM images WHERE id = $1 RETURNING *`;
+      const result = await db.query(query, [id]);
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Image deleted successfully"
+        });
+      } else {
+        return c.json({
+          success: false,
+          message: "Image not found"
+        }, 404);
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to delete image",
+        error: error3.message
+      }, 500);
+    }
+  }));
   app2.get("/admin/contacts", catchAsync(async (c) => {
     const db = createDatabase(c.env);
     const { page = 1, limit = 10, search, status } = c.req.query();
@@ -16675,267 +17195,6 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
       }, 500);
     }
   }));
-  app2.get("/admin/tickets", catchAsync(async (c) => {
-    const db = createDatabase(c.env);
-    const { page = 1, limit = 10, search, status, event_id } = c.req.query();
-    try {
-      let whereConditions = [];
-      let params = [];
-      let paramIndex = 1;
-      if (status) {
-        whereConditions.push(`status = $${paramIndex++}`);
-        params.push(status);
-      }
-      if (event_id) {
-        whereConditions.push(`event_id = $${paramIndex++}`);
-        params.push(event_id);
-      }
-      if (search) {
-        whereConditions.push(`(customer_name ILIKE $${paramIndex++} OR customer_email ILIKE $${paramIndex++} OR ticket_number ILIKE $${paramIndex++})`);
-        params.push(`%${search}%`, `%${search}%`, `%${search}%`);
-      }
-      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
-      const countQuery = `SELECT COUNT(*) as total FROM tickets ${whereClause}`;
-      const countResult = await db.query(countQuery, params);
-      const total = countResult.success ? parseInt(countResult.data[0]?.total || 0) : 0;
-      const offset = (page - 1) * limit;
-      params.push(limit, offset);
-      const query = `
-        SELECT id, ticket_number, customer_name, customer_email, customer_phone,
-               event_name, event_id, number_of_tickets, amount_paid, 
-               event_timings, venue, qr_code_url, url, status, is_verified, 
-               verified_at, verified_by, created_at, updated_at
-        FROM tickets 
-        ${whereClause}
-        ORDER BY created_at DESC 
-        LIMIT $${paramIndex++} OFFSET $${paramIndex++}
-      `;
-      const result = await db.query(query, params);
-      const tickets = result.success ? result.data : [];
-      return c.json({
-        success: true,
-        message: "Tickets fetched successfully",
-        data: tickets,
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total,
-          totalPages: Math.ceil(total / limit)
-        }
-      });
-    } catch (error3) {
-      return c.json({
-        success: false,
-        message: "Failed to fetch tickets",
-        error: error3.message
-      }, 500);
-    }
-  }));
-  app2.post("/admin/tickets", catchAsync(async (c) => {
-    const db = createDatabase(c.env);
-    const ticketData = await c.req.json();
-    console.log("Received data fields:", {
-      customer_name: ticketData.customer_name,
-      customer_email: ticketData.customer_email,
-      event_name: ticketData.event_name,
-      has_data: !!ticketData.customer_name
-    });
-    try {
-      const id = crypto.randomUUID();
-      const now = (/* @__PURE__ */ new Date()).toISOString();
-      const ticketNumber = ticketData.ticket_number || `TKT-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
-      const query = `
-        INSERT INTO tickets (
-          id, ticket_number, customer_name, customer_email, customer_phone,
-          event_name, event_id, number_of_tickets, amount_paid, 
-          event_timings, venue, qr_code_url, url, status, is_verified, 
-          created_at, updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-        RETURNING *
-      `;
-      const result = await db.query(query, [
-        id,
-        ticketNumber,
-        ticketData.customer_name,
-        ticketData.customer_email,
-        ticketData.customer_phone || null,
-        ticketData.event_name || null,
-        ticketData.event_id || null,
-        ticketData.number_of_tickets || 1,
-        ticketData.amount_paid || null,
-        ticketData.event_timings || null,
-        ticketData.venue || null,
-        ticketData.qr_code_url || null,
-        ticketData.url || null,
-        ticketData.status || "valid",
-        ticketData.is_verified || false,
-        now,
-        now
-      ]);
-      if (result.success && result.data.length > 0) {
-        return c.json({
-          success: true,
-          message: "Ticket created successfully",
-          data: result.data[0]
-        }, 201);
-      } else {
-        throw new Error("Failed to create ticket");
-      }
-    } catch (error3) {
-      return c.json({
-        success: false,
-        message: "Failed to create ticket",
-        error: error3.message
-      }, 500);
-    }
-  }));
-  app2.put("/admin/tickets/:id", catchAsync(async (c) => {
-    const db = createDatabase(c.env);
-    const id = c.req.param("id");
-    const ticketData = await c.req.json();
-    try {
-      const now = (/* @__PURE__ */ new Date()).toISOString();
-      const query = `
-        UPDATE tickets SET
-          customer_name = $2, customer_email = $3, customer_phone = $4,
-          event_name = $5, event_id = $6, number_of_tickets = $7,
-          amount_paid = $8, event_timings = $9, venue = $10, 
-          qr_code_url = $11, url = $12, status = $13, is_verified = $14, updated_at = $15
-        WHERE id = $1
-        RETURNING *
-      `;
-      const result = await db.query(query, [
-        id,
-        ticketData.customer_name,
-        ticketData.customer_email,
-        ticketData.customer_phone || null,
-        ticketData.event_name || null,
-        ticketData.event_id || null,
-        ticketData.number_of_tickets || 1,
-        ticketData.amount_paid || null,
-        ticketData.event_timings || null,
-        ticketData.venue || null,
-        ticketData.qr_code_url || null,
-        ticketData.url || null,
-        ticketData.status || "valid",
-        ticketData.is_verified || false,
-        now
-      ]);
-      if (result.success && result.data.length > 0) {
-        return c.json({
-          success: true,
-          message: "Ticket updated successfully",
-          data: result.data[0]
-        });
-      } else {
-        throw new Error("Failed to update ticket or ticket not found");
-      }
-    } catch (error3) {
-      return c.json({
-        success: false,
-        message: "Failed to update ticket",
-        error: error3.message
-      }, 500);
-    }
-  }));
-  app2.delete("/admin/tickets/:id", catchAsync(async (c) => {
-    const db = createDatabase(c.env);
-    const id = c.req.param("id");
-    try {
-      const query = `DELETE FROM tickets WHERE id = $1 RETURNING *`;
-      const result = await db.query(query, [id]);
-      if (result.success && result.data.length > 0) {
-        return c.json({
-          success: true,
-          message: "Ticket deleted successfully"
-        });
-      } else {
-        return c.json({
-          success: false,
-          message: "Ticket not found"
-        }, 404);
-      }
-    } catch (error3) {
-      return c.json({
-        success: false,
-        message: "Failed to delete ticket",
-        error: error3.message
-      }, 500);
-    }
-  }));
-  app2.patch("/admin/tickets/:id/verify", catchAsync(async (c) => {
-    const db = createDatabase(c.env);
-    const id = c.req.param("id");
-    const user = c.get("user");
-    try {
-      const now = (/* @__PURE__ */ new Date()).toISOString();
-      const query = `
-        UPDATE tickets SET
-          is_verified = true, verified_at = $2, verified_by = $3, updated_at = $2
-        WHERE id = $1
-        RETURNING *
-      `;
-      const result = await db.query(query, [id, now, user.email]);
-      if (result.success && result.data.length > 0) {
-        return c.json({
-          success: true,
-          message: "Ticket verified successfully",
-          data: result.data[0]
-        });
-      } else {
-        return c.json({
-          success: false,
-          message: "Ticket not found"
-        }, 404);
-      }
-    } catch (error3) {
-      return c.json({
-        success: false,
-        message: "Failed to verify ticket",
-        error: error3.message
-      }, 500);
-    }
-  }));
-  app2.get("/admin/tickets/stats", catchAsync(async (c) => {
-    const db = createDatabase(c.env);
-    try {
-      const [
-        totalTickets,
-        verifiedTickets,
-        recentSales,
-        revenueStats
-      ] = await Promise.all([
-        db.query("SELECT COUNT(*) as count FROM tickets"),
-        db.query("SELECT COUNT(*) as count FROM tickets WHERE is_verified = true"),
-        db.query("SELECT COUNT(*) as count FROM tickets WHERE created_at >= NOW() - INTERVAL '7 days'"),
-        db.query(`
-          SELECT 
-            SUM(CAST(amount_paid AS DECIMAL)) as total_revenue,
-            COUNT(*) as total_bookings,
-            AVG(CAST(amount_paid AS DECIMAL)) as avg_ticket_price
-          FROM tickets 
-          WHERE created_at >= NOW() - INTERVAL '30 days'
-          AND amount_paid IS NOT NULL
-        `)
-      ]);
-      return c.json({
-        success: true,
-        message: "Ticket statistics fetched successfully",
-        data: {
-          total_tickets: totalTickets.success ? totalTickets.data[0].count : 0,
-          verified_tickets: verifiedTickets.success ? verifiedTickets.data[0].count : 0,
-          recent_sales: recentSales.success ? recentSales.data[0].count : 0,
-          revenue: revenueStats.success ? revenueStats.data[0] : null
-        }
-      });
-    } catch (error3) {
-      return c.json({
-        success: false,
-        message: "Failed to fetch ticket statistics",
-        error: error3.message
-      }, 500);
-    }
-  }));
 }, "setupAdminRoutes");
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_process();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_console();
@@ -16946,7 +17205,8 @@ var setupUploadRoutes = /* @__PURE__ */ __name2((app2) => {
     try {
       const formData = await c.req.formData();
       const file = formData.get("file");
-      const folder = formData.get("folder") || "general";
+  const folder = formData.get("folder") || "general";
+  const providedName = formData.get("name");
       if (!file) {
         return c.json({
           success: false,
@@ -16967,11 +17227,23 @@ var setupUploadRoutes = /* @__PURE__ */ __name2((app2) => {
           message: "File too large. Maximum size is 5MB"
         }, 400);
       }
-      const validFolders = ["artworks", "workshops", "events", "artists", "blogs", "general"];
+      // Allow specific folders, including ArtParty images
+      const validFolders = ["artworks", "workshops", "events", "artists", "blogs", "images", "artparty", "artpartyimages", "general"];
       const sanitizedFolder = validFolders.includes(folder) ? folder : "general";
       const timestamp = Date.now();
       const fileExtension = file.name.split(".").pop();
-      const filename = `${sanitizedFolder}/${timestamp}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
+      // Optional name-based filename
+      let filename;
+      if (providedName && typeof providedName === "string" && providedName.trim().length > 0) {
+        const base = providedName
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "")
+          .substring(0, 80);
+        filename = `${sanitizedFolder}/${base}-${timestamp}.${fileExtension}`;
+      } else {
+        filename = `${sanitizedFolder}/${timestamp}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
+      }
       if (c.env.R2_BUCKET) {
         try {
           await c.env.R2_BUCKET.put(filename, file.stream(), {

@@ -67,9 +67,9 @@ const Footer = () => {
         <div className="footer-bottom-content">
           <p className="copyright">© 2025 Kalakritam. All rights reserved.</p>
           <div className="footer-legal">
-            <a href="#privacy">Privacy Policy</a>
+            <button className="footer-nav-btn" onClick={() => navigateWithLoading('/privacy')}>Privacy Policy</button>
             <span className="separator">|</span>
-            <a href="#terms">Terms of Service</a>
+            <button className="footer-nav-btn" onClick={() => navigateWithLoading('/terms')}>Terms of Service</button>
           </div>
         </div>
       </div>

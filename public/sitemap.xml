@@ -70,6 +70,22 @@
     <priority>0.6</priority>
   </url>
 
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://kalakritam.in/privacy</loc>
+    <lastmod>2025-10-13</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+
+  <!-- Terms of Service -->
+  <url>
+    <loc>https://kalakritam.in/terms</loc>
+    <lastmod>2025-10-13</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+
   <!-- Blog Section -->
   <url>
     <loc>https://kalakritam.in/blogs</loc>

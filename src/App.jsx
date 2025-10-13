@@ -91,6 +91,22 @@ const ArtParty = React.lazy(() => {
   });
 });
 
+const PrivacyPolicy = React.lazy(() => {
+  const measure = measureLazyLoadTime('PrivacyPolicy');
+  return import('./components/PrivacyPolicy').then(module => {
+    measure();
+    return module;
+  });
+});
+
+const TermsOfService = React.lazy(() => {
+  const measure = measureLazyLoadTime('TermsOfService');
+  return import('./components/TermsOfService').then(module => {
+    measure();
+    return module;
+  });
+});
+
 const AdminLogin = React.lazy(() => {
   const measure = measureLazyLoadTime('AdminLogin');
   return import('./components/AdminLogin').then(module => {
@@ -378,6 +394,8 @@ const AppContent = () => {
                   <Route path="/events" element={<Events />} />
                   <Route path="/artblogs" element={<ArtBlogs />} />
                   <Route path="/artparty" element={<ArtParty />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
                   
                   {/* Demo Routes (for development/testing) */}
                   <Route path="/toast-demo" element={<ToastDemo />} />

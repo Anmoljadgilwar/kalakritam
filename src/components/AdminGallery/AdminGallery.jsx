@@ -29,7 +29,6 @@ const AdminGallery = () => {
     category: '',
     imageUrl: '',
     available: true,
-    featured: false,
     // SEO fields
     metaTitle: '',
     metaDescription: '',
@@ -79,7 +78,6 @@ const AdminGallery = () => {
       category: '',
       imageUrl: '',
       available: true,
-      featured: false
     });
     setImageFile(null);
     setModalMode('create');
@@ -98,7 +96,6 @@ const AdminGallery = () => {
       category: artwork.category || '',
       imageUrl: artwork.imageUrl || '',
       available: artwork.available !== false,
-      featured: artwork.featured || false,
       // SEO fields
       metaTitle: artwork.metaTitle || '',
       metaDescription: artwork.metaDescription || '',
@@ -186,11 +183,11 @@ const AdminGallery = () => {
         
         // Image fields (now with actual R2 URL)
         image_url: imageUrl || null,
+  imageUrl: imageUrl || null,
         thumbnail_url: null, // We don't handle thumbnails yet
         
         // Status fields
         available: formData.available !== false,
-        featured: formData.featured || false,
         
         // SEO/Meta fields
         meta_title: formData.metaTitle || (formData.title ? `${formData.title} - Original Artwork | Kalakritam` : null),
@@ -319,7 +316,6 @@ const AdminGallery = () => {
             </button>
             <div className="gallery-stats">
               <span className="stat">Total: {artworks.length}</span>
-              <span className="stat">Featured: {artworks.filter(a => a.featured).length}</span>
             </div>
           </div>
         </section>
@@ -368,7 +364,6 @@ const AdminGallery = () => {
                     <td>
                       <div className="status-badges">
                         {artwork.available && <span className="status-badge available">Available</span>}
-                        {artwork.featured && <span className="status-badge featured">Featured</span>}
                       </div>
                     </td>
                     <td>
@@ -604,18 +599,6 @@ const AdminGallery = () => {
                           onChange={handleInputChange}
                         />
                         Available for Purchase
-                      </label>
-                    </div>
-                    
-                    <div className="form-group">
-                      <label className="checkbox-label">
-                        <input
-                          type="checkbox"
-                          name="featured"
-                          checked={formData.featured}
-                          onChange={handleInputChange}
-                        />
-                        Featured Artwork
                       </label>
                     </div>
                   </div>
