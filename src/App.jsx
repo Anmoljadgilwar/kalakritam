@@ -9,6 +9,7 @@ import { measureLazyLoadTime } from './hooks/usePerformanceTracking'
 import { seoManager } from './utils/seoManager.js'
 import useServerConnection from './hooks/useServerConnection.js'
 import './App.css'
+import ScrollToTop from './components/ScrollToTop.jsx'
 
 // Lazy load all components for better performance with performance tracking
 const IntroVideo = React.lazy(() => {
@@ -190,6 +191,15 @@ const AdminArtPartyImages = React.lazy(() => {
 const ToastDemo = React.lazy(() => {
   const measure = measureLazyLoadTime('ToastDemo');
   return import('./components/ToastDemo').then(module => {
+    measure();
+    return module;
+  });
+});
+
+// Artwork detail dynamic page
+const ArtworkDetail = React.lazy(() => {
+  const measure = measureLazyLoadTime('ArtworkDetail');
+  return import('./components/ArtworkDetail/ArtworkDetail.jsx').then(module => {
     measure();
     return module;
   });
@@ -380,12 +390,14 @@ const AppContent = () => {
             />
           </div>
           <div className="app-content">
+            <ScrollToTop behavior="auto" />
             <LazyLoadingErrorBoundary>
               <Suspense fallback={<LazyLoadingFallback />}>
                 <Routes>
                   <Route path="/" element={<IntroVideo />} />
                   <Route path="/home" element={<Home />} />
                   <Route path="/gallery" element={<Gallery />} />
+                  <Route path="/gallery/:slug" element={<ArtworkDetail />} />
                   <Route path="/workshops" element={<Workshops />} />
                   <Route path="/artists" element={<Artists />} />
                   <Route path="/arts" element={<Navigate to="/artists" replace />} />
