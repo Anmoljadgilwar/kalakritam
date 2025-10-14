@@ -29,6 +29,13 @@ const Workshops = () => {
   const [error, setError] = useState(null);
   const fetchCalled = useRef(false);
   
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const itemsPerPage = 6;
+  
   // Mobile optimization states
   const [isMobile, setIsMobile] = useState(shouldOptimizeForMobile());
   const [particleConfig, setParticleConfig] = useState(getMobileParticleConfig());
@@ -84,13 +91,17 @@ const Workshops = () => {
     }
   }, []);
 
-  const fetchWorkshops = async () => {
+  const fetchWorkshops = async (page = 1, append = false) => {
     try {
-      setLoading(true);
-      const loadingId = toast.dataLoading('Loading workshops...');
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+      const loadingId = toast.dataLoading(append ? 'Loading more workshops...' : 'Loading workshops...');
       
-      console.log('Fetching workshops from:', `${config.apiBaseUrl}/workshops`);
-      const response = await fetch(`${config.apiBaseUrl}/workshops`);
+      console.log('Fetching workshops from:', `${config.apiBaseUrl}/workshops?page=${page}&limit=${itemsPerPage}`);
+      const response = await fetch(`${config.apiBaseUrl}/workshops?page=${page}&limit=${itemsPerPage}`);
       console.log('Response status:', response.status);
       const data = await response.json();
       console.log('Response data:', data);
@@ -98,7 +109,19 @@ const Workshops = () => {
       toast.dismiss(loadingId);
       
       if (data.success) {
-        setWorkshops(data.data);
+        if (append) {
+          setWorkshops(prev => [...prev, ...data.data]);
+        } else {
+          setWorkshops(data.data);
+        }
+        
+        // Update pagination info
+        if (data.pagination) {
+          setCurrentPage(data.pagination.page);
+          setTotalPages(data.pagination.totalPages);
+          setTotalItems(data.pagination.total || 0);
+        }
+        
         toast.dataLoaded(`Loaded ${data.data.length} workshops`);
       } else {
         setError('Failed to load workshops');
@@ -110,6 +133,13 @@ const Workshops = () => {
       toast.serverError('Failed to connect to server');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const loadMore = () => {
+    if (currentPage < totalPages && !loadingMore) {
+      fetchWorkshops(currentPage + 1, true);
     }
   };
 
@@ -299,6 +329,74 @@ const Workshops = () => {
                   Show All Workshops
                 </button>
               </div>
+            </div>
+          )}
+          
+          {/* Load More Button */}
+          {currentPage < totalPages && (
+            <div className="load-more-container" style={{ 
+              textAlign: 'center', 
+              margin: '4rem 0 3rem 0',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '1rem'
+            }}>
+              <button 
+                className="load-more-btn"
+                onClick={loadMore}
+                disabled={loadingMore}
+                style={{
+                  position: 'relative',
+                  padding: '1rem 2.5rem',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  color: '#1a1a1a',
+                  background: loadingMore 
+                    ? 'linear-gradient(135deg, #8a6a15 0%, #b89560 100%)'
+                    : 'linear-gradient(135deg, #c38f21 0%, #d4af85 100%)',
+                  border: '2px solid rgba(195, 143, 33, 0.3)',
+                  borderRadius: '50px',
+                  cursor: loadingMore ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: loadingMore 
+                    ? '0 4px 15px rgba(195, 143, 33, 0.2)'
+                    : '0 6px 25px rgba(195, 143, 33, 0.4)',
+                  transform: loadingMore ? 'scale(0.98)' : 'scale(1)',
+                  overflow: 'hidden',
+                  letterSpacing: '0.5px',
+                  textTransform: 'uppercase'
+                }}
+                onMouseEnter={(e) => !loadingMore && (e.target.style.transform = 'scale(1.05)', e.target.style.boxShadow = '0 8px 30px rgba(195, 143, 33, 0.5)')}
+                onMouseLeave={(e) => !loadingMore && (e.target.style.transform = 'scale(1)', e.target.style.boxShadow = '0 6px 25px rgba(195, 143, 33, 0.4)')}
+              >
+                {loadingMore ? (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{
+                      display: 'inline-block',
+                      width: '16px',
+                      height: '16px',
+                      border: '3px solid #1a1a1a',
+                      borderTopColor: 'transparent',
+                      borderRadius: '50%',
+                      animation: 'spin 0.8s linear infinite'
+                    }}></span>
+                    Loading...
+                  </span>
+                ) : (
+                  `Load More Workshops`
+                )}
+              </button>
+              {!loadingMore && (
+                <div style={{
+                  fontSize: '0.9rem',
+                  color: '#d4af85',
+                  fontWeight: '500',
+                  opacity: 0.8
+                }}>
+                  Showing {workshops.length} of {totalItems} workshops • Page {currentPage} of {totalPages}
+                </div>
+              )}
             </div>
           )}
         </main>

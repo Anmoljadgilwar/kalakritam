@@ -124,7 +124,8 @@ const ArtworkDetail = () => {
         }
         
         const loadingId = toast.dataLoading('Loading artwork...');
-        const res = await fetch(`${config.apiBaseUrl}/gallery`);
+        // Fetch all artworks with a high limit to ensure we get the one we're looking for
+        const res = await fetch(`${config.apiBaseUrl}/gallery?limit=1000`);
         const data = await res.json();
         toast.dismiss(loadingId);
         

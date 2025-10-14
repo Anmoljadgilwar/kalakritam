@@ -14071,7 +14071,7 @@ var setupGalleryRoutes = /* @__PURE__ */ __name2((app2) => {
   app2.get("/gallery", optionalAuth, catchAsync(async (c) => {
     try {
       const page = parseInt(c.req.query("page")) || 1;
-      const limit = parseInt(c.req.query("limit")) || 12;
+      const limit = parseInt(c.req.query("limit")) || 6;
       const category = c.req.query("category");
       const search = c.req.query("search");
       const isAuthenticated = c.get("isAuthenticated");
@@ -14213,7 +14213,7 @@ var setupEventsRoutes = /* @__PURE__ */ __name2((app2) => {
   app2.get("/events", optionalAuth, catchAsync(async (c) => {
     try {
       const page = parseInt(c.req.query("page")) || 1;
-      const limit = parseInt(c.req.query("limit")) || 10;
+      const limit = parseInt(c.req.query("limit")) || 6;
       const upcoming = c.req.query("upcoming") === "true";
       const search = c.req.query("search");
       const offset = (page - 1) * limit;
@@ -14352,7 +14352,7 @@ var setupWorkshopsRoutes = /* @__PURE__ */ __name2((app2) => {
   app2.get("/workshops", optionalAuth, catchAsync(async (c) => {
     try {
       const page = parseInt(c.req.query("page")) || 1;
-      const limit = parseInt(c.req.query("limit")) || 10;
+      const limit = parseInt(c.req.query("limit")) || 6;
       const search = c.req.query("search");
       const upcoming = c.req.query("upcoming") === "true";
       const offset = (page - 1) * limit;
@@ -14491,7 +14491,7 @@ var setupArtistsRoutes = /* @__PURE__ */ __name2((app2) => {
   app2.get("/artists", optionalAuth, catchAsync(async (c) => {
     try {
       const page = parseInt(c.req.query("page")) || 1;
-      const limit = parseInt(c.req.query("limit")) || 10;
+      const limit = parseInt(c.req.query("limit")) || 6;
       const featured = c.req.query("featured") === "true";
       const offset = (page - 1) * limit;
       const db = createDatabase(c.env);
@@ -15885,7 +15885,7 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
   }));
   app2.get("/admin/gallery", catchAsync(async (c) => {
     const db = createDatabase(c.env);
-    const { page = 1, limit = 10, search } = c.req.query();
+    const { page = 1, limit = 6, search } = c.req.query();
     try {
       let whereConditions = [];
       let params = [];
@@ -16065,7 +16065,7 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
   }));
   app2.get("/admin/events", catchAsync(async (c) => {
     const db = createDatabase(c.env);
-    const { page = 1, limit = 10, search, featured } = c.req.query();
+    const { page = 1, limit = 6, search, featured } = c.req.query();
     try {
       let whereConditions = [];
       let params = [];
@@ -16252,7 +16252,7 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
   }));
   app2.get("/admin/workshops", catchAsync(async (c) => {
     const db = createDatabase(c.env);
-    const { page = 1, limit = 10, search } = c.req.query();
+    const { page = 1, limit = 6, search } = c.req.query();
     try {
       let whereConditions = [];
       let params = [];
@@ -16482,7 +16482,7 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
   }));
   app2.get("/admin/artists", catchAsync(async (c) => {
     const db = createDatabase(c.env);
-    const { page = 1, limit = 10, search, featured } = c.req.query();
+    const { page = 1, limit = 6, search, featured } = c.req.query();
     try {
       let whereConditions = [];
       let params = [];

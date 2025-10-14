@@ -21,6 +21,12 @@ const Artists = () => {
   const [error, setError] = useState(null);
   const fetchCalled = useRef(false);
   
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const itemsPerPage = 6;
+  
   // Mobile optimizations
   const { particleConfig, networkOptimizations, getOptimizedImageUrl, trackImageLoad, setTotalImages } = useMobileOptimizations('artists');
   const [blurConfig, setBlurConfig] = useState(getMobileBlurConfig());
@@ -32,18 +38,33 @@ const Artists = () => {
     }
   }, []);
 
-  const fetchArtists = async () => {
+  const fetchArtists = async (page = 1, append = false) => {
     try {
-      setLoading(true);
-      const loadingId = toast.dataLoading('Loading artists...');
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+      const loadingId = toast.dataLoading(append ? 'Loading more artists...' : 'Loading artists...');
       
-      const response = await fetch(`${config.apiBaseUrl}/artists`);
+      const response = await fetch(`${config.apiBaseUrl}/artists?page=${page}&limit=${itemsPerPage}`);
       const data = await response.json();
       
       toast.dismiss(loadingId);
       
       if (data.success) {
-        setArtists(data.data);
+        if (append) {
+          setArtists(prev => [...prev, ...data.data]);
+        } else {
+          setArtists(data.data);
+        }
+        
+        // Update pagination info
+        if (data.pagination) {
+          setCurrentPage(data.pagination.page);
+          setTotalPages(data.pagination.totalPages);
+        }
+        
         toast.dataLoaded(`Loaded ${data.data.length} artists`);
       } else {
         setError('Failed to load artists');
@@ -55,6 +76,13 @@ const Artists = () => {
       toast.serverError('Failed to connect to server');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const loadMore = () => {
+    if (currentPage < totalPages && !loadingMore) {
+      fetchArtists(currentPage + 1, true);
     }
   };
 
@@ -237,6 +265,31 @@ const Artists = () => {
                   Show All Artists
                 </button>
               </div>
+            </div>
+          )}
+          
+          {/* Load More Button */}
+          {currentPage < totalPages && (
+            <div className="load-more-container" style={{ textAlign: 'center', margin: '3rem 0' }}>
+              <button 
+                className="load-more-btn"
+                onClick={loadMore}
+                disabled={loadingMore}
+                style={{
+                  padding: '1rem 3rem',
+                  fontSize: '1.1rem',
+                  fontWeight: '600',
+                  color: '#1a1a1a',
+                  background: 'linear-gradient(135deg, #c38f21 0%, #d4af85 100%)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: loadingMore ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease',
+                  opacity: loadingMore ? 0.6 : 1
+                }}
+              >
+                {loadingMore ? 'Loading...' : `Load More (${currentPage} / ${totalPages})`}
+              </button>
             </div>
           )}
         </main>

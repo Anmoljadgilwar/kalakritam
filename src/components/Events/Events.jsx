@@ -20,6 +20,13 @@ const Events = () => {
   const [error, setError] = useState(null);
   const fetchCalled = useRef(false);
   
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const itemsPerPage = 6;
+  
   // Mobile optimizations
   const { particleConfig, networkOptimizations } = useMobileOptimizations('events');
   const [blurConfig, setBlurConfig] = useState(getMobileBlurConfig());
@@ -31,12 +38,16 @@ const Events = () => {
     }
   }, []);
 
-  const fetchEvents = async () => {
+  const fetchEvents = async (page = 1, append = false) => {
     try {
-      setLoading(true);
-      const loadingId = toast.dataLoading('Loading events...');
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+      const loadingId = toast.dataLoading(append ? 'Loading more events...' : 'Loading events...');
       
-      const response = await fetch(`${config.apiBaseUrl}/events`);
+      const response = await fetch(`${config.apiBaseUrl}/events?page=${page}&limit=${itemsPerPage}`);
       const data = await response.json();
       
       toast.dismiss(loadingId);
@@ -47,7 +58,20 @@ const Events = () => {
           ...event,
           imageUrl: config.transformImageUrl(event.image_url || event.imageUrl)
         }));
-        setEvents(transformedData);
+        
+        if (append) {
+          setEvents(prev => [...prev, ...transformedData]);
+        } else {
+          setEvents(transformedData);
+        }
+        
+        // Update pagination info
+        if (data.pagination) {
+          setCurrentPage(data.pagination.page);
+          setTotalPages(data.pagination.totalPages);
+          setTotalItems(data.pagination.total || 0);
+        }
+        
         toast.dataLoaded(`Loaded ${transformedData.length} events`);
       } else {
         setError('Failed to load events');
@@ -59,6 +83,13 @@ const Events = () => {
       toast.serverError('Failed to connect to server');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const loadMore = () => {
+    if (currentPage < totalPages && !loadingMore) {
+      fetchEvents(currentPage + 1, true);
     }
   };
 
@@ -204,6 +235,74 @@ const Events = () => {
                 </div>
               ))}
             </div>
+            
+            {/* Load More Button */}
+            {currentPage < totalPages && (
+              <div className="load-more-container" style={{ 
+                textAlign: 'center', 
+                margin: '4rem 0 3rem 0',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <button 
+                  className="load-more-btn"
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  style={{
+                    position: 'relative',
+                    padding: '1rem 2.5rem',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    color: '#1a1a1a',
+                    background: loadingMore 
+                      ? 'linear-gradient(135deg, #8a6a15 0%, #b89560 100%)'
+                      : 'linear-gradient(135deg, #c38f21 0%, #d4af85 100%)',
+                    border: '2px solid rgba(195, 143, 33, 0.3)',
+                    borderRadius: '50px',
+                    cursor: loadingMore ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: loadingMore 
+                      ? '0 4px 15px rgba(195, 143, 33, 0.2)'
+                      : '0 6px 25px rgba(195, 143, 33, 0.4)',
+                    transform: loadingMore ? 'scale(0.98)' : 'scale(1)',
+                    overflow: 'hidden',
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase'
+                  }}
+                  onMouseEnter={(e) => !loadingMore && (e.target.style.transform = 'scale(1.05)', e.target.style.boxShadow = '0 8px 30px rgba(195, 143, 33, 0.5)')}
+                  onMouseLeave={(e) => !loadingMore && (e.target.style.transform = 'scale(1)', e.target.style.boxShadow = '0 6px 25px rgba(195, 143, 33, 0.4)')}
+                >
+                  {loadingMore ? (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{
+                        display: 'inline-block',
+                        width: '16px',
+                        height: '16px',
+                        border: '3px solid #1a1a1a',
+                        borderTopColor: 'transparent',
+                        borderRadius: '50%',
+                        animation: 'spin 0.8s linear infinite'
+                      }}></span>
+                      Loading...
+                    </span>
+                  ) : (
+                    `Load More Events`
+                  )}
+                </button>
+                {!loadingMore && (
+                  <div style={{
+                    fontSize: '0.9rem',
+                    color: '#d4af85',
+                    fontWeight: '500',
+                    opacity: 0.8
+                  }}>
+                    Showing {events.length} of {totalItems} events • Page {currentPage} of {totalPages}
+                  </div>
+                )}
+              </div>
+            )}
           </section>
         )}
 

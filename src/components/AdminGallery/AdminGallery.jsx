@@ -18,6 +18,12 @@ const AdminGallery = () => {
   const [modalMode, setModalMode] = useState('view'); // 'view', 'create', 'edit'
   const [selectedArtwork, setSelectedArtwork] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const itemsPerPage = 6;
   const [formData, setFormData] = useState({
     title: '',
     artist: '',
@@ -43,10 +49,15 @@ const AdminGallery = () => {
     fetchArtworks();
   }, []);
 
-  const fetchArtworks = async () => {
+  const fetchArtworks = async (page = 1, append = false) => {
     try {
-      setLoading(true);
-  const response = await galleryApi.getArtworks({ limit: 1000 });
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+      
+      const response = await galleryApi.getArtworks({ page, limit: itemsPerPage });
       
       if (response.success) {
         // Transform image URLs to handle localhost URLs
@@ -54,7 +65,18 @@ const AdminGallery = () => {
           ...artwork,
           imageUrl: config.transformImageUrl(artwork.image_url || artwork.imageUrl)
         }));
-        setArtworks(transformedData);
+        
+        if (append) {
+          setArtworks(prev => [...prev, ...transformedData]);
+        } else {
+          setArtworks(transformedData);
+        }
+        
+        // Update pagination info
+        if (response.pagination) {
+          setCurrentPage(response.pagination.page);
+          setTotalPages(response.pagination.totalPages);
+        }
       } else {
         setError('Failed to load artworks');
       }
@@ -63,6 +85,13 @@ const AdminGallery = () => {
       setError('Failed to connect to server');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const loadMore = () => {
+    if (currentPage < totalPages && !loadingMore) {
+      fetchArtworks(currentPage + 1, true);
     }
   };
 
@@ -400,6 +429,31 @@ const AdminGallery = () => {
               </tbody>
             </table>
           </div>
+          
+          {/* Load More Button */}
+          {currentPage < totalPages && (
+            <div className="load-more-container" style={{ textAlign: 'center', margin: '2rem 0' }}>
+              <button 
+                className="load-more-btn"
+                onClick={loadMore}
+                disabled={loadingMore}
+                style={{
+                  padding: '0.8rem 2.5rem',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  color: '#1a1a1a',
+                  background: 'linear-gradient(135deg, #c38f21 0%, #d4af85 100%)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: loadingMore ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease',
+                  opacity: loadingMore ? 0.6 : 1
+                }}
+              >
+                {loadingMore ? 'Loading...' : `Load More (${currentPage} / ${totalPages})`}
+              </button>
+            </div>
+          )}
         </section>
       </main>
 

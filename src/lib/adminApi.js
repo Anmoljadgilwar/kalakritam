@@ -112,7 +112,10 @@ export const galleryApi = {
 
 // Workshops API functions
 export const workshopsApi = {
-  getAll: () => apiCall('admin/workshops'),
+  getAll: ({ page = 1, limit = 1000 } = {}) => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    return apiCall(`admin/workshops?${params.toString()}`);
+  },
   create: (workshop) => apiCall('admin/workshops', 'POST', workshop),
   update: async (id, workshop) => {
     // If there's an old image and a new one, delete the old one
@@ -171,7 +174,10 @@ export const workshopsApi = {
 
 // Events API functions
 export const eventsApi = {
-  getAll: () => apiCall('admin/events'),
+  getAll: ({ page = 1, limit = 1000 } = {}) => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    return apiCall(`admin/events?${params.toString()}`);
+  },
   addEvent: (event) => apiCall('admin/events', 'POST', event),
   updateEvent: async (id, event) => {
     // If there's an old image and a new one, delete the old one
@@ -230,7 +236,10 @@ export const eventsApi = {
 
 // Artists API functions
 export const artistsApi = {
-  getAll: () => apiCall('admin/artists'),
+  getAll: ({ page = 1, limit = 1000 } = {}) => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    return apiCall(`admin/artists?${params.toString()}`);
+  },
   create: (artist) => apiCall('admin/artists', 'POST', artist),
   update: async (id, artist) => {
     // If there's an old image and a new one, delete the old one
