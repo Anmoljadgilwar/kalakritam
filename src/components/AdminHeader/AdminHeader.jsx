@@ -12,8 +12,9 @@ const AdminHeader = ({ currentPage = 'portal' }) => {
 
   const adminNavItems = [
     { path: '/admin/portal', label: 'Dashboard', icon: '🏠' },
+    { path: '/admin/hero-banners', label: 'Hero Banners', icon: '🎬' },
     { path: '/admin/gallery', label: 'Gallery', icon: '🖼️' },
-  { path: '/admin/artpartyimages', label: 'ArtParty Images', icon: '🗂️' },
+    { path: '/admin/artpartyimages', label: 'ArtParty Images', icon: '🗂️' },
     { path: '/admin/workshops', label: 'Workshops', icon: '🎨' },
     { path: '/admin/events', label: 'Events', icon: '📅' },
     { path: '/admin/artists', label: 'Artists', icon: '👨‍🎨' },

@@ -148,6 +148,14 @@ const AdminWorkshops = React.lazy(() => {
   });
 });
 
+const AdminHeroBanners = React.lazy(() => {
+  const measure = measureLazyLoadTime('AdminHeroBanners');
+  return import('./components/AdminHeroBanners').then(module => {
+    measure();
+    return module;
+  });
+});
+
 const AdminEvents = React.lazy(() => {
   const measure = measureLazyLoadTime('AdminEvents');
   return import('./components/AdminEvents').then(module => {
@@ -432,6 +440,7 @@ const AppContent = () => {
                   <Route path="/admin/contact" element={<AdminContact />} />
                   <Route path="/admin/tickets" element={<AdminTickets />} />
                   <Route path="/admin/artpartyimages" element={<AdminArtPartyImages />} />
+                  <Route path="/admin/hero-banners" element={<AdminHeroBanners />} />
                   
                   {/* Public Ticket Verification Routes */}
                   <Route path="/verify-ticket/:ticketId" element={<TicketVerification />} />

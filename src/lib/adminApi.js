@@ -836,3 +836,27 @@ export const authApi = {
     return localStorage.getItem('adminToken') !== null;
   }
 };
+
+// Hero Banners API functions
+export const heroBannersApi = {
+  getAll: ({ page = 1, limit = 20 } = {}) => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    return apiCall(`admin/hero-banners?${params}`);
+  },
+
+  getActive: () => {
+    return apiCall('hero-banners');
+  },
+
+  create: (bannerData) => {
+    return apiCall('admin/hero-banners', 'POST', bannerData);
+  },
+
+  update: (id, bannerData) => {
+    return apiCall(`admin/hero-banners/${id}`, 'PUT', bannerData);
+  },
+
+  delete: (id) => {
+    return apiCall(`admin/hero-banners/${id}`, 'DELETE');
+  }
+};

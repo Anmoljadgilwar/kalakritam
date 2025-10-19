@@ -17207,22 +17207,24 @@ var setupUploadRoutes = /* @__PURE__ */ __name2((app2) => {
           message: "No file provided"
         }, 400);
       }
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp", "video/mp4", "video/webm", "video/quicktime"];
       if (!allowedTypes.includes(file.type)) {
         return c.json({
           success: false,
-          message: "Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed"
+          message: "Invalid file type. Only JPEG, PNG, GIF, WebP images and MP4, WebM videos are allowed"
         }, 400);
       }
-      const maxSize = 5 * 1024 * 1024;
+      // Different max size for images (5MB) and videos (50MB)
+      const isVideo = file.type.startsWith('video/');
+      const maxSize = isVideo ? 50 * 1024 * 1024 : 5 * 1024 * 1024;
       if (file.size > maxSize) {
         return c.json({
           success: false,
-          message: "File too large. Maximum size is 5MB"
+          message: `File too large. Maximum size is ${isVideo ? '50MB' : '5MB'}`
         }, 400);
       }
-      // Allow specific folders, including ArtParty images
-      const validFolders = ["artworks", "workshops", "events", "artists", "blogs", "images", "artparty", "artpartyimages", "general"];
+      // Allow specific folders, including hero-banners
+      const validFolders = ["artworks", "workshops", "events", "artists", "blogs", "images", "artparty", "artpartyimages", "hero-banners", "general"];
       const sanitizedFolder = validFolders.includes(folder) ? folder : "general";
       const timestamp = Date.now();
       const fileExtension = file.name.split(".").pop();
@@ -17984,6 +17986,201 @@ app.get("/test-db", async (c) => {
     }, 500);
   }
 });
+
+// Hero Banners Routes
+var setupHeroBannersRoutes = /* @__PURE__ */ __name2((app2) => {
+  // Get all active hero banners (public)
+  app2.get("/hero-banners", optionalAuth, catchAsync(async (c) => {
+    try {
+      const db = createDatabase(c.env);
+      const query = `
+        SELECT id, title, media_type, media_url, link_url, order_index, active, created_at, updated_at
+        FROM hero_banners 
+        WHERE active = true
+        ORDER BY order_index ASC
+      `;
+      const result = await db.query(query);
+      
+      if (!result.success) {
+        throw new Error(result.error || "Database query failed");
+      }
+      
+      const banners = result.data || [];
+      
+      return c.json({
+        success: true,
+        message: "Hero banners fetched successfully",
+        data: banners
+      });
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to fetch hero banners",
+        error: error3.message
+      }, 500);
+    }
+  }));
+
+  // Get all hero banners (admin)
+  app2.get("/admin/hero-banners", authenticateToken, catchAsync(async (c) => {
+    try {
+      const db = createDatabase(c.env);
+      const { page = 1, limit = 20 } = c.req.query();
+      
+      const offset = (page - 1) * limit;
+      const countQuery = `SELECT COUNT(*) as total FROM hero_banners`;
+      const countResult = await db.query(countQuery);
+      const total = countResult.success ? parseInt(countResult.data[0]?.total || 0) : 0;
+      
+      const query = `
+        SELECT id, title, media_type, media_url, link_url, order_index, active, created_at, updated_at
+        FROM hero_banners 
+        ORDER BY order_index ASC, created_at DESC
+        LIMIT $1 OFFSET $2
+      `;
+      const result = await db.query(query, [limit, offset]);
+      const banners = result.success ? result.data : [];
+      
+      return c.json({
+        success: true,
+        message: "Hero banners fetched successfully",
+        data: banners,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      });
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to fetch hero banners",
+        error: error3.message
+      }, 500);
+    }
+  }));
+
+  // Create hero banner (admin)
+  app2.post("/admin/hero-banners", authenticateToken, catchAsync(async (c) => {
+    try {
+      const db = createDatabase(c.env);
+      const bannerData = await c.req.json();
+      const id = crypto.randomUUID();
+      const now = (/* @__PURE__ */ new Date()).toISOString();
+      
+      const query = `
+        INSERT INTO hero_banners (
+          id, title, media_type, media_url, link_url, order_index, active, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING *
+      `;
+      
+      const result = await db.query(query, [
+        id,
+        bannerData.title || null,
+        bannerData.media_type || 'image',
+        bannerData.media_url || null,
+        bannerData.link_url || null,
+        bannerData.order_index || 0,
+        bannerData.active !== false,
+        now,
+        now
+      ]);
+      
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Hero banner created successfully",
+          data: result.data[0]
+        }, 201);
+      } else {
+        throw new Error("Failed to create hero banner");
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to create hero banner",
+        error: error3.message
+      }, 500);
+    }
+  }));
+
+  // Update hero banner (admin)
+  app2.put("/admin/hero-banners/:id", authenticateToken, catchAsync(async (c) => {
+    try {
+      const db = createDatabase(c.env);
+      const id = c.req.param("id");
+      const bannerData = await c.req.json();
+      const now = (/* @__PURE__ */ new Date()).toISOString();
+      
+      const query = `
+        UPDATE hero_banners SET
+          title = $2, media_type = $3, media_url = $4, link_url = $5,
+          order_index = $6, active = $7, updated_at = $8
+        WHERE id = $1
+        RETURNING *
+      `;
+      
+      const result = await db.query(query, [
+        id,
+        bannerData.title || null,
+        bannerData.media_type || 'image',
+        bannerData.media_url || null,
+        bannerData.link_url || null,
+        bannerData.order_index || 0,
+        bannerData.active !== false,
+        now
+      ]);
+      
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Hero banner updated successfully",
+          data: result.data[0]
+        });
+      } else {
+        throw new Error("Failed to update hero banner or banner not found");
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to update hero banner",
+        error: error3.message
+      }, 500);
+    }
+  }));
+
+  // Delete hero banner (admin)
+  app2.delete("/admin/hero-banners/:id", authenticateToken, catchAsync(async (c) => {
+    try {
+      const db = createDatabase(c.env);
+      const id = c.req.param("id");
+      
+      const query = `DELETE FROM hero_banners WHERE id = $1 RETURNING *`;
+      const result = await db.query(query, [id]);
+      
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Hero banner deleted successfully"
+        });
+      } else {
+        return c.json({
+          success: false,
+          message: "Hero banner not found"
+        }, 404);
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to delete hero banner",
+        error: error3.message
+      }, 500);
+    }
+  }));
+}, "setupHeroBannersRoutes");
+
 setupAuthRoutes(app);
 setupGalleryRoutes(app);
 setupEventsRoutes(app);
@@ -17992,6 +18189,7 @@ setupArtistsRoutes(app);
 setupBlogsRoutes(app);
 setupContactRoutes(app);
 setupTicketsRoutes(app);
+setupHeroBannersRoutes(app);
 setupAdminRoutes(app);
 setupUploadRoutes(app);
 setupImageRoutes(app);

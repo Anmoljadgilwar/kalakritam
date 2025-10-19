@@ -3,7 +3,7 @@ import AdminHeader from '../AdminHeader';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import AdminLoading from '../AdminLoading';
-import { galleryApi, workshopsApi, eventsApi, artistsApi } from '../../lib/adminApi';
+import { galleryApi, workshopsApi, eventsApi, artistsApi, heroBannersApi } from '../../lib/adminApi';
 import './AdminPortal.css';
 
 const AdminPortal = () => {
@@ -11,7 +11,8 @@ const AdminPortal = () => {
     artworks: 0,
     workshops: 0,
     events: 0,
-    artists: 0
+    artists: 0,
+    heroBanners: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -24,11 +25,12 @@ const AdminPortal = () => {
       setLoading(true);
       
       // Fetch all data in parallel
-      const [artworksRes, workshopsRes, eventsRes, artistsRes] = await Promise.allSettled([
+      const [artworksRes, workshopsRes, eventsRes, artistsRes, heroBannersRes] = await Promise.allSettled([
         galleryApi.getArtworks(),
         workshopsApi.getAll(),
         eventsApi.getAll(),
-        artistsApi.getAll()
+        artistsApi.getAll(),
+        heroBannersApi.getAll()
       ]);
 
       // Extract counts from successful responses
@@ -36,7 +38,8 @@ const AdminPortal = () => {
         artworks: artworksRes.status === 'fulfilled' ? (artworksRes.value?.data?.length || 0) : 0,
         workshops: workshopsRes.status === 'fulfilled' ? (workshopsRes.value?.data?.length || 0) : 0,
         events: eventsRes.status === 'fulfilled' ? (eventsRes.value?.data?.length || 0) : 0,
-        artists: artistsRes.status === 'fulfilled' ? (artistsRes.value?.data?.length || 0) : 0
+        artists: artistsRes.status === 'fulfilled' ? (artistsRes.value?.data?.length || 0) : 0,
+        heroBanners: heroBannersRes.status === 'fulfilled' ? (heroBannersRes.value?.data?.length || 0) : 0
       };
       path: '/admin/artpartyimages',
       setStats(newStats);
@@ -50,18 +53,25 @@ const AdminPortal = () => {
 
   const adminModules = [
     {
+      title: 'Hero Banners',
+      description: 'Manage home page hero banners with images or videos (16:9 ratio)',
+      path: '/admin/hero-banners',
+      icon: '🎬',
+      color: '#c38f21'
+    },
+    {
       title: 'Gallery Management',
       description: 'Manage artworks, categories, and gallery content',
       path: '/admin/gallery',
       icon: '🖼️',
-      color: '#c38f21'
+      color: '#d4af85'
     },
     {
       title: 'Workshop Management',
       description: 'Create and manage workshops, instructors, and enrollment',
       path: '/admin/workshops',
       icon: '🎨',
-      color: '#d4af85'
+      color: '#c38f21'
     },
     {
       title: 'Event Management',
@@ -155,6 +165,13 @@ const AdminPortal = () => {
         <section className="admin-quick-stats">
           <h2>Quick Overview</h2>
           <div className="stats-grid">
+              <div className="stat-card">
+                <div className="stat-icon">🎬</div>
+                <div className="stat-info">
+                  <span className="stat-number">{stats.heroBanners}</span>
+                  <span className="stat-label">Hero Banners</span>
+                </div>
+              </div>
               <div className="stat-card">
                 <div className="stat-icon">🖼️</div>
                 <div className="stat-info">

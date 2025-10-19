@@ -14,6 +14,7 @@ import { mobilePerformanceMonitor } from '../../utils/mobilePerformanceMonitor';
 import Header from '../Header';
 import Footer from '../Footer';
 import Particles from '../Particles';
+import HeroBanner from '../HeroBanner';
 import './Home.css';
 import '../../assets/fonts/fonts.css';
 
@@ -232,6 +233,9 @@ const Home = () => {
       )}
       
       <Header currentPage="home" />
+      
+      {/* Hero Banner - 16:9 ratio image/video carousel */}
+      <HeroBanner />
       
       <main className="home-content">
         <section className="hero-section">
