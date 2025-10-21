@@ -262,7 +262,7 @@ const Home = () => {
           <div className="promo-banner__text">
             <TextType 
               text={[
-                "Want to get free Pass worth ₹1199/- of below event?",
+                "Want to get free Pass worth ₹1199/- for the below event?",
                 "Do sign up for more details!",
                 "Limited time offer - Register now!"
               ]}

@@ -1,0 +1,50 @@
+/* MUI Toast Container Styles */
+
+.MuiSnackbar-root {
+  z-index: 9999 !important;
+}
+
+.MuiAlert-root {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.MuiAlert-outlined {
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.MuiAlert-outlinedSuccess {
+  border-color: #4caf50 !important;
+}
+
+.MuiAlert-outlinedError {
+  border-color: #f44336 !important;
+}
+
+.MuiAlert-outlinedWarning {
+  border-color: #ff9800 !important;
+}
+
+.MuiAlert-outlinedInfo {
+  border-color: #2196f3 !important;
+}
+
+/* Mobile responsive */
+@media only screen and (max-width: 480px) {
+  .MuiAlert-root {
+    width: calc(100vw - 32px) !important;
+    font-size: 13px !important;
+  }
+}

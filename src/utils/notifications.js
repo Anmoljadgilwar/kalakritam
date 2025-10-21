@@ -1,4 +1,7 @@
-// Toast notification utility for global notifications
+// Material UI based notification utility
+import { toast as muiToast } from '../components/MuiToastContainer/muiToastService.js';
+
+// Toast notification utility using Material UI
 export const NOTIFICATION_TYPES = {
   SUCCESS: 'success',
   ERROR: 'error',
@@ -16,249 +19,213 @@ export const NOTIFICATION_POSITIONS = {
   BOTTOM_CENTER: 'bottom-center'
 };
 
+// Notification Manager class for compatibility with existing code
 class NotificationManager {
   constructor() {
-    this.notifications = [];
-    this.listeners = [];
-    this.idCounter = 0;
+    this.activeToasts = new Map();
   }
 
-  subscribe(listener) {
-    this.listeners.push(listener);
-    return () => {
-      this.listeners = this.listeners.filter(l => l !== listener);
-    };
-  }
-
-  emit() {
-    this.listeners.forEach(listener => listener(this.notifications));
-  }
-
-  add(notification) {
-    const id = ++this.idCounter;
-    const newNotification = {
-      id,
-      timestamp: Date.now(),
-      position: NOTIFICATION_POSITIONS.TOP_RIGHT,
-      duration: 5000,
-      dismissible: true,
-      clickable: false,
-      onClick: null,
-      ...notification
-    };
-
-    this.notifications.push(newNotification);
-    this.emit();
-
-    // Auto remove after duration (if not persistent)
-    if (newNotification.duration > 0) {
-      setTimeout(() => {
-        this.remove(id);
-      }, newNotification.duration);
-    }
-
-    return id;
-  }
-
-  remove(id) {
-    this.notifications = this.notifications.filter(n => n.id !== id);
-    this.emit();
-  }
-
-  clear() {
-    this.notifications = [];
-    this.emit();
-  }
-
-  // Convenience methods
+  // Basic toast methods
   success(message, options = {}) {
-    return this.add({
-      type: NOTIFICATION_TYPES.SUCCESS,
-      message,
-      ...options
-    });
+    const toastId = muiToast.success(message, options);
+    this.activeToasts.set(toastId, { type: 'success', message });
+    return toastId;
   }
 
   error(message, options = {}) {
-    return this.add({
-      type: NOTIFICATION_TYPES.ERROR,
-      message,
-      duration: 7000, // Error messages stay longer
-      ...options
-    });
+    const toastId = muiToast.error(message, options);
+    this.activeToasts.set(toastId, { type: 'error', message });
+    return toastId;
   }
 
   warning(message, options = {}) {
-    return this.add({
-      type: NOTIFICATION_TYPES.WARNING,
-      message,
-      ...options
-    });
+    const toastId = muiToast.warning(message, options);
+    this.activeToasts.set(toastId, { type: 'warning', message });
+    return toastId;
   }
 
   info(message, options = {}) {
-    return this.add({
-      type: NOTIFICATION_TYPES.INFO,
-      message,
-      ...options
-    });
+    const toastId = muiToast.info(message, options);
+    this.activeToasts.set(toastId, { type: 'info', message });
+    return toastId;
   }
 
   loading(message, options = {}) {
-    return this.add({
-      type: NOTIFICATION_TYPES.LOADING,
-      message,
-      duration: 0, // Loading notifications are persistent
-      dismissible: false,
-      ...options
-    });
+    const toastId = muiToast.loading(message, options);
+    this.activeToasts.set(toastId, { type: 'loading', message });
+    return toastId;
+  }
+
+  // Promise-based toast for async operations
+  promise(promise, messages, options = {}) {
+    return muiToast.promise(promise, messages, options);
+  }
+
+  // Update an existing toast
+  update(toastId, options = {}) {
+    muiToast.update(toastId, options);
+  }
+
+  // Remove/dismiss a toast
+  remove(toastId) {
+    muiToast.dismiss(toastId);
+    this.activeToasts.delete(toastId);
+  }
+
+  dismiss(toastId) {
+    this.remove(toastId);
+  }
+
+  // Clear all toasts
+  clear() {
+    muiToast.clear();
+    this.activeToasts.clear();
   }
 
   // Server connection specific notifications
   serverConnecting(message = 'Connecting to server...') {
     return this.loading(message, {
-      id: 'server-connecting',
-      icon: '🔄'
+      icon: '🔄',
+      toastId: 'server-connecting',
     });
   }
 
   serverConnected(message = 'Connected to server successfully!') {
-    this.remove('server-connecting'); // Remove connecting notification
+    this.remove('server-connecting');
     return this.success(message, {
       icon: '✅',
-      duration: 3000
+      duration: 3000,
     });
   }
 
   serverDisconnected(message = 'Connection to server lost') {
     return this.error(message, {
       icon: '🔌',
-      duration: 0, // Persistent until reconnected
-      dismissible: true
+      duration: 0,
     });
   }
 
   serverError(message = 'Server error occurred') {
     return this.error(message, {
       icon: '⚠️',
-      duration: 8000
+      duration: 8000,
     });
   }
 
   // API specific notifications
   apiRequest(message = 'Processing request...') {
     return this.loading(message, {
-      icon: '📡'
+      icon: '📡',
     });
   }
 
   apiSuccess(message = 'Request completed successfully!') {
     return this.success(message, {
       icon: '✅',
-      duration: 3000
+      duration: 3000,
     });
   }
 
   apiError(message = 'Request failed') {
     return this.error(message, {
       icon: '❌',
-      duration: 6000
+      duration: 6000,
     });
   }
 
   // Data operations
   dataSaving(message = 'Saving data...') {
     return this.loading(message, {
-      icon: '💾'
+      icon: '💾',
     });
   }
 
   dataSaved(message = 'Data saved successfully!') {
     return this.success(message, {
       icon: '✅',
-      duration: 3000
+      duration: 3000,
     });
   }
 
   dataLoading(message = 'Loading data...') {
     return this.loading(message, {
-      icon: '📥'
+      icon: '📥',
     });
   }
 
   dataLoaded(message = 'Data loaded successfully!') {
     return this.success(message, {
       icon: '✅',
-      duration: 2000
+      duration: 2000,
     });
   }
 
   // File operations
   fileUploading(message = 'Uploading file...') {
     return this.loading(message, {
-      icon: '📤'
+      icon: '📤',
     });
   }
 
   fileUploaded(message = 'File uploaded successfully!') {
     return this.success(message, {
       icon: '✅',
-      duration: 3000
+      duration: 3000,
     });
   }
 
   fileDeleting(message = 'Deleting file...') {
     return this.loading(message, {
-      icon: '🗑️'
+      icon: '🗑️',
     });
   }
 
   fileDeleted(message = 'File deleted successfully!') {
     return this.success(message, {
       icon: '✅',
-      duration: 3000
+      duration: 3000,
     });
   }
 
   // Authentication notifications
   authLoading(message = 'Authenticating...') {
     return this.loading(message, {
-      icon: '🔐'
+      icon: '🔐',
     });
   }
 
   authSuccess(message = 'Authentication successful!') {
     return this.success(message, {
       icon: '✅',
-      duration: 3000
+      duration: 3000,
     });
   }
 
   authError(message = 'Authentication failed') {
     return this.error(message, {
       icon: '🚫',
-      duration: 5000
+      duration: 5000,
     });
   }
 
   // Form operations
   formSubmitting(message = 'Submitting form...') {
     return this.loading(message, {
-      icon: '📋'
+      icon: '📋',
     });
   }
 
   formSubmitted(message = 'Form submitted successfully!') {
     return this.success(message, {
       icon: '✅',
-      duration: 3000
+      duration: 3000,
     });
   }
 
   formError(message = 'Form submission failed') {
     return this.error(message, {
       icon: '❌',
-      duration: 5000
+      duration: 5000,
     });
   }
 
@@ -266,7 +233,7 @@ class NotificationManager {
   validationError(message = 'Please check your input') {
     return this.warning(message, {
       icon: '⚠️',
-      duration: 4000
+      duration: 4000,
     });
   }
 
@@ -274,8 +241,32 @@ class NotificationManager {
   copied(message = 'Copied to clipboard!') {
     return this.success(message, {
       icon: '📋',
-      duration: 2000
+      duration: 2000,
     });
+  }
+
+  // Legacy methods for backwards compatibility
+  add(notification) {
+    const { type, message, ...options } = notification;
+    switch (type) {
+      case NOTIFICATION_TYPES.SUCCESS:
+        return this.success(message, options);
+      case NOTIFICATION_TYPES.ERROR:
+        return this.error(message, options);
+      case NOTIFICATION_TYPES.WARNING:
+        return this.warning(message, options);
+      case NOTIFICATION_TYPES.INFO:
+        return this.info(message, options);
+      case NOTIFICATION_TYPES.LOADING:
+        return this.loading(message, options);
+      default:
+        return this.info(message, options);
+    }
+  }
+
+  subscribe(listener) {
+    // For backwards compatibility
+    return () => {};
   }
 }
 
@@ -289,49 +280,51 @@ export const toast = {
   warning: (message, options) => notificationManager.warning(message, options),
   info: (message, options) => notificationManager.info(message, options),
   loading: (message, options) => notificationManager.loading(message, options),
-  
+  promise: (promise, messages, options) => notificationManager.promise(promise, messages, options),
+
   // Server connection methods
   serverConnecting: (message) => notificationManager.serverConnecting(message),
   serverConnected: (message) => notificationManager.serverConnected(message),
   serverDisconnected: (message) => notificationManager.serverDisconnected(message),
   serverError: (message) => notificationManager.serverError(message),
-  
+
   // API methods
   apiRequest: (message) => notificationManager.apiRequest(message),
   apiSuccess: (message) => notificationManager.apiSuccess(message),
   apiError: (message) => notificationManager.apiError(message),
-  
+
   // Data operations
   dataSaving: (message) => notificationManager.dataSaving(message),
   dataSaved: (message) => notificationManager.dataSaved(message),
   dataLoading: (message) => notificationManager.dataLoading(message),
   dataLoaded: (message) => notificationManager.dataLoaded(message),
-  
+
   // File operations
   fileUploading: (message) => notificationManager.fileUploading(message),
   fileUploaded: (message) => notificationManager.fileUploaded(message),
   fileDeleting: (message) => notificationManager.fileDeleting(message),
   fileDeleted: (message) => notificationManager.fileDeleted(message),
-  
+
   // Authentication
   authLoading: (message) => notificationManager.authLoading(message),
   authSuccess: (message) => notificationManager.authSuccess(message),
   authError: (message) => notificationManager.authError(message),
-  
+
   // Form operations
   formSubmitting: (message) => notificationManager.formSubmitting(message),
   formSubmitted: (message) => notificationManager.formSubmitted(message),
   formError: (message) => notificationManager.formError(message),
-  
+
   // Validation
   validationError: (message) => notificationManager.validationError(message),
-  
+
   // Utility
   copied: (message) => notificationManager.copied(message),
-  
+
   // Utility methods
-  dismiss: (id) => notificationManager.remove(id),
-  clear: () => notificationManager.clear()
+  dismiss: (id) => notificationManager.dismiss(id),
+  update: (id, options) => notificationManager.update(id, options),
+  clear: () => notificationManager.clear(),
 };
 
 export default notificationManager;

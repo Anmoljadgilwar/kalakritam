@@ -369,13 +369,12 @@ const EventDetail = () => {
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="booking-logo-btn district-logo-btn"
-                      title="Book on District"
+                      title="Book on District by Zomato"
                     >
                       <img 
-                        src="https://assets.website-files.com/63634f4a7b868a399577cf37/63916302e991e6e2cb24d3d2_district-logo.svg" 
-                        alt="District" 
+                        src="/images/district-logo.png" 
+                        alt="District by Zomato" 
                         className="booking-logo-icon"
-                        onError={(e) => e.target.style.display = 'none'}
                       />
                     </a>
                   )}
@@ -388,10 +387,9 @@ const EventDetail = () => {
                       title="Book on BookMyShow"
                     >
                       <img 
-                        src="https://in.bmscdn.com/webin/common/icons/logo.svg" 
+                        src="/images/bookmyshow-logo.png" 
                         alt="BookMyShow" 
                         className="booking-logo-icon"
-                        onError={(e) => e.target.style.display = 'none'}
                       />
                     </a>
                   )}

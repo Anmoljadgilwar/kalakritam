@@ -1,0 +1,222 @@
+/* Additional Custom Toastify Styles - Proper Alignment */
+
+/* Override and enhance the base toastify styles */
+.Toastify__toast-container {
+  position: fixed !important;
+  z-index: 9999 !important;
+  padding: 16px !important;
+  pointer-events: none;
+}
+
+.Toastify__toast-container * {
+  pointer-events: auto;
+}
+
+/* Ensure proper positioning for all positions */
+.Toastify__toast-container--top-right {
+  top: 16px !important;
+  right: 16px !important;
+}
+
+.Toastify__toast-container--top-left {
+  top: 16px !important;
+  left: 16px !important;
+}
+
+.Toastify__toast-container--top-center {
+  top: 16px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.Toastify__toast-container--bottom-right {
+  bottom: 16px !important;
+  right: 16px !important;
+}
+
+.Toastify__toast-container--bottom-left {
+  bottom: 16px !important;
+  left: 16px !important;
+}
+
+.Toastify__toast-container--bottom-center {
+  bottom: 16px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Toast item alignment with transparency */
+.Toastify__toast {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  min-height: 64px !important;
+  padding: 16px 20px !important;
+  margin-bottom: 12px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100%;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(45, 45, 45, 0.95) 100%) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+.Toastify__toast-body {
+  padding: 0 8px !important;
+  margin: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: 48px;
+  word-break: break-word;
+  line-height: 1.5 !important;
+}
+
+.Toastify__toast-body > div {
+  display: flex !important;
+  align-items: center !important;
+  width: 100%;
+}
+
+.Toastify__toast-icon {
+  width: 24px !important;
+  height: 24px !important;
+  margin-inline-end: 12px !important;
+  margin-inline-start: 0 !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 24px;
+  line-height: 1 !important;
+}
+
+.Toastify__close-button {
+  align-self: center !important;
+  margin-left: 12px !important;
+  padding: 4px !important;
+  width: 24px;
+  height: 24px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0;
+}
+
+/* Custom loading animation */
+.Toastify__spinner {
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #ffffff;
+  animation: toastify-spin 0.65s linear infinite;
+}
+
+/* Enhanced icon animations */
+.Toastify__toast-icon {
+  animation: toastify-icon-pop 0.3s ease-out;
+}
+
+@keyframes toastify-icon-pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Hover effects */
+.Toastify__toast:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Close button enhancement */
+.Toastify__close-button:hover {
+  color: #ffffff;
+  transform: rotate(90deg);
+  transition: all 0.3s ease;
+}
+
+/* Progress bar animation */
+.Toastify__progress-bar {
+  transition: width 0.3s ease;
+}
+
+/* Mobile optimizations */
+@media only screen and (max-width: 768px) {
+  .Toastify__toast-container {
+    width: calc(100vw - 32px) !important;
+    padding: 8px !important;
+    left: 16px !important;
+    right: 16px !important;
+  }
+
+  .Toastify__toast-container--top-left,
+  .Toastify__toast-container--top-center,
+  .Toastify__toast-container--top-right {
+    top: 16px !important;
+    left: 16px !important;
+    right: 16px !important;
+    transform: none !important;
+  }
+
+  .Toastify__toast-container--bottom-left,
+  .Toastify__toast-container--bottom-center,
+  .Toastify__toast-container--bottom-right {
+    bottom: 16px !important;
+    left: 16px !important;
+    right: 16px !important;
+    transform: none !important;
+  }
+
+  .Toastify__toast {
+    margin: 0 0 8px 0 !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    padding: 14px 16px !important;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .Toastify__toast-container {
+    padding: 8px !important;
+  }
+
+  .Toastify__toast {
+    margin: 0 0 8px 0 !important;
+    padding: 12px 16px !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
+    min-height: 56px !important;
+  }
+
+  .Toastify__toast-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    margin-inline-end: 10px !important;
+  }
+  
+  .Toastify__close-button {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 16px !important;
+    margin-left: 8px !important;
+  }
+}
+
+/* Dark mode specific enhancements */
+@media (prefers-color-scheme: dark) {
+  .Toastify__toast {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  }
+}

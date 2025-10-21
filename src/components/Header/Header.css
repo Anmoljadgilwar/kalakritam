@@ -118,7 +118,7 @@
   cursor: pointer;
   font-size: clamp(0.75rem, 2.5vw, 0.9rem);
   font-weight: 500;
-  font-family: 'The Seasons', 'Cinzel', serif !important;
+  font-family: 'The Seasons', 'Cinzel', serif;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   text-decoration: none;
@@ -422,7 +422,7 @@
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 500;
-  font-family: 'The Seasons', 'Cinzel', serif !important;
+  font-family: 'The Seasons', 'Cinzel', serif;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   text-decoration: none;
@@ -595,7 +595,7 @@
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
-  font-family: 'The Seasons', 'Cinzel', serif !important;
+  font-family: 'The Seasons', 'Cinzel', serif;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   min-height: 44px;
@@ -645,11 +645,14 @@
 .login-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
 }
 
 .login-btn svg {
   stroke: currentColor;
+  flex-shrink: 0;
+  display: block;
 }
 
 /* User Dropdown Menu */
@@ -692,7 +695,7 @@
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
-  font-family: 'The Seasons', 'Cinzel', serif !important;
+  font-family: 'The Seasons', 'Cinzel', serif;
   transition: all 0.3s ease;
   text-align: left;
 }

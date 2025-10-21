@@ -41,7 +41,7 @@
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 450px;
+  max-width: 550px;
 }
 
 .user-login-card {
@@ -49,7 +49,7 @@
   backdrop-filter: blur(20px);
   border: 1px solid rgba(195, 143, 33, 0.2);
   border-radius: 20px;
-  padding: 3rem 2.5rem 2.5rem;
+  padding: 3rem 3rem 2.5rem;
   box-shadow: 
     0 25px 50px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(195, 143, 33, 0.1),
@@ -158,9 +158,15 @@
 .input-icon {
   position: absolute;
   left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
   color: #d4af85;
   opacity: 0.7;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
 .form-input {
@@ -204,6 +210,8 @@ input#email {
 .password-toggle {
   position: absolute;
   right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   color: #d4af85;
@@ -325,15 +333,47 @@ input#email {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 44px;
+  min-height: 52px;
+  width: 100%;
+  position: relative;
 }
 
-/* Override Google button styles to match theme */
+/* Custom styled Google button container */
 .google-signin-wrapper > div {
   width: 100% !important;
+  display: flex;
+  justify-content: center;
 }
 
+/* Theme-based Google button styling */
+.google-signin-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 47, 47, 0.6);
+  border: 1px solid rgba(195, 143, 33, 0.3);
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: -1;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.google-signin-wrapper:hover::before {
+  border-color: #c38f21;
+  background: rgba(0, 47, 47, 0.8);
+  box-shadow: 0 4px 12px rgba(195, 143, 33, 0.15);
+}
+
+/* Override Google button iframe styles */
 .google-signin-wrapper iframe {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Custom Google button wrapper to ensure theme consistency */
+.google-signin-wrapper div[role="button"] {
+  background: transparent !important;
   border-radius: 12px !important;
 }
 
@@ -411,8 +451,12 @@ input#email {
     padding: 1rem 0.5rem;
   }
   
+  .user-login-content {
+    max-width: 100%;
+  }
+  
   .user-login-card {
-    padding: 2rem 1.5rem;
+    padding: 2.5rem 2rem;
     border-radius: 16px;
   }
   
@@ -430,10 +474,14 @@ input#email {
   
   .input-icon {
     left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
   }
   
   .password-toggle {
     right: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
   }
   
   .login-submit-btn {
@@ -444,7 +492,7 @@ input#email {
 
 @media (max-width: 480px) {
   .user-login-card {
-    padding: 1.5rem 1rem;
+    padding: 1.5rem 1.25rem;
     margin: 0.5rem;
   }
   

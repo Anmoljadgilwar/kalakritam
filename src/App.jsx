@@ -1,18 +1,18 @@
-import React, { Suspense, useEffect } from 'react'
+import * as React from 'react'
+import { Suspense, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import RequireAuth from './components/RequireAuth'
 import GuestOnly from './components/GuestOnly'
 import { LoadingProvider, useLoading } from './contexts/LoadingContext.jsx'
-import { NotificationProvider } from './contexts/NotificationContext.jsx'
 import { UserAuthProvider } from './contexts/UserAuthContext.jsx'
 import Loading from './components/Loading'
-import GlobalToastContainer from './components/GlobalToastContainer'
 import Particles from './components/Particles'
 import { measureLazyLoadTime } from './hooks/usePerformanceTracking'
 import { seoManager } from './utils/seoManager.js'
 import useServerConnection from './hooks/useServerConnection.js'
 import { toast } from './utils/notifications.js'
 import { updateSpeculationRules } from './utils/pageOptimizationScript.js'
+import MuiToastContainer from './components/MuiToastContainer'
 import './App.css'
 import ScrollToTop from './components/ScrollToTop.jsx'
 
@@ -462,7 +462,7 @@ const AppContent = () => {
   return (
     <>
       {isLoading && <Loading />}
-      <GlobalToastContainer />
+      <MuiToastContainer />
       <Router>
         <EventNotificationHandler />
         <PageOptimizer />
@@ -562,11 +562,9 @@ function App() {
 
   return (
     <LoadingProvider>
-      <NotificationProvider>
-        <UserAuthProvider>
-          <AppContent />
-        </UserAuthProvider>
-      </NotificationProvider>
+      <UserAuthProvider>
+        <AppContent />
+      </UserAuthProvider>
     </LoadingProvider>
   )
 }

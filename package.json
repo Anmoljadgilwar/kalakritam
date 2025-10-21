@@ -20,6 +20,9 @@
     }
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.4",
     "@neondatabase/serverless": "^1.0.1",
     "@react-three/drei": "^10.6.1",
     "@react-three/fiber": "^9.3.0",
@@ -41,6 +44,7 @@
     "react-dom": "^19.1.0",
     "react-helmet-async": "^2.0.5",
     "react-router-dom": "^7.7.1",
+    "react-toastify": "^11.0.5",
     "three": "^0.179.1"
   },
   "devDependencies": {

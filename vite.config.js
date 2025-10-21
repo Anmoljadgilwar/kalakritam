@@ -29,6 +29,9 @@ export default defineConfig({
             if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
               return 'react-vendor';
             }
+            if (id.includes('@mui/material') || id.includes('@emotion')) {
+              return 'mui-vendor';
+            }
             if (id.includes('three') || id.includes('@react-three') || id.includes('ogl')) {
               return 'graphics-vendor';
             }
@@ -45,7 +48,7 @@ export default defineConfig({
       }
     },
     // Optimize chunk size
-    chunkSizeWarningLimit: 800,
+    chunkSizeWarningLimit: 1000,
     // Target modern browsers for better performance
     target: 'es2020',
     // Use esbuild for minification (faster)
@@ -65,7 +68,10 @@ export default defineConfig({
       'react',
       'react-dom',
       'react-router-dom',
-      'gsap'
+      'gsap',
+      '@mui/material',
+      '@emotion/react',
+      '@emotion/styled'
     ],
     exclude: [
       'ogl',

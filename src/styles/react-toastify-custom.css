@@ -1,0 +1,264 @@
+/* React Toastify Custom Enhancements - Fixed Alignment */
+
+/* Base toast container with proper positioning */
+.Toastify__toast-container {
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  position: fixed !important;
+  z-index: 9999 !important;
+  padding: 16px !important;
+}
+
+/* Enhanced toast styles with glassmorphism and proper flex */
+.Toastify__toast {
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 
+              0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 16px 20px !important;
+  min-height: 64px !important;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(45, 45, 45, 0.95) 100%) !important;
+}
+
+.Toastify__toast-body {
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  line-height: 1.5 !important;
+}
+
+.Toastify__toast-body > div {
+  display: flex !important;
+  align-items: center !important;
+  line-height: 1.5 !important;
+}
+
+.Toastify__toast-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-inline-end: 12px !important;
+  margin-inline-start: 0 !important;
+  flex-shrink: 0 !important;
+  line-height: 1 !important;
+}
+
+.Toastify__close-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+}
+
+/* Hover state animation */
+.Toastify__toast:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5),
+              0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced progress bar with gradient */
+.Toastify__progress-bar--success {
+  background: linear-gradient(90deg, #07bc0c 0%, #0ef716 100%);
+}
+
+.Toastify__progress-bar--error {
+  background: linear-gradient(90deg, #e74c3c 0%, #ff6b6b 100%);
+}
+
+.Toastify__progress-bar--warning {
+  background: linear-gradient(90deg, #f1c40f 0%, #f39c12 100%);
+}
+
+.Toastify__progress-bar--info {
+  background: linear-gradient(90deg, #3498db 0%, #5dade2 100%);
+}
+
+/* Icon animations */
+.Toastify__toast-icon {
+  animation: icon-bounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes icon-bounce {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Close button with smooth rotation */
+.Toastify__close-button {
+  transition: all 0.3s ease;
+}
+
+.Toastify__close-button:hover {
+  transform: rotate(90deg) scale(1.2);
+  color: #ffffff;
+}
+
+/* Loading spinner enhancement */
+@keyframes toastify-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Toast type specific enhancements with transparency */
+.Toastify__toast--success {
+  background: linear-gradient(135deg, rgba(10, 61, 10, 0.95) 0%, rgba(26, 90, 26, 0.95) 100%) !important;
+  border-left-width: 5px;
+  border-left-color: #07bc0c;
+  animation: toast-slide-in 0.4s ease-out;
+}
+
+.Toastify__toast--error {
+  background: linear-gradient(135deg, rgba(61, 10, 10, 0.95) 0%, rgba(90, 26, 26, 0.95) 100%) !important;
+  border-left-width: 5px;
+  border-left-color: #e74c3c;
+  animation: toast-slide-in 0.4s ease-out;
+}
+
+.Toastify__toast--warning {
+  background: linear-gradient(135deg, rgba(61, 45, 10, 0.95) 0%, rgba(90, 74, 26, 0.95) 100%) !important;
+  border-left-width: 5px;
+  border-left-color: #f1c40f;
+  animation: toast-slide-in 0.4s ease-out;
+}
+
+.Toastify__toast--info {
+  background: linear-gradient(135deg, rgba(10, 26, 61, 0.95) 0%, rgba(26, 42, 90, 0.95) 100%) !important;
+  border-left-width: 5px;
+  border-left-color: #3498db;
+  animation: toast-slide-in 0.4s ease-out;
+}
+
+/* Slide-in animation */
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Mobile responsive adjustments - Fixed */
+@media only screen and (max-width: 768px) {
+  .Toastify__toast-container {
+    width: calc(100vw - 32px) !important;
+    padding: 8px !important;
+  }
+  
+  .Toastify__toast-container--top-left,
+  .Toastify__toast-container--top-center,
+  .Toastify__toast-container--top-right {
+    top: 16px !important;
+    left: 16px !important;
+    right: 16px !important;
+    transform: none !important;
+  }
+
+  .Toastify__toast-container--bottom-left,
+  .Toastify__toast-container--bottom-center,
+  .Toastify__toast-container--bottom-right {
+    bottom: 16px !important;
+    left: 16px !important;
+    right: 16px !important;
+    transform: none !important;
+  }
+
+  .Toastify__toast {
+    margin: 0 0 8px 0 !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    padding: 14px 16px !important;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .Toastify__toast-container {
+    padding: 8px !important;
+    width: calc(100vw - 32px) !important;
+  }
+
+  .Toastify__toast {
+    margin: 0 0 8px 0 !important;
+    padding: 12px 16px !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
+    min-height: 56px !important;
+  }
+
+  .Toastify__toast-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .Toastify__close-button {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 16px !important;
+  }
+}
+
+/* RTL Support */
+.Toastify__toast--rtl {
+  direction: rtl;
+}
+
+.Toastify__toast--rtl .Toastify__toast-icon {
+  margin-inline-start: 10px;
+  margin-inline-end: 0;
+}
+
+/* Accessibility improvements */
+.Toastify__toast:focus-visible {
+  outline: 3px solid #3498db;
+  outline-offset: 2px;
+}
+
+/* Dark theme enhancements with transparency */
+@media (prefers-color-scheme: dark) {
+  .Toastify__toast {
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(45, 45, 45, 0.95) 100%) !important;
+  }
+
+  .Toastify__close-button {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .Toastify__close-button:hover {
+    color: rgba(255, 255, 255, 1);
+  }
+}
+
+/* Light theme (fallback) with transparency */
+@media (prefers-color-scheme: light) {
+  .Toastify__toast {
+    background: linear-gradient(135deg, rgba(245, 245, 245, 0.95) 0%, rgba(224, 224, 224, 0.95) 100%) !important;
+    color: #1a1a1a;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .Toastify__close-button {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}

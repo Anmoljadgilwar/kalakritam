@@ -179,8 +179,8 @@
 .booking-logo-btn {
   width: 50px;
   height: 50px;
-  padding: 8px;
-  background: rgba(255, 255, 255, 0.95);
+  padding: 0;
+  background: transparent;
   border: 2px solid rgba(195, 143, 33, 0.3);
   border-radius: 12px;
   cursor: pointer;
@@ -190,20 +190,21 @@
   justify-content: center;
   box-shadow: 0 4px 15px rgba(195, 143, 33, 0.2);
   backdrop-filter: blur(10px);
+  overflow: hidden;
 }
 
 .booking-logo-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(195, 143, 33, 0.4);
   border-color: #c38f21;
-  background: rgba(255, 255, 255, 1);
 }
 
 .booking-logo-btn svg,
 .booking-logo-btn img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
 .event-detail-venue {
@@ -631,7 +632,7 @@
   .booking-logo-btn {
     width: 45px;
     height: 45px;
-    padding: 6px;
+    padding: 0;
   }
   
   /* Booking buttons responsive */

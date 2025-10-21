@@ -21,6 +21,13 @@ export const UserAuthProvider = ({ children }) => {
   // Create a unique ID for this provider instance
   const providerId = React.useRef(`provider-${Math.random().toString(36).substr(2, 9)}`);
   
+  // Auto-logout timer references
+  const inactivityTimerRef = React.useRef(null);
+  const lastActivityRef = React.useRef(Date.now());
+  
+  // 10 hours in milliseconds
+  const INACTIVITY_TIMEOUT = 10 * 60 * 60 * 1000; // 10 hours
+  
   console.log(`UserAuthProvider [${providerId.current}] - Initialized`);
 
   // Log state changes for debugging
@@ -198,7 +205,99 @@ export const UserAuthProvider = ({ children }) => {
     localStorage.removeItem('userToken');
     localStorage.removeItem('userData');
     localStorage.removeItem('loginTime');
+    localStorage.removeItem('lastActivity');
+    
+    // Clear inactivity timer
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+      inactivityTimerRef.current = null;
+    }
   };
+
+  // Reset inactivity timer
+  const resetInactivityTimer = React.useCallback(() => {
+    if (!isAuthenticated) return;
+    
+    const now = Date.now();
+    lastActivityRef.current = now;
+    localStorage.setItem('lastActivity', now.toString());
+    
+    // Clear existing timer
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+    }
+    
+    // Set new timer
+    inactivityTimerRef.current = setTimeout(() => {
+      console.log('UserAuthContext - Auto-logout: 10 hours of inactivity');
+      logout();
+      
+      // Show notification to user
+      if (window.showNotification) {
+        window.showNotification('Session expired due to inactivity', 'info');
+      }
+    }, INACTIVITY_TIMEOUT);
+    
+    console.log('UserAuthContext - Inactivity timer reset');
+  }, [isAuthenticated]);
+
+  // Track user activity
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    // Activity events to track
+    const activityEvents = [
+      'mousedown',
+      'mousemove',
+      'keypress',
+      'scroll',
+      'touchstart',
+      'click'
+    ];
+    
+    // Throttle activity tracking to once per minute
+    let lastActivityUpdate = 0;
+    const ACTIVITY_THROTTLE = 60 * 1000; // 1 minute
+    
+    const handleActivity = () => {
+      const now = Date.now();
+      if (now - lastActivityUpdate > ACTIVITY_THROTTLE) {
+        lastActivityUpdate = now;
+        resetInactivityTimer();
+      }
+    };
+    
+    // Add event listeners
+    activityEvents.forEach(event => {
+      window.addEventListener(event, handleActivity, { passive: true });
+    });
+    
+    // Initial timer setup
+    resetInactivityTimer();
+    
+    // Check for inactivity on mount (in case user had tab open for long time)
+    const lastActivity = localStorage.getItem('lastActivity');
+    if (lastActivity) {
+      const timeSinceLastActivity = Date.now() - parseInt(lastActivity);
+      if (timeSinceLastActivity > INACTIVITY_TIMEOUT) {
+        console.log('UserAuthContext - Auto-logout: Session expired while tab was inactive');
+        logout();
+        if (window.showNotification) {
+          window.showNotification('Session expired due to inactivity', 'info');
+        }
+      }
+    }
+    
+    // Cleanup
+    return () => {
+      activityEvents.forEach(event => {
+        window.removeEventListener(event, handleActivity);
+      });
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current);
+      }
+    };
+  }, [isAuthenticated, resetInactivityTimer]);
 
   const updateUserProfile = async (updates) => {
     try {
