@@ -57,7 +57,20 @@ export default defineConfig({
     cssMinify: true,
     // Preload modules
     modulePreload: {
-      polyfill: false
+      polyfill: true,
+      resolveDependencies: (filename, deps, { hostId, hostType }) => {
+        // Ensure react-vendor is loaded before other chunks
+        return deps.filter(dep => {
+          if (filename.includes('react-vendor')) return true;
+          if (dep.includes('react-vendor')) return true;
+          return true;
+        });
+      }
+    },
+    // Ensure proper module initialization order
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true
     }
   },
   // Optimize dependencies
@@ -76,6 +89,14 @@ export default defineConfig({
       '@react-three/fiber',
       '@react-three/drei'
     ]
+  },
+  // Ensure single React instance
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+    alias: {
+      'react': 'react',
+      'react-dom': 'react-dom'
+    }
   },
   // Optimize for development
   server: {
