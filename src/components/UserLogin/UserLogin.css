@@ -153,25 +153,29 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .input-icon {
   position: absolute;
-  left: 1rem;
+  left: 1.125rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #d4af85;
-  opacity: 0.7;
-  z-index: 2;
+  color: #c38f21;
+  opacity: 0.8;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .form-input {
   width: 100%;
-  padding: 1rem 1rem 1rem 3rem;
+  padding: 1rem 3rem 1rem 3.25rem;
   font-size: 1rem;
   color: #ffffff;
   background: rgba(0, 47, 47, 0.6);
@@ -181,6 +185,8 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   backdrop-filter: blur(10px);
   text-transform: none;
+  position: relative;
+  z-index: 0;
 }
 
 .form-input:focus {
@@ -209,29 +215,33 @@ input#email {
 
 .password-toggle {
   position: absolute;
-  right: 1rem;
+  right: 1.125rem;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #d4af85;
+  color: #c38f21;
   cursor: pointer;
-  padding: 0.25rem;
+  padding: 0.5rem;
   border-radius: 6px;
   transition: all 0.3s ease;
-  z-index: 2;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.8;
+  width: 36px;
+  height: 36px;
 }
 
 .password-toggle:hover {
-  color: #c38f21;
-  background: rgba(195, 143, 33, 0.1);
+  color: #d4a124;
+  background: rgba(195, 143, 33, 0.15);
+  opacity: 1;
 }
 
 .password-toggle:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
@@ -469,19 +479,21 @@ input#email {
   }
   
   .form-input {
-    padding: 0.875rem 0.875rem 0.875rem 2.75rem;
+    padding: 0.875rem 2.75rem 0.875rem 3rem;
+    font-size: 0.95rem;
   }
   
   .input-icon {
-    left: 0.875rem;
-    top: 50%;
-    transform: translateY(-50%);
+    left: 1rem;
+    width: 18px;
+    height: 18px;
   }
   
   .password-toggle {
-    right: 0.875rem;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    padding: 0.4rem;
   }
   
   .login-submit-btn {
