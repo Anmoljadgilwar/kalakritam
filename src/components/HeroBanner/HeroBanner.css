@@ -143,114 +143,6 @@
   border-radius: 6px;
 }
 
-/* Campaign Button Container */
-.campaign-button-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 5;
-  pointer-events: auto;
-}
-
-.show-interest-banner-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 1.5rem 3rem;
-  background: linear-gradient(135deg, #c38f21 0%, #d4a124 50%, #c38f21 100%);
-  border: 3px solid #ffd700;
-  border-radius: 16px;
-  color: #000;
-  font-family: 'Samarkan', 'Cinzel', serif;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 
-    0 8px 32px rgba(195, 143, 33, 0.4),
-    0 0 0 0 rgba(255, 215, 0, 0.7),
-    inset 0 2px 10px rgba(255, 255, 255, 0.3);
-  position: relative;
-  overflow: hidden;
-  text-transform: uppercase;
-  animation: buttonPulse 2s ease-in-out infinite;
-}
-
-@keyframes buttonPulse {
-  0%, 100% {
-    box-shadow: 
-      0 8px 32px rgba(195, 143, 33, 0.4),
-      0 0 0 0 rgba(255, 215, 0, 0.7),
-      inset 0 2px 10px rgba(255, 255, 255, 0.3);
-  }
-  50% {
-    box-shadow: 
-      0 8px 40px rgba(195, 143, 33, 0.6),
-      0 0 20px 10px rgba(255, 215, 0, 0.5),
-      inset 0 2px 10px rgba(255, 255, 255, 0.3);
-  }
-}
-
-.show-interest-banner-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  animation: shine 3s ease-in-out infinite;
-}
-
-@keyframes shine {
-  0% { left: -100%; }
-  20%, 100% { left: 200%; }
-}
-
-.show-interest-banner-btn:hover {
-  transform: scale(1.05) translateY(-2px);
-  box-shadow: 
-    0 12px 48px rgba(195, 143, 33, 0.6),
-    0 0 30px 15px rgba(255, 215, 0, 0.6),
-    inset 0 2px 10px rgba(255, 255, 255, 0.4);
-}
-
-.show-interest-banner-btn:active {
-  transform: scale(0.98);
-}
-
-.btn-icon {
-  font-size: 2rem;
-  animation: iconBounce 1s ease-in-out infinite;
-}
-
-@keyframes iconBounce {
-  0%, 100% { 
-    transform: translateY(0); 
-  }
-  50% { 
-    transform: translateY(-5px); 
-  }
-}
-
-.btn-text {
-  font-size: 1.5rem;
-  letter-spacing: 0px;
-  position: relative;
-  z-index: 1;
-}
-
-.btn-subtext {
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0px;
-  opacity: 0.9;
-  position: relative;
-  z-index: 1;
-}
-
 /* Responsive Design */
 @media (max-width: 1200px) {
   .hero-banner-title {
@@ -303,24 +195,6 @@
   .hero-banner-dot.active {
     width: 24px;
   }
-
-  /* Campaign Button Mobile */
-  .show-interest-banner-btn {
-    padding: 1.25rem 2rem;
-    border-radius: 12px;
-  }
-
-  .btn-icon {
-    font-size: 1.5rem;
-  }
-
-  .btn-text {
-    font-size: 1.2rem;
-  }
-
-  .btn-subtext {
-    font-size: 0.8rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -358,26 +232,6 @@
 
   .hero-banner-dot.active {
     width: 20px;
-  }
-
-  /* Campaign Button Small Mobile */
-  .show-interest-banner-btn {
-    padding: 1rem 1.5rem;
-    border-radius: 10px;
-    border-width: 2px;
-  }
-
-  .btn-icon {
-    font-size: 1.25rem;
-  }
-
-  .btn-text {
-    font-size: 1rem;
-    letter-spacing: 1px;
-  }
-
-  .btn-subtext {
-    font-size: 0.7rem;
   }
 }
 

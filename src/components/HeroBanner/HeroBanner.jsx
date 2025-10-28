@@ -1,89 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { heroBannersApi } from '../../lib/adminApi';
-import { useUserAuth } from '../../contexts/UserAuthContext';
 import './HeroBanner.css';
 
 const HeroBanner = () => {
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useUserAuth();
   const [banners, setBanners] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [showCampaignButton, setShowCampaignButton] = useState(false);
   const videoRef = React.useRef(null);
 
   useEffect(() => {
     fetchActiveBanners();
   }, []);
-
-  // Check campaign eligibility for logged-in users
-  useEffect(() => {
-    console.log('🔍 Campaign eligibility check:', { isAuthenticated, user });
-    
-    if (!isAuthenticated || !user) {
-      console.log('❌ Not authenticated or no user');
-      setShowCampaignButton(false);
-      return;
-    }
-
-    // Check if user account was created today and hasn't participated
-    const checkEligibility = () => {
-      try {
-        console.log('🔍 User object:', user);
-        console.log('🔍 User properties:', Object.keys(user));
-        
-        // Check if user has already participated (stored in localStorage)
-        const hasParticipated = localStorage.getItem(`campaign_participated_${user.id}`);
-        console.log('🔍 Has participated:', hasParticipated);
-        
-        if (hasParticipated) {
-          console.log('❌ User already participated');
-          setShowCampaignButton(false);
-          return;
-        }
-
-        // Check if account was created today
-        // Try different possible field names for created date
-        const createdAtField = user.created_at || user.createdAt || user.created || user.signup_date;
-        console.log('🔍 Created at field:', createdAtField);
-        
-        if (!createdAtField) {
-          console.log('⚠️ No created_at field found in user object');
-          // For testing, show button anyway
-          setShowCampaignButton(true);
-          return;
-        }
-        
-        const createdAt = new Date(createdAtField);
-        const today = new Date();
-        
-        console.log('🔍 Created date:', createdAt);
-        console.log('🔍 Today:', today);
-        
-        const isToday = 
-          createdAt.getDate() === today.getDate() &&
-          createdAt.getMonth() === today.getMonth() &&
-          createdAt.getFullYear() === today.getFullYear();
-
-        console.log('🔍 Is today?', isToday);
-
-        if (isToday) {
-          console.log('✅ Showing campaign button!');
-          setShowCampaignButton(true);
-        } else {
-          console.log('❌ Account not created today');
-          setShowCampaignButton(false);
-        }
-      } catch (error) {
-        console.error('❌ Error checking campaign eligibility:', error);
-      }
-    };
-
-    checkEligibility();
-  }, [isAuthenticated, user]);
 
   const fetchActiveBanners = async () => {
     try {
@@ -152,11 +81,6 @@ const HeroBanner = () => {
     }
   };
 
-  const handleShowInterest = (e) => {
-    e.stopPropagation();
-    navigate('/show-interest');
-  };
-
   // Don't render if loading, error, or no banners
   if (loading || error || banners.length === 0) {
     return null;
@@ -211,20 +135,6 @@ const HeroBanner = () => {
         {currentBanner.title && (
           <div className="hero-banner-content">
             <h2 className="hero-banner-title">{currentBanner.title}</h2>
-          </div>
-        )}
-
-        {/* Campaign Button for Eligible Users */}
-        {showCampaignButton && (
-          <div className="campaign-button-container">
-            <button 
-              className="show-interest-banner-btn"
-              onClick={handleShowInterest}
-            >
-              <span className="btn-icon">⭐</span>
-              <span className="btn-text">Show Interest</span>
-              <span className="btn-subtext">Win ₹1,299 Free Pass</span>
-            </button>
           </div>
         )}
 

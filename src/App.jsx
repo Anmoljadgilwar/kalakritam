@@ -269,14 +269,6 @@ const AdminUsers = React.lazy(() => {
   });
 });
 
-const ShowInterest = React.lazy(() => {
-  const measure = measureLazyLoadTime('ShowInterest');
-  return import('./components/ShowInterest').then(module => {
-    measure();
-    return module;
-  });
-});
-
 
 
 // Preload commonly visited components for better UX
@@ -535,7 +527,6 @@ const AppContent = () => {
                   <Route path="/user/login" element={<GuestOnly><UserLogin /></GuestOnly>} />
                   <Route path="/user/signup" element={<GuestOnly><UserLogin /></GuestOnly>} />
                   <Route path="/user/dashboard" element={<RequireAuth><UserDashboard /></RequireAuth>} />
-                  <Route path="/show-interest" element={<RequireAuth><ShowInterest /></RequireAuth>} />
                   
                   {/* Username-based routes for logged-in users - MUST be at the end to avoid conflicts */}
                   <Route path="/u/:username/home" element={<RequireAuth><Home /></RequireAuth>} />
