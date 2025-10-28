@@ -336,15 +336,7 @@ const Home = () => {
             <h1 className="main-title">Kalakritam</h1>
             <h2 className="sub-title">Premier Art Workshops in Hyderabad</h2>
             
-            {/* What Kalakritam Does - Simple Statement */}
-            <div className="app-purpose-simple">
-              <p>
-                <strong>🎨 Kalakritam</strong> is an online platform for discovering and booking art workshops in Hyderabad. 
-                We connect art enthusiasts with expert-led workshops, cultural events, and creative experiences. 
-                Sign in with Google to register for workshops and manage bookings. 
-                <a href="/privacy#google-oauth" className="oauth-link"> Learn about Google Sign-In & Data Usage →</a>
-              </p>
-            </div>
+            {/* Brief introduction intentionally omitted - details are available via Privacy Policy */}
 
             <p>
               Experience the finest <strong>art workshops in Hyderabad</strong> at Kalakritam, where weekend creativity 
