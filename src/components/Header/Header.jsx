@@ -22,6 +22,7 @@ const Header = ({ currentPage = 'home' }) => {
     { path: '/workshops', label: 'Workshops' },
     { path: '/events', label: 'Events' },
     { path: '/artists', label: 'Artists' },
+    { path: '/moments', label: 'Moments' },
     { path: '/artblogs', label: 'Art Blogs' },
     { path: '/contact', label: 'Contact' },
     { path: '/about', label: 'About Us' }

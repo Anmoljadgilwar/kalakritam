@@ -3,7 +3,7 @@ import AdminHeader from '../AdminHeader';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import AdminLoading from '../AdminLoading';
-import { galleryApi, workshopsApi, eventsApi, artistsApi, heroBannersApi } from '../../lib/adminApi';
+import { galleryApi, workshopsApi, eventsApi, artistsApi, heroBannersApi, momentsApi } from '../../lib/adminApi';
 import './AdminPortal.css';
 
 const AdminPortal = () => {
@@ -12,7 +12,8 @@ const AdminPortal = () => {
     workshops: 0,
     events: 0,
     artists: 0,
-    heroBanners: 0
+    heroBanners: 0,
+    moments: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -25,12 +26,13 @@ const AdminPortal = () => {
       setLoading(true);
       
       // Fetch all data in parallel
-      const [artworksRes, workshopsRes, eventsRes, artistsRes, heroBannersRes] = await Promise.allSettled([
+      const [artworksRes, workshopsRes, eventsRes, artistsRes, heroBannersRes, momentsRes] = await Promise.allSettled([
         galleryApi.getArtworks(),
         workshopsApi.getAll(),
         eventsApi.getAll(),
         artistsApi.getAll(),
-        heroBannersApi.getAll()
+        heroBannersApi.getAll(),
+        momentsApi.getAll()
       ]);
 
       // Extract counts from successful responses
@@ -39,7 +41,8 @@ const AdminPortal = () => {
         workshops: workshopsRes.status === 'fulfilled' ? (workshopsRes.value?.data?.length || 0) : 0,
         events: eventsRes.status === 'fulfilled' ? (eventsRes.value?.data?.length || 0) : 0,
         artists: artistsRes.status === 'fulfilled' ? (artistsRes.value?.data?.length || 0) : 0,
-        heroBanners: heroBannersRes.status === 'fulfilled' ? (heroBannersRes.value?.data?.length || 0) : 0
+        heroBanners: heroBannersRes.status === 'fulfilled' ? (heroBannersRes.value?.data?.length || 0) : 0,
+        moments: momentsRes.status === 'fulfilled' ? (momentsRes.value?.data?.length || 0) : 0
       };
       path: '/admin/artpartyimages',
       setStats(newStats);
@@ -117,11 +120,18 @@ const AdminPortal = () => {
       color: '#d4af85'
     },
     {
+      title: 'Moments Management',
+      description: 'Upload and manage event moments photos in masonry grid',
+      path: '/admin/moments',
+      icon: '📸',
+      color: '#c38f21'
+    },
+    {
       title: 'User Management',
       description: 'View and manage registered users, track activity and statistics',
       path: '/admin/users',
       icon: '👥',
-      color: '#c38f21'
+      color: '#d4af85'
     }
   ];
 
@@ -205,6 +215,13 @@ const AdminPortal = () => {
                 <div className="stat-info">
                   <span className="stat-number">{stats.artists}</span>
                   <span className="stat-label">Artists</span>
+                </div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">📸</div>
+                <div className="stat-info">
+                  <span className="stat-number">{stats.moments}</span>
+                  <span className="stat-label">Moments</span>
                 </div>
               </div>
             </div>

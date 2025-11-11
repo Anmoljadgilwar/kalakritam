@@ -69,6 +69,18 @@ const AdminWorkshops = () => {
       }
       
       const response = await workshopsApi.getAll({ page, limit: itemsPerPage });
+      console.log('📋 Fetched workshops:', {
+        success: response.success,
+        count: response.data?.length,
+        firstWorkshop: response.data?.[0],
+        firstWorkshopDates: {
+          startDate: response.data?.[0]?.startDate,
+          endDate: response.data?.[0]?.endDate,
+          startDateType: typeof response.data?.[0]?.startDate,
+          endDateType: typeof response.data?.[0]?.endDate
+        }
+      });
+      
       // Handle API response structure
       const data = response.data || response || [];
       
@@ -135,15 +147,40 @@ const AdminWorkshops = () => {
     // Format date for datetime-local input field  
     const formatDateTimeLocal = (dateString) => {
       if (!dateString) return '';
-      const date = new Date(dateString);
-      // Format as YYYY-MM-DDTHH:mm for datetime-local input
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${year}-${month}-${day}T${hours}:${minutes}`;
+      try {
+        const date = new Date(dateString);
+        // Check if date is valid
+        if (isNaN(date.getTime())) return '';
+        
+        console.log('🔄 Converting date for input:', {
+          input: dateString,
+          parsedDate: date.toString(),
+          localDate: date.toLocaleString()
+        });
+        
+        // Format as YYYY-MM-DDTHH:mm for datetime-local input
+        // Use local timezone
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const formatted = `${year}-${month}-${day}T${hours}:${minutes}`;
+        
+        console.log('🔄 Formatted for input:', formatted);
+        return formatted;
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        return '';
+      }
     };
+
+    console.log('✏️ Editing workshop:', {
+      id: workshop.id,
+      title: workshop.title,
+      startDate: workshop.startDate,
+      endDate: workshop.endDate
+    });
 
     setFormData({
       title: workshop.title || '',
@@ -221,18 +258,59 @@ const AdminWorkshops = () => {
         }
       }
       
+      // Convert datetime-local format to ISO 8601 with timezone
+      const formatDateForDB = (dateTimeLocalString) => {
+        if (!dateTimeLocalString) return null;
+        try {
+          // datetime-local gives us "YYYY-MM-DDTHH:mm" in local timezone
+          // Convert to ISO 8601 format with timezone
+          const date = new Date(dateTimeLocalString);
+          if (isNaN(date.getTime())) return null;
+          const isoString = date.toISOString(); // Returns "YYYY-MM-DDTHH:mm:ss.sssZ"
+          console.log('📅 Date conversion:', { input: dateTimeLocalString, output: isoString });
+          return isoString;
+        } catch (error) {
+          console.error('Error formatting date for database:', error);
+          return null;
+        }
+      };
+      
+      console.log('📝 Form data before conversion:', {
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        maxParticipants: formData.maxParticipants,
+        maxParticipantsType: typeof formData.maxParticipants,
+        price: formData.price,
+        priceType: typeof formData.price
+      });
+      
+      // Parse numeric values properly
+      const parseIntSafely = (value) => {
+        if (value === '' || value === null || value === undefined) return 0;
+        const parsed = parseInt(String(value).trim(), 10);
+        console.log('🔢 Parsing integer:', { input: value, parsed, isNaN: isNaN(parsed) });
+        return isNaN(parsed) ? 0 : parsed;
+      };
+      
+      const parseFloatSafely = (value) => {
+        if (value === '' || value === null || value === undefined) return 0;
+        const parsed = parseFloat(String(value).trim());
+        console.log('💰 Parsing float:', { input: value, parsed, isNaN: isNaN(parsed) });
+        return isNaN(parsed) ? 0 : parsed;
+      };
+      
       // Prepare data with correct field mapping for database
       const workshopData = {
         title: formData.title,
         instructor: formData.instructor,
         description: formData.description,
-        start_date: formData.startDate,
-        end_date: formData.endDate,
+        start_date: formatDateForDB(formData.startDate),
+        end_date: formatDateForDB(formData.endDate),
         venue: formData.venue,
         duration: formData.duration,
-        price: parseFloat(formData.price) || 0,
-        max_participants: parseInt(formData.maxParticipants) || 0,
-        current_participants: parseInt(formData.currentParticipants) || 0,
+        price: parseFloatSafely(formData.price),
+        max_participants: parseIntSafely(formData.maxParticipants),
+        current_participants: parseIntSafely(formData.currentParticipants),
         image_url: imageUrl || '',
         featured: formData.featured,
         active: formData.active,
@@ -246,6 +324,8 @@ const AdminWorkshops = () => {
         og_image: formData.ogImage
       };
 
+      console.log('📤 Sending workshop data to API:', workshopData);
+
       let result;
       if (modalMode === 'create') {
         result = await workshopsApi.create(workshopData);
@@ -257,6 +337,8 @@ const AdminWorkshops = () => {
         };
         result = await workshopsApi.update(selectedWorkshop.id, updateData);
       }
+
+      console.log('📥 Received response from API:', result);
 
       toast.dismiss(loadingId);
       toast.success(`Workshop ${modalMode === 'create' ? 'created' : 'updated'} successfully`);
@@ -635,6 +717,8 @@ const AdminWorkshops = () => {
                         name="maxParticipants"
                         value={formData.maxParticipants}
                         onChange={handleInputChange}
+                        min="0"
+                        step="1"
                       />
                     </div>
                     
@@ -647,6 +731,7 @@ const AdminWorkshops = () => {
                         value={formData.currentParticipants}
                         onChange={handleInputChange}
                         min="0"
+                        step="1"
                       />
                     </div>
                     

@@ -12,7 +12,7 @@ const LazyImage = ({
   ...props 
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
+  const [isInView, setIsInView] = useState(true); // Changed to true by default
   const [hasError, setHasError] = useState(false);
   const imgRef = useRef();
   
@@ -20,6 +20,8 @@ const LazyImage = ({
   const lazyConfig = getMobileLazyConfig();
   const isMobile = shouldOptimizeForMobile();
 
+  // Removed IntersectionObserver - load images immediately
+  /*
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -29,8 +31,8 @@ const LazyImage = ({
         }
       },
       {
-        threshold: lazyConfig.threshold,
-        rootMargin: lazyConfig.rootMargin
+        threshold: 0,
+        rootMargin: '400px'
       }
     );
 
@@ -40,6 +42,7 @@ const LazyImage = ({
 
     return () => observer.disconnect();
   }, []);
+  */
 
   const handleLoad = () => {
     setIsLoaded(true);

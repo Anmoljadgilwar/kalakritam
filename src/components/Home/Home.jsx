@@ -307,26 +307,6 @@ const Home = () => {
         <SplitTextAnimation />
       )}
       
-      {/* Promotional Banner with Typing Effect - Only show on home page for non-authenticated users */}
-      {!isAuthenticated && !username && (location.pathname === '/home' || location.pathname === '/') ? (
-        <div className="promo-banner">
-          <div className="promo-banner__text">
-            <TextType 
-              text={[
-                "Want to get free Pass worth ₹1199/- for the below event?",
-                "Do sign up for more details!",
-                "Limited time offer - Register now!"
-              ]}
-              typingSpeed={75}
-              pauseDuration={1500}
-              showCursor={true}
-              cursorCharacter="|"
-              className="promo-banner__highlight"
-            />
-          </div>
-        </div>
-      ) : null}
-      
       {/* Hero Banner - 16:9 ratio image/video carousel */}
       <HeroBanner />
       

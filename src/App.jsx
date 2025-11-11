@@ -217,6 +217,22 @@ const AdminArtPartyImages = React.lazy(() => {
   });
 });
 
+const Moments = React.lazy(() => {
+  const measure = measureLazyLoadTime('Moments');
+  return import('./components/Moments').then(module => {
+    measure();
+    return module;
+  });
+});
+
+const AdminMoments = React.lazy(() => {
+  const measure = measureLazyLoadTime('AdminMoments');
+  return import('./components/AdminMoments').then(module => {
+    measure();
+    return module;
+  });
+});
+
 const ToastDemo = React.lazy(() => {
   const measure = measureLazyLoadTime('ToastDemo');
   return import('./components/ToastDemo').then(module => {
@@ -320,11 +336,17 @@ if (typeof window !== 'undefined') {
         case '/artparty':
           preloadComponent(() => import('./components/ArtParty'));
           break;
+          case '/moments':
+            preloadComponent(() => import('./components/Moments'));
+            break;
           case '/contact':
             preloadComponent(() => import('./components/Contact'));
             break;
           case '/admin/artpartyimages':
             preloadComponent(() => import('./components/AdminArtPartyImages'));
+            break;
+          case '/admin/moments':
+            preloadComponent(() => import('./components/AdminMoments'));
             break;
         }
         preloadTimeouts.delete(href);
@@ -499,6 +521,7 @@ const AppContent = () => {
                   <Route path="/events/:slug" element={<EventDetail />} />
                   <Route path="/artblogs" element={<ArtBlogs />} />
                   <Route path="/artparty" element={<ArtParty />} />
+                  <Route path="/moments" element={<Moments />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />
                   <Route path="/terms" element={<TermsOfService />} />
                   
@@ -516,6 +539,7 @@ const AppContent = () => {
                   <Route path="/admin/contact" element={<AdminContact />} />
                   <Route path="/admin/tickets" element={<AdminTickets />} />
                   <Route path="/admin/artpartyimages" element={<AdminArtPartyImages />} />
+                  <Route path="/admin/moments" element={<AdminMoments />} />
                   <Route path="/admin/hero-banners" element={<AdminHeroBanners />} />
                   <Route path="/admin/users" element={<AdminUsers />} />
                   
@@ -542,6 +566,7 @@ const AppContent = () => {
                   <Route path="/u/:username/artblogs" element={<RequireAuth><ArtBlogs /></RequireAuth>} />
                   <Route path="/u/:username/artists" element={<RequireAuth><Artists /></RequireAuth>} />
                   <Route path="/u/:username/artparty" element={<RequireAuth><ArtParty /></RequireAuth>} />
+                  <Route path="/u/:username/moments" element={<RequireAuth><Moments /></RequireAuth>} />
                   
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>

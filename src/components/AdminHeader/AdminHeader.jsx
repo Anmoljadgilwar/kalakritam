@@ -15,6 +15,7 @@ const AdminHeader = ({ currentPage = 'portal' }) => {
     { path: '/admin/hero-banners', label: 'Hero Banners', icon: '🎬' },
     { path: '/admin/gallery', label: 'Gallery', icon: '🖼️' },
     { path: '/admin/artpartyimages', label: 'ArtParty Images', icon: '🗂️' },
+    { path: '/admin/moments', label: 'Moments', icon: '📸' },
     { path: '/admin/workshops', label: 'Workshops', icon: '🎨' },
     { path: '/admin/events', label: 'Events', icon: '📅' },
     { path: '/admin/artists', label: 'Artists', icon: '👨‍🎨' },

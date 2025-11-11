@@ -14943,7 +14943,16 @@ var setupWorkshopsRoutes = /* @__PURE__ */ __name2((app2) => {
       `;
       params.push(limit, offset);
       const result = await db.query(query, params);
-      const workshops = result.success ? result.data : [];
+      const workshops = result.success ? result.data.map(w => ({
+        ...w,
+        startDate: w.start_date,
+        endDate: w.end_date,
+        imageUrl: w.image_url,
+        maxParticipants: w.max_participants,
+        currentParticipants: w.current_participants,
+        createdAt: w.created_at,
+        updatedAt: w.updated_at
+      })) : [];
       return c.json({
         success: true,
         message: "Workshops fetched successfully",
@@ -14986,10 +14995,27 @@ var setupWorkshopsRoutes = /* @__PURE__ */ __name2((app2) => {
           message: "Workshop not found"
         }, 404);
       }
+      const workshop = result.data[0];
+      const transformedWorkshop = {
+        ...workshop,
+        startDate: workshop.start_date,
+        endDate: workshop.end_date,
+        imageUrl: workshop.image_url,
+        maxParticipants: workshop.max_participants,
+        currentParticipants: workshop.current_participants,
+        metaTitle: workshop.meta_title,
+        metaDescription: workshop.meta_description,
+        metaKeywords: workshop.meta_keywords,
+        ogTitle: workshop.og_title,
+        ogDescription: workshop.og_description,
+        ogImage: workshop.og_image,
+        createdAt: workshop.created_at,
+        updatedAt: workshop.updated_at
+      };
       return c.json({
         success: true,
         message: "Workshop fetched successfully",
-        data: result.data[0]
+        data: transformedWorkshop
       });
     } catch (error3) {
       return c.json({
@@ -16629,6 +16655,194 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
       }, 500);
     }
   }));
+
+  // ==================== MOMENTS API ENDPOINTS ====================
+  // GET all moments with pagination
+  app2.get("/admin/moments", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const { page = 1, limit = 20, search } = c.req.query();
+    try {
+      let whereConditions = [];
+      let params = [];
+      let paramIndex = 1;
+      if (search) {
+        whereConditions.push(`event_name ILIKE $${paramIndex++}`);
+        params.push(`%${search}%`);
+      }
+      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
+      const countQuery = `SELECT COUNT(*) as total FROM moments ${whereClause}`;
+      const countResult = await db.query(countQuery, params);
+      const total = countResult.success ? parseInt(countResult.data[0]?.total || 0) : 0;
+      const offset = (page - 1) * limit;
+      params.push(limit, offset);
+      const query = `
+        SELECT id, event_name, photos, created_at, updated_at
+        FROM moments 
+        ${whereClause}
+        ORDER BY created_at DESC 
+        LIMIT $${paramIndex++} OFFSET $${paramIndex++}
+      `;
+      const result = await db.query(query, params);
+      const moments = result.success ? result.data : [];
+      return c.json({
+        success: true,
+        message: "Moments fetched successfully",
+        data: moments,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      });
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to fetch moments",
+        error: error3.message
+      }, 500);
+    }
+  }));
+
+  // POST create new moment
+  app2.post("/admin/moments", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const momentData = await c.req.json();
+    try {
+      const id = crypto.randomUUID();
+      const now = (/* @__PURE__ */ new Date()).toISOString();
+      
+      // photos should be an array of image URLs
+      const photosJson = JSON.stringify(momentData.photos || []);
+      
+      const query = `
+        INSERT INTO moments (
+          id, event_name, photos, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5)
+        RETURNING *
+      `;
+      const result = await db.query(query, [
+        id,
+        momentData.event_name,
+        photosJson,
+        now,
+        now
+      ]);
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Moment created successfully",
+          data: result.data[0]
+        }, 201);
+      } else {
+        throw new Error("Failed to create moment");
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to create moment",
+        error: error3.message
+      }, 500);
+    }
+  }));
+
+  // PUT update moment
+  app2.put("/admin/moments/:id", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const id = c.req.param("id");
+    const momentData = await c.req.json();
+    try {
+      const now = (/* @__PURE__ */ new Date()).toISOString();
+      
+      // photos should be an array of image URLs
+      const photosJson = JSON.stringify(momentData.photos || []);
+      
+      const query = `
+        UPDATE moments SET
+          event_name = $2, photos = $3, updated_at = $4
+        WHERE id = $1
+        RETURNING *
+      `;
+      const result = await db.query(query, [
+        id,
+        momentData.event_name,
+        photosJson,
+        now
+      ]);
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Moment updated successfully",
+          data: result.data[0]
+        });
+      } else {
+        throw new Error("Failed to update moment or moment not found");
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to update moment",
+        error: error3.message
+      }, 500);
+    }
+  }));
+
+  // DELETE moment
+  app2.delete("/admin/moments/:id", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const id = c.req.param("id");
+    try {
+      const query = `DELETE FROM moments WHERE id = $1 RETURNING *`;
+      const result = await db.query(query, [id]);
+      if (result.success && result.data.length > 0) {
+        return c.json({
+          success: true,
+          message: "Moment deleted successfully"
+        });
+      } else {
+        return c.json({
+          success: false,
+          message: "Moment not found"
+        }, 404);
+      }
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to delete moment",
+        error: error3.message
+      }, 500);
+    }
+  }));
+
+  // GET public moments (no auth required)
+  app2.get("/moments", catchAsync(async (c) => {
+    const db = createDatabase(c.env);
+    const { page = 1, limit = 100 } = c.req.query();
+    try {
+      const offset = (page - 1) * limit;
+      const query = `
+        SELECT id, event_name, photos, created_at
+        FROM moments 
+        ORDER BY created_at DESC 
+        LIMIT $1 OFFSET $2
+      `;
+      const result = await db.query(query, [limit, offset]);
+      const moments = result.success ? result.data : [];
+      return c.json({
+        success: true,
+        message: "Moments fetched successfully",
+        data: moments
+      });
+    } catch (error3) {
+      return c.json({
+        success: false,
+        message: "Failed to fetch moments",
+        error: error3.message
+      }, 500);
+    }
+  }));
+  // ==================== END MOMENTS API ====================
+
   app2.get("/admin/events", catchAsync(async (c) => {
     const db = createDatabase(c.env);
     const { page = 1, limit = 6, search, featured } = c.req.query();
@@ -16852,7 +17066,22 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
         LIMIT $${paramIndex++} OFFSET $${paramIndex++}
       `;
       const result = await db.query(query, params);
-      const workshops = result.success ? result.data : [];
+      const workshops = result.success ? result.data.map(w => ({
+        ...w,
+        startDate: w.start_date,
+        endDate: w.end_date,
+        imageUrl: w.image_url,
+        maxParticipants: w.max_participants,
+        currentParticipants: w.current_participants,
+        metaTitle: w.meta_title,
+        metaDescription: w.meta_description,
+        metaKeywords: w.meta_keywords,
+        ogTitle: w.og_title,
+        ogDescription: w.og_description,
+        ogImage: w.og_image,
+        createdAt: w.created_at,
+        updatedAt: w.updated_at
+      })) : [];
       return c.json({
         success: true,
         message: "Workshops fetched successfully",
@@ -16875,6 +17104,14 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
   app2.post("/admin/workshops", catchAsync(async (c) => {
     const db = createDatabase(c.env);
     const workshopData = await c.req.json();
+    
+    console.log('🔍 Backend received workshop data:', {
+      max_participants: workshopData.max_participants,
+      max_participants_type: typeof workshopData.max_participants,
+      price: workshopData.price,
+      price_type: typeof workshopData.price
+    });
+    
     try {
       const id = crypto.randomUUID();
       const now = (/* @__PURE__ */ new Date()).toISOString();
@@ -16912,10 +17149,36 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
         now
       ]);
       if (result.success && result.data.length > 0) {
+        const workshop = result.data[0];
+        
+        console.log('✅ Workshop created in database:', {
+          id: workshop.id,
+          max_participants: workshop.max_participants,
+          max_participants_type: typeof workshop.max_participants,
+          price: workshop.price,
+          price_type: typeof workshop.price
+        });
+        
+        const transformedWorkshop = {
+          ...workshop,
+          startDate: workshop.start_date,
+          endDate: workshop.end_date,
+          imageUrl: workshop.image_url,
+          maxParticipants: workshop.max_participants,
+          currentParticipants: workshop.current_participants,
+          metaTitle: workshop.meta_title,
+          metaDescription: workshop.meta_description,
+          metaKeywords: workshop.meta_keywords,
+          ogTitle: workshop.og_title,
+          ogDescription: workshop.og_description,
+          ogImage: workshop.og_image,
+          createdAt: workshop.created_at,
+          updatedAt: workshop.updated_at
+        };
         return c.json({
           success: true,
           message: "Workshop created successfully",
-          data: result.data[0]
+          data: transformedWorkshop
         }, 201);
       } else {
         throw new Error("Failed to create workshop");
@@ -16932,6 +17195,15 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
     const db = createDatabase(c.env);
     const id = c.req.param("id");
     const workshopData = await c.req.json();
+    
+    console.log('🔍 Backend received workshop update data:', {
+      id: id,
+      max_participants: workshopData.max_participants,
+      max_participants_type: typeof workshopData.max_participants,
+      price: workshopData.price,
+      price_type: typeof workshopData.price
+    });
+    
     try {
       const now = (/* @__PURE__ */ new Date()).toISOString();
       const query = `
@@ -16968,10 +17240,36 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
         now
       ]);
       if (result.success && result.data.length > 0) {
+        const workshop = result.data[0];
+        
+        console.log('✅ Workshop updated in database:', {
+          id: workshop.id,
+          max_participants: workshop.max_participants,
+          max_participants_type: typeof workshop.max_participants,
+          price: workshop.price,
+          price_type: typeof workshop.price
+        });
+        
+        const transformedWorkshop = {
+          ...workshop,
+          startDate: workshop.start_date,
+          endDate: workshop.end_date,
+          imageUrl: workshop.image_url,
+          maxParticipants: workshop.max_participants,
+          currentParticipants: workshop.current_participants,
+          metaTitle: workshop.meta_title,
+          metaDescription: workshop.meta_description,
+          metaKeywords: workshop.meta_keywords,
+          ogTitle: workshop.og_title,
+          ogDescription: workshop.og_description,
+          ogImage: workshop.og_image,
+          createdAt: workshop.created_at,
+          updatedAt: workshop.updated_at
+        };
         return c.json({
           success: true,
           message: "Workshop updated successfully",
-          data: result.data[0]
+          data: transformedWorkshop
         });
       } else {
         throw new Error("Failed to update workshop or workshop not found");

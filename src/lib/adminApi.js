@@ -182,7 +182,16 @@ export const workshopsApi = {
     
     return response;
   },
-  create: (workshop) => apiCall('admin/workshops', 'POST', workshop),
+  create: async (workshop) => {
+    const response = await apiCall('admin/workshops', 'POST', workshop);
+    
+    // Transform the response data from snake_case to camelCase
+    if (response.success && response.data) {
+      response.data = transformWorkshopFromDB(response.data);
+    }
+    
+    return response;
+  },
   update: async (id, workshop) => {
     // If there's an old image and a new one, delete the old one
     if (workshop.oldImageUrl && workshop.imageUrl && workshop.oldImageUrl !== workshop.imageUrl) {
@@ -195,10 +204,24 @@ export const workshopsApi = {
       
       // Remove oldImageUrl from the data sent to backend
       const { oldImageUrl, ...updateData } = workshop;
-      return apiCall(`admin/workshops/${id}`, 'PUT', updateData);
+      const response = await apiCall(`admin/workshops/${id}`, 'PUT', updateData);
+      
+      // Transform the response data from snake_case to camelCase
+      if (response.success && response.data) {
+        response.data = transformWorkshopFromDB(response.data);
+      }
+      
+      return response;
     }
     
-    return apiCall(`admin/workshops/${id}`, 'PUT', workshop);
+    const response = await apiCall(`admin/workshops/${id}`, 'PUT', workshop);
+    
+    // Transform the response data from snake_case to camelCase
+    if (response.success && response.data) {
+      response.data = transformWorkshopFromDB(response.data);
+    }
+    
+    return response;
   },
   delete: async (id) => {
     try {
@@ -975,6 +998,83 @@ export const heroBannersApi = {
   delete: (id) => {
     return apiCall(`admin/hero-banners/${id}`, 'DELETE');
   }
+};
+
+// Moments API functions
+export const momentsApi = {
+  getAll: async ({ page = 1, limit = 1000 } = {}) => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    return apiCall(`admin/moments?${params.toString()}`);
+  },
+  
+  create: async (moment) => {
+    return apiCall('admin/moments', 'POST', moment);
+  },
+  
+  update: async (id, moment) => {
+    // If there are old images and new ones, delete old ones
+    if (moment.oldPhotos && moment.photos) {
+      const oldUrls = moment.oldPhotos;
+      const newUrls = moment.photos;
+      
+      // Find URLs that are in old but not in new (deleted images)
+      const deletedUrls = oldUrls.filter(url => !newUrls.includes(url));
+      
+      // Delete each removed image
+      for (const url of deletedUrls) {
+        try {
+          await uploadApi.deleteImage(url);
+          console.log('✅ Old moment image deleted successfully:', url);
+        } catch (error) {
+          console.warn('⚠️ Failed to delete old moment image:', error);
+        }
+      }
+      
+      // Remove oldPhotos from the data sent to backend
+      const { oldPhotos, ...updateData } = moment;
+      return apiCall(`admin/moments/${id}`, 'PUT', updateData);
+    }
+    
+    return apiCall(`admin/moments/${id}`, 'PUT', moment);
+  },
+  
+  delete: async (id) => {
+    try {
+      // First get the moment to find the image URLs
+      const moments = await momentsApi.getAll();
+      const moment = moments.data?.find(item => item.id === id);
+      
+      console.log('🔍 Found moment for deletion:', moment);
+      
+      // Delete the moment record
+      const result = await apiCall(`admin/moments/${id}`, 'DELETE');
+      
+      // If successful and moment had images, delete them from R2
+      if (result.success && moment) {
+        const photos = moment.photos;
+        
+        console.log('🖼️ Photos to delete:', photos);
+        
+        if (photos && Array.isArray(photos) && photos.length > 0) {
+          for (const photoUrl of photos) {
+            try {
+              await uploadApi.deleteImage(photoUrl);
+              console.log('✅ Moment image deleted from R2 successfully:', photoUrl);
+            } catch (imageError) {
+              console.warn('⚠️ Failed to delete moment image from R2:', imageError);
+            }
+          }
+        } else {
+          console.log('ℹ️ No photos found for moment, skipping image deletion');
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to delete moment:', error);
+      throw error;
+    }
+  },
 };
 
 // User Authentication API functions
