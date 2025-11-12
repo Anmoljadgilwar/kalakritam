@@ -207,7 +207,7 @@ export class SEOManager {
   // Performance optimization
   preloadCriticalResources() {
     const criticalResources = [
-      { href: '/intro-video.mp4', as: 'video' },
+      { href: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/intro-video.mp4', as: 'video' },
       { href: '/images/og-image.jpg', as: 'image' }
     ];
 
