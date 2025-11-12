@@ -309,9 +309,6 @@ const AdminFinancials = () => {
                         return income - (eventExp + materialCost + marketingCost);
                       })} 
                       height={120}
-                      colors={['#8884d8']}
-                      showHighlight
-                      showTooltip
                     />
                   </Box>
                   <Box flexGrow={1}>
@@ -328,9 +325,6 @@ const AdminFinancials = () => {
                         return income - (eventExp + materialCost + marketingCost);
                       })}
                       height={120}
-                      colors={['#00C49F']}
-                      showHighlight
-                      showTooltip
                     />
                   </Box>
                 </Stack>
