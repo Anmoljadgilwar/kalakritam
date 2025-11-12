@@ -13,12 +13,6 @@
     "start": "vite preview --host --port 4173",
     "dev:fast": "vite --force --host"
   },
-  "overrides": {
-    "react-helmet-async": {
-      "react": "^19.1.0",
-      "react-dom": "^19.1.0"
-    }
-  },
   "dependencies": {
     "@barba/core": "^2.10.3",
     "@barba/css": "^2.1.16",
@@ -46,8 +40,8 @@
     "pg": "^8.16.3",
     "postprocessing": "^6.37.7",
     "qrcode": "^1.5.4",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-helmet-async": "^2.0.5",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.7.1",
