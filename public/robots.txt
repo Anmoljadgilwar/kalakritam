@@ -55,9 +55,6 @@ Disallow: /static/
 Disallow: /.well-known/
 Disallow: /node_modules/
 Disallow: /src/
-Disallow: /*.json$
-Disallow: /*.js$
-Disallow: /*.css$
 Disallow: /assets/
 
 # Disallow verification pages (not for indexing)

@@ -310,7 +310,7 @@ const Home = () => {
       {/* Hero Banner - 16:9 ratio image/video carousel */}
       <HeroBanner />
       
-      <main className="home-content">
+      <main className="home-content" role="main" id="main-content">
         <section className="hero-section scroll-animate fade-up">
           <div className="hero-text">
             <h1 className="main-title">Kalakritam</h1>

@@ -72,15 +72,25 @@
     <link rel="dns-prefetch" href="//api.kalakritam.in">
     
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="/intro-video.mp4" as="video" type="video/mp4">
+    <link rel="preload" href="/intro-video.mp4" as="video" type="video/mp4" fetchpriority="high">
     <link rel="modulepreload" href="/src/main.jsx">
     
-    <!-- Font Loading -->
+    <!-- Font Loading - Optimized for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=The+Seasons&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css2?family=The+Seasons&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=The+Seasons&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    </noscript>
+    
+    <!-- Critical CSS for fastest FCP -->
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}body,html{width:100%;height:100%;overflow-x:hidden;background:#000;color:#fff;font-family:system-ui,-apple-system,sans-serif}#root{min-height:100vh;width:100%}.intro-video-container{position:fixed;top:0;left:0;width:100vw;height:100vh;background-color:#002f2f;display:flex;align-items:center;justify-content:center;z-index:1000}video{max-width:100%;max-height:100%;object-fit:contain}
+    </style>
     
     <!-- Alternative Languages -->
     <link rel="alternate" hreflang="en" href="https://kalakritam.in/">

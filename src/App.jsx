@@ -448,13 +448,19 @@ const AppContent = () => {
     retryDelay: 2000,
     endpoints: ['/api/health', '/api/status', '/'], // Health check endpoints
     onConnect: () => {
-      console.log('Server connection established');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Server connection established');
+      }
     },
     onDisconnect: (error) => {
-      console.warn('Server connection lost:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Server connection lost:', error);
+      }
     },
     onError: (error) => {
-      console.error('Server connection error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Server connection error:', error);
+      }
     }
   });
 
