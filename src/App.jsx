@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { Suspense, useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import RequireAuth from './components/RequireAuth'
 import GuestOnly from './components/GuestOnly'
