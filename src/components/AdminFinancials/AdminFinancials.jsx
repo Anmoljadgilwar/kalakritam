@@ -3,7 +3,6 @@ import { Box, Button, Card, CardContent, FormControl, Grid, IconButton, InputLab
 import { BarChart } from '@mui/x-charts/BarChart';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { PieChart } from '@mui/x-charts/PieChart';
-import { SparkLineChart } from '@mui/x-charts/SparkLineChart';
 import AdminHeader from '../AdminHeader';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
@@ -300,31 +299,47 @@ const AdminFinancials = () => {
                     <Typography variant="body2" sx={{ color: palette.goldLight, mb: 1, textAlign: 'center' }}>
                       Profit Trend (Line)
                     </Typography>
-                    <SparkLineChart 
-                      data={sortedRecords.map(r => {
-                        const income = parseFloat(r.income) || 0;
-                        const eventExp = parseFloat(r.event_expense) || 0;
-                        const materialCost = parseFloat(r.material_cost) || 0;
-                        const marketingCost = parseFloat(r.marketing_cost) || 0;
-                        return income - (eventExp + materialCost + marketingCost);
-                      })} 
+                    <LineChart
+                      xAxis={[{ 
+                        data: sortedRecords.map((_, idx) => idx + 1),
+                        scaleType: 'linear'
+                      }]}
+                      series={[{
+                        data: sortedRecords.map(r => {
+                          const income = parseFloat(r.income) || 0;
+                          const eventExp = parseFloat(r.event_expense) || 0;
+                          const materialCost = parseFloat(r.material_cost) || 0;
+                          const marketingCost = parseFloat(r.marketing_cost) || 0;
+                          return income - (eventExp + materialCost + marketingCost);
+                        }),
+                        color: '#8884d8',
+                        curve: 'linear'
+                      }]}
                       height={120}
+                      margin={{ top: 10, right: 10, bottom: 20, left: 40 }}
                     />
                   </Box>
                   <Box flexGrow={1}>
                     <Typography variant="body2" sx={{ color: palette.goldLight, mb: 1, textAlign: 'center' }}>
                       Profit Trend (Bar)
                     </Typography>
-                    <SparkLineChart
-                      plotType="bar"
-                      data={sortedRecords.map(r => {
-                        const income = parseFloat(r.income) || 0;
-                        const eventExp = parseFloat(r.event_expense) || 0;
-                        const materialCost = parseFloat(r.material_cost) || 0;
-                        const marketingCost = parseFloat(r.marketing_cost) || 0;
-                        return income - (eventExp + materialCost + marketingCost);
-                      })}
+                    <BarChart
+                      xAxis={[{ 
+                        data: sortedRecords.map((_, idx) => idx + 1),
+                        scaleType: 'band'
+                      }]}
+                      series={[{
+                        data: sortedRecords.map(r => {
+                          const income = parseFloat(r.income) || 0;
+                          const eventExp = parseFloat(r.event_expense) || 0;
+                          const materialCost = parseFloat(r.material_cost) || 0;
+                          const marketingCost = parseFloat(r.marketing_cost) || 0;
+                          return income - (eventExp + materialCost + marketingCost);
+                        }),
+                        color: '#00C49F'
+                      }]}
                       height={120}
+                      margin={{ top: 10, right: 10, bottom: 20, left: 40 }}
                     />
                   </Box>
                 </Stack>
