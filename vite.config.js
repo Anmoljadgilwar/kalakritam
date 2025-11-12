@@ -54,15 +54,16 @@ export default defineConfig({
       }
     },
     // Optimize chunk size
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 500,
     // Target modern browsers for better performance
     target: 'es2020',
     // Use esbuild for minification (faster)
     minify: 'esbuild',
-    // Enable source maps for debugging but smaller in production
-    sourcemap: process.env.NODE_ENV === 'development',
+    // Disable source maps in production for smaller files
+    sourcemap: false,
     // Optimize CSS
     cssMinify: true,
+    cssCodeSplit: true,
     // Preload modules
     modulePreload: {
       polyfill: true,
@@ -79,7 +80,11 @@ export default defineConfig({
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: true
-    }
+    },
+    // Enable compression
+    reportCompressedSize: true,
+    // Optimize assets
+    assetsInlineLimit: 4096
   },
   // Optimize dependencies
   optimizeDeps: {

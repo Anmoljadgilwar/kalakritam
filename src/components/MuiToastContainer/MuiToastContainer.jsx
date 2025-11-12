@@ -50,9 +50,9 @@ const MuiToastContainer = () => {
           open={true}
           autoHideDuration={toast.duration > 0 ? toast.duration : null}
           onClose={handleClose(toast.id)}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           style={{ 
-            top: `${16 + index * 72}px`,
+            bottom: `${16 + index * 72}px`,
             zIndex: 9999
           }}
         >

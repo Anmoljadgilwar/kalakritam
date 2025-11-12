@@ -75,11 +75,15 @@ const IntroVideo = () => {
     const handleVideoLoad = () => {
       setVideoLoaded(true);
       performanceMonitor.measure('intro-video-load', 'intro-video-start');
-      console.log('Video loaded successfully');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Video loaded successfully');
+      }
     };
 
     const handleCanPlay = () => {
-      console.log('Video can start playing');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Video can start playing');
+      }
       setVideoLoaded(true);
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);

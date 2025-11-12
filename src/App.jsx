@@ -423,30 +423,6 @@ class LazyLoadingErrorBoundary extends React.Component {
   }
 }
 
-// Component to handle notifications inside Router context
-const EventNotificationHandler = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const notificationTimer = setTimeout(() => {
-      toast.info('🎉 Register for our upcoming events!', {
-        description: 'Click here to explore exciting events',
-        duration: 8000, // Show for 8 seconds
-        clickable: true,
-        dismissOnClick: true,
-        onClick: () => {
-          navigate('/events');
-        },
-        icon: '🎨'
-      });
-    }, 5000); // 5 seconds delay
-
-    return () => clearTimeout(notificationTimer);
-  }, [navigate]);
-
-  return null;
-};
-
 // Component to handle page optimizations like speculation rules
 const PageOptimizer = () => {
   const location = useLocation();
@@ -540,7 +516,6 @@ const AppContent = () => {
       {isLoading && <Loading />}
       <MuiToastContainer />
       <Router>
-        <EventNotificationHandler />
         <PageOptimizer />
         <div className="app">
           {showParticles && (
