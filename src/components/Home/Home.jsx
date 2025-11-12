@@ -136,32 +136,9 @@ const Home = () => {
     };
     
     window.addEventListener('scroll', handleScrollProgress, { passive: true });
-    
-    // Initialize scroll animations with smooth fade in/out
-    const observerOptions = {
-      threshold: 0.15,
-      rootMargin: '0px 0px -100px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          // Add animate-in class for fade in effect
-          entry.target.classList.add('animate-in');
-        } else {
-          // Remove animate-in class for smooth fade out when scrolling back
-          entry.target.classList.remove('animate-in');
-        }
-      });
-    }, observerOptions);
-
-    // Observe all elements with scroll-animate class
-    const animatedElements = document.querySelectorAll('.scroll-animate');
-    animatedElements.forEach(el => observer.observe(el));
 
     return () => {
       window.removeEventListener('scroll', handleScrollProgress);
-      animatedElements.forEach(el => observer.unobserve(el));
     };
   }, []);
 
@@ -311,7 +288,7 @@ const Home = () => {
       <HeroBanner />
       
       <main className="home-content">
-        <section className="hero-section scroll-animate fade-up">
+        <section className="hero-section">
           <div className="hero-text">
             <h1 className="main-title">Kalakritam</h1>
             <h2 className="sub-title">Premier Art Workshops in Hyderabad</h2>
@@ -336,10 +313,10 @@ const Home = () => {
           </div>
         </section>
         
-        <section className="features-section scroll-animate scale-in">
+        <section className="features-section">
           <h2 className="section-title">Experience Indian Art at Kalakritam - Hyderabad's Premier Art Destination</h2>
           <div className="features-grid">
-            <article className="feature-card scroll-animate fade-left delay-100" onClick={() => handleNavigation('/gallery', 'Art Gallery')}>
+            <article className="feature-card" onClick={() => handleNavigation('/gallery', 'Art Gallery')}>
               <div className="card-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -352,7 +329,7 @@ const Home = () => {
               <button className="card-cta">Explore Gallery</button>
             </article>
 
-            <article className="feature-card scroll-animate fade-up delay-200" onClick={() => navigateWithLoading('/workshops')}>
+            <article className="feature-card" onClick={() => navigateWithLoading('/workshops')}>
               <div className="card-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -365,7 +342,7 @@ const Home = () => {
               <button className="card-cta">Join Workshops</button>
             </article>
 
-            <article className="feature-card scroll-animate fade-right delay-300" onClick={() => navigateWithLoading('/events')}>
+            <article className="feature-card" onClick={() => navigateWithLoading('/events')}>
               <div className="card-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
@@ -378,7 +355,7 @@ const Home = () => {
               <button className="card-cta">View Events</button>
             </article>
 
-            <article className="feature-card scroll-animate fade-left delay-400" onClick={() => navigateWithLoading('/artists')}>
+            <article className="feature-card" onClick={() => navigateWithLoading('/artists')}>
               <div className="card-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -391,7 +368,7 @@ const Home = () => {
               <button className="card-cta">Meet Artists</button>
             </article>
 
-            <article className="feature-card scroll-animate fade-up delay-500" onClick={() => navigateWithLoading('/artblogs')}>
+            <article className="feature-card" onClick={() => navigateWithLoading('/artblogs')}>
               <div className="card-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
@@ -404,7 +381,7 @@ const Home = () => {
               <button className="card-cta">Read Blogs</button>
             </article>
 
-            <article className="feature-card scroll-animate fade-right delay-600" onClick={() => navigateWithLoading('/contact')}>
+            <article className="feature-card" onClick={() => navigateWithLoading('/contact')}>
               <div className="card-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 00 18.54 8H16.8l-.86-2.58A1.5 1.5 0 00 14.52 4h-5.04c-.66 0-1.26.42-1.42 1.42L7.2 8H5.46c-.66 0-1.26.42-1.42 1.37L1.5 16H4v6h16z"/>
@@ -419,7 +396,7 @@ const Home = () => {
           </div>
         </section>
 
-        <section className="about-section scroll-animate slide-rotate">
+        <section className="about-section">
           <h2>About Kalakritam - Hyderabad's Premier Art Workshop Center | Manifesting Through Art</h2>
           <p>
             <strong>Kalakritam</strong>, derived from the Sanskrit words <em>kala</em> (art/skill) and <em>kritam</em> (creation/work), 
