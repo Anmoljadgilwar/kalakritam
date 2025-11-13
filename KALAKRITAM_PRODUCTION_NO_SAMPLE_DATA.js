@@ -16737,7 +16737,12 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
       params.push(limit, offset);
       const query = `
         SELECT id, title, description, image_url, thumbnail_url, artist, 
-               category, medium, dimensions, year, price, 
+               category, medium, dimensions, 
+               CASE 
+                 WHEN year IS NULL THEN NULL
+                 ELSE CAST(year AS INTEGER)
+               END as year, 
+               price, 
                available, slug, meta_title, meta_description, meta_keywords,
                og_title, og_description, og_image, created_at, updated_at
         FROM artworks 
@@ -16772,6 +16777,9 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
     try {
       const id = crypto.randomUUID();
       const now = (/* @__PURE__ */ new Date()).toISOString();
+      const yearValue = artworkData.year ? parseInt(artworkData.year, 10) : null;
+      const year = yearValue && !isNaN(yearValue) && yearValue >= 1 && yearValue <= 9999 ? yearValue : null;
+      console.log('📥 Backend received artwork data:', { receivedYear: artworkData.year, parsedYearValue: yearValue, validatedYear: year });
       const query = `
         INSERT INTO artworks (
           id, title, artist, description, medium, dimensions, 
@@ -16788,7 +16796,7 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
         artworkData.description || null,
         artworkData.medium || null,
         artworkData.dimensions || null,
-        artworkData.year || null,
+        year,
         artworkData.price || null,
         artworkData.category || null,
         artworkData.image_url || null,
@@ -16804,6 +16812,7 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
         now
       ]);
       if (result.success && result.data.length > 0) {
+        console.log('✅ Artwork stored in DB:', { id: result.data[0].id, year: result.data[0].year, yearType: typeof result.data[0].year });
         return c.json({
           success: true,
           message: "Artwork created successfully",
@@ -16826,6 +16835,9 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
     const artworkData = await c.req.json();
     try {
       const now = (/* @__PURE__ */ new Date()).toISOString();
+      const yearValue = artworkData.year ? parseInt(artworkData.year, 10) : null;
+      const year = yearValue && !isNaN(yearValue) && yearValue >= 1 && yearValue <= 9999 ? yearValue : null;
+      console.log('📥 Backend received artwork update:', { id, receivedYear: artworkData.year, parsedYearValue: yearValue, validatedYear: year });
       const query = `
         UPDATE artworks SET
           title = $2, artist = $3, description = $4, medium = $5, dimensions = $6,
@@ -16842,7 +16854,7 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
         artworkData.description || null,
         artworkData.medium || null,
         artworkData.dimensions || null,
-        artworkData.year || null,
+        year,
         artworkData.price || null,
         artworkData.category || null,
         artworkData.image_url || null,
@@ -16857,6 +16869,7 @@ var setupAdminRoutes = /* @__PURE__ */ __name2((app2) => {
         now
       ]);
       if (result.success && result.data.length > 0) {
+        console.log('✅ Artwork updated in DB:', { id: result.data[0].id, year: result.data[0].year, yearType: typeof result.data[0].year });
         return c.json({
           success: true,
           message: "Artwork updated successfully",

@@ -167,6 +167,37 @@ const AdminGallery = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Capture form values immediately from the form element to avoid React state race conditions
+    const form = e.target;
+    
+    // Get raw year value and log it for debugging
+    const rawYearValue = form.year.value;
+    console.log('🔍 Raw year input value:', {
+      rawValue: rawYearValue,
+      rawType: typeof rawYearValue,
+      rawIsEmpty: rawYearValue === '',
+      formDataYear: formData.year
+    });
+    
+    const formValues = {
+      title: form.title.value,
+      artist: form.artist.value,
+      description: form.description.value,
+      medium: form.medium.value,
+      dimensions: form.dimensions.value,
+      year: rawYearValue,  // Keep as string, will parse later
+      price: form.price.value,
+      category: form.category.value,
+      available: form.available.checked,
+      metaTitle: formData.metaTitle,
+      metaDescription: formData.metaDescription,
+      metaKeywords: formData.metaKeywords,
+      slug: formData.slug,
+      ogTitle: formData.ogTitle,
+      ogDescription: formData.ogDescription,
+      ogImage: formData.ogImage
+    };
+    
     try {
       const loadingId = toast.dataSaving(`${modalMode === 'create' ? 'Creating' : 'Updating'} artwork...`);
       
@@ -196,43 +227,50 @@ const AdminGallery = () => {
       // Match the exact database schema from Neon
       const artworkData = {
         // Required/basic fields
-        title: formData.title || "Untitled Artwork",
-        description: formData.description || null,
+        title: formValues.title || "Untitled Artwork",
+        description: formValues.description || null,
         
         // Artist fields (database has both artist_id and artist)
         artist_id: null, // We don't have artist management yet, so null
-        artist: formData.artist || null, // This will be the artist name as text
+        artist: formValues.artist || null, // This will be the artist name as text
         
         // Artwork details
-        category: formData.category || null,
-        medium: formData.medium || null,
-        dimensions: formData.dimensions || null,
-        year: formData.year ? parseInt(formData.year) : null,
-        price: formData.price ? parseFloat(formData.price) : null,
+        category: formValues.category || null,
+        medium: formValues.medium || null,
+        dimensions: formValues.dimensions || null,
+        year: formValues.year && formValues.year !== '' ? parseInt(formValues.year, 10) : null,
+        price: formValues.price && formValues.price !== '' ? parseFloat(formValues.price) : null,
         
         // Image fields (now with actual R2 URL)
         image_url: imageUrl || null,
-  imageUrl: imageUrl || null,
+        imageUrl: imageUrl || null,
         thumbnail_url: null, // We don't handle thumbnails yet
         
         // Status fields
-        available: formData.available !== false,
+        available: formValues.available !== false,
         
         // SEO/Meta fields
-        meta_title: formData.metaTitle || (formData.title ? `${formData.title} - Original Artwork | Kalakritam` : null),
-        meta_description: formData.metaDescription || (formData.title && formData.description ? 
-          `Discover "${formData.title}" - ${formData.description}. Explore unique artworks and cultural heritage at Kalakritam's online gallery.` : null),
-        meta_keywords: formData.metaKeywords || "kalakritam, art, culture, traditional art, contemporary art, artwork, painting, sculpture, gallery, art collection",
-        slug: formData.slug || (formData.title ? formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : null),
-        og_title: formData.ogTitle || (formData.title ? `${formData.title} - Discover Original Artwork` : null),
-        og_description: formData.ogDescription || (formData.title && formData.description ? 
-          `Experience "${formData.title}" and explore the rich world of art and culture at Kalakritam. ${formData.description}` : null),
-        og_image: formData.ogImage || imageUrl || null
+        meta_title: formValues.metaTitle || (formValues.title ? `${formValues.title} - Original Artwork | Kalakritam` : null),
+        meta_description: formValues.metaDescription || (formValues.title && formValues.description ? 
+          `Discover "${formValues.title}" - ${formValues.description}. Explore unique artworks and cultural heritage at Kalakritam's online gallery.` : null),
+        meta_keywords: formValues.metaKeywords || "kalakritam, art, culture, traditional art, contemporary art, artwork, painting, sculpture, gallery, art collection",
+        slug: formValues.slug || (formValues.title ? formValues.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : null),
+        og_title: formValues.ogTitle || (formValues.title ? `${formValues.title} - Discover Original Artwork` : null),
+        og_description: formValues.ogDescription || (formValues.title && formValues.description ? 
+          `Experience "${formValues.title}" and explore the rich world of art and culture at Kalakritam. ${formValues.description}` : null),
+        og_image: formValues.ogImage || imageUrl || null
         
         // Note: id, created_at, updated_at are auto-generated by the database
       };
       
-      console.log('Submitting artwork data with R2 image URL:', artworkData);
+      console.log('📤 Submitting artwork data:', {
+        year: artworkData.year,
+        yearType: typeof artworkData.year,
+        yearIsNull: artworkData.year === null,
+        formValuesYear: formValues.year,
+        formValuesYearType: typeof formValues.year,
+        allData: artworkData
+      });
       
       let response;
       if (modalMode === 'create') {
@@ -609,11 +647,14 @@ const AdminGallery = () => {
                     <div className="form-group">
                       <label htmlFor="year">Year</label>
                       <input
-                        type="number"
+                        type="text"
                         id="year"
                         name="year"
                         value={formData.year}
                         onChange={handleInputChange}
+                        placeholder="e.g., 2000"
+                        pattern="[0-9]*"
+                        inputMode="numeric"
                       />
                     </div>
                     
