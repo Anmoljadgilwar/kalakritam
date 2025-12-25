@@ -14210,6 +14210,7 @@ var setupUserAuthRoutes = /* @__PURE__ */ __name2((app2) => {
           email: user.email,
           provider: user.provider,
           photoUrl: user.photo_url,
+          profileImageUrl: user.profile_image_url,
           phone: user.phone,
           bio: user.bio,
           isActive: user.is_active,
@@ -14283,6 +14284,7 @@ var setupUserAuthRoutes = /* @__PURE__ */ __name2((app2) => {
           email: user.email,
           provider: user.provider,
           photoUrl: user.photo_url,
+          profileImageUrl: user.profile_image_url,
           phone: user.phone,
           bio: user.bio,
           isActive: user.is_active,
@@ -14431,6 +14433,7 @@ var setupUserAuthRoutes = /* @__PURE__ */ __name2((app2) => {
           provider: user.provider,
           googleId: user.google_id,
           photoUrl: user.photo_url,
+          profileImageUrl: user.profile_image_url,
           phone: user.phone,
           bio: user.bio,
           isActive: user.is_active,
@@ -14452,7 +14455,7 @@ var setupUserAuthRoutes = /* @__PURE__ */ __name2((app2) => {
   app2.put("/api/auth/profile", authenticateUser, catchAsync(async (c) => {
     try {
       const tokenUser = c.get("user");
-      const { name, phone, bio } = await c.req.json();
+      const { name, phone, bio, profile_image_url } = await c.req.json();
       
       const db = createDatabase(c.env);
       if (!db) {
@@ -14464,9 +14467,9 @@ var setupUserAuthRoutes = /* @__PURE__ */ __name2((app2) => {
       
       const now = new Date().toISOString();
       const updateResult = await db.query(`
-        UPDATE users SET name = $1, phone = $2, bio = $3, updated_at = $4 
-        WHERE id = $5 RETURNING *
-      `, [name || null, phone || null, bio || null, now, tokenUser.userId]);
+        UPDATE users SET name = $1, phone = $2, bio = $3, profile_image_url = $4, updated_at = $5 
+        WHERE id = $6 RETURNING *
+      `, [name || null, phone || null, bio || null, profile_image_url || null, now, tokenUser.userId]);
       
       const user = updateResult?.data?.[0] || null;
       
@@ -14486,6 +14489,7 @@ var setupUserAuthRoutes = /* @__PURE__ */ __name2((app2) => {
           provider: user.provider,
           googleId: user.google_id,
           photoUrl: user.photo_url,
+          profileImageUrl: user.profile_image_url,
           phone: user.phone,
           bio: user.bio,
           isActive: user.is_active,
@@ -18348,7 +18352,7 @@ var setupUploadRoutes = /* @__PURE__ */ __name2((app2) => {
         }, 400);
       }
       // Allow specific folders, including hero-banners
-      const validFolders = ["artworks", "workshops", "events", "artists", "blogs", "images", "artparty", "artpartyimages", "hero-banners", "general"];
+      const validFolders = ["artworks", "workshops", "events", "artists", "blogs", "images", "artparty", "artpartyimages", "hero-banners", "user-profiles", "general"];
       const sanitizedFolder = validFolders.includes(folder) ? folder : "general";
       const timestamp = Date.now();
       const fileExtension = file.name.split(".").pop();
@@ -19337,7 +19341,7 @@ app.get("/api/info", (c) => {
       contact: "/contact/*",
       tickets: "/tickets/*",
       admin: "/admin/*",
-      upload: "/upload/*",
+       upload: "/upload/*",
       images: "/images/*",
       debug: "/debug/*"
     }

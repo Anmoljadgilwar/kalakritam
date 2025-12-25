@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useUserAuth } from '../../contexts/UserAuthContext';
 import { validateUsernameMatch, getUserPath, getNavigationPath } from '../../utils/userHelpers';
 import { toast } from '../../utils/notifications';
+import { config } from '../../config/environment';
 import Header from '../Header';
 import Footer from '../Footer';
 import './UserDashboard.css';
@@ -16,8 +17,12 @@ const UserDashboard = () => {
     name: '',
     email: '',
     phone: '',
-    bio: ''
+    bio: '',
+    profileImageUrl: ''
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Validate username in URL matches logged-in user
   useEffect(() => {
@@ -42,8 +47,10 @@ const UserDashboard = () => {
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
-        bio: user.bio || ''
+        bio: user.bio || '',
+        profileImageUrl: user.profileImageUrl || ''
       });
+      setImagePreview(user.profileImageUrl || user.photoUrl || null);
     }
   }, [user, isLoading, isAuthenticated]);
 
@@ -61,10 +68,137 @@ const UserDashboard = () => {
     }));
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSaveProfile = async () => {
-    // This will be implemented when the API is ready
-    toast.info('Profile update feature coming soon!');
-    setIsEditing(false);
+    setIsSaving(true);
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        toast.error('You are not logged in. Please log in again.');
+        logout();
+        navigate('/user/login');
+        return;
+      }
+
+      let imageUrl = profileData.profileImageUrl;
+
+      // If a new image was selected, upload it first
+      if (imageFile) {
+        try {
+          toast.info('Uploading profile image...');
+          
+          const formData = new FormData();
+          formData.append('file', imageFile);
+          formData.append('folder', 'user-profiles');
+
+          const uploadResponse = await fetch(`${config.apiBaseUrl}/upload/image`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: formData
+          });
+
+          if (!uploadResponse.ok) {
+            const errorData = await uploadResponse.json();
+            
+            // Handle expired token in upload
+            if (uploadResponse.status === 403 || uploadResponse.status === 401) {
+              toast.error('Your session has expired. Please log in again.');
+              logout();
+              navigate('/user/login');
+              return;
+            }
+            
+            throw new Error(errorData.message || 'Failed to upload image');
+          }
+
+          const uploadData = await uploadResponse.json();
+          
+          if (uploadData.success) {
+            imageUrl = uploadData.data?.url || uploadData.url;
+            toast.success('Image uploaded successfully');
+          } else {
+            throw new Error(uploadData.message || 'Failed to upload image');
+          }
+        } catch (uploadError) {
+          console.error('Image upload error:', uploadError);
+          toast.error(`Image upload failed: ${uploadError.message}`);
+          setIsSaving(false);
+          return; // Don't continue if image upload fails
+        }
+      }
+
+      // Update profile
+      const response = await fetch(`${config.apiBaseUrl}/api/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: profileData.name,
+          phone: profileData.phone,
+          bio: profileData.bio,
+          profile_image_url: imageUrl
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Profile update failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData
+        });
+        
+        // Handle expired token
+        if (response.status === 403 || response.status === 401) {
+          toast.error('Your session has expired. Please log in again.');
+          logout();
+          navigate('/user/login');
+          return;
+        }
+        
+        throw new Error(errorData.message || errorData.error || `Failed to update profile (${response.status})`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        toast.success('Profile updated successfully!');
+        setIsEditing(false);
+        setImageFile(null);
+        // Update user context with new data
+        window.location.reload(); // Refresh to get updated user data
+      } else {
+        throw new Error(data.error || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Profile update error:', error);
+      toast.error(error.message || 'Failed to update profile');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (isLoading) {
@@ -123,14 +257,33 @@ const UserDashboard = () => {
             <div className="profile-content">
               <div className="profile-avatar">
                 <div className="avatar-circle">
-                  {user.photoUrl ? (
-                    <img src={user.photoUrl} alt={user.name} />
+                  {imagePreview ? (
+                    <img src={imagePreview} alt={user.name} />
                   ) : (
                     <span className="avatar-initials">
                       {user.name?.charAt(0).toUpperCase()}
                     </span>
                   )}
                 </div>
+                {isEditing && (
+                  <div className="avatar-upload">
+                    <input
+                      type="file"
+                      id="profile-image"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      style={{ display: 'none' }}
+                    />
+                    <label htmlFor="profile-image" className="upload-btn">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                      Upload Photo
+                    </label>
+                  </div>
+                )}
                 {user.provider === 'google' && (
                   <div className="google-badge">
                     <svg width="16" height="16" viewBox="0 0 24 24">
@@ -202,8 +355,9 @@ const UserDashboard = () => {
                   <button 
                     className="save-btn"
                     onClick={handleSaveProfile}
+                    disabled={isSaving}
                   >
-                    Save Changes
+                    {isSaving ? 'Saving...' : 'Save Changes'}
                   </button>
                 )}
               </div>
@@ -253,6 +407,25 @@ const UserDashboard = () => {
                     {user.lastLogin ? 
                       `Last login: ${new Date(user.lastLogin).toLocaleDateString()}` :
                       'Active'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="stat-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <div className="stat-info">
+                  <p className="stat-label">Last Updated</p>
+                  <p className="stat-value">
+                    {user.updatedAt ? 
+                      new Date(user.updatedAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      }) :
+                      'Not updated'}
                   </p>
                 </div>
               </div>

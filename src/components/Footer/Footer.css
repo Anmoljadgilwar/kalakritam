@@ -112,14 +112,11 @@
   color: #d4af85;
   transition: all 0.3s ease;
   padding: 0.5rem;
-  border-radius: 50%;
-  background: rgba(195, 143, 33, 0.1);
   flex-shrink: 0;
 }
 
 .social-link:hover {
   color: #c38f21;
-  background: rgba(195, 143, 33, 0.2);
   transform: translateY(-2px);
 }
 

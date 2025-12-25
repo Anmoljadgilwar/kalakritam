@@ -327,7 +327,7 @@ const Gallery = () => {
                     <div className="artwork-overlay-content universal-card-overlay-content">
                       <h3>{artwork.title}</h3>
                       <p>by {artwork.artist}</p>
-                      <span className="highlight-text">{artwork.price}</span>
+                      {artwork.price && <span className="highlight-text">{artwork.price}</span>}
                     </div>
                   </div>
                 </div>
@@ -337,18 +337,24 @@ const Gallery = () => {
                   <p className="artwork-artist universal-card-subtitle">by {artwork.artist}</p>
                   
                   <div className="artwork-details universal-card-details">
-                    <div className="detail-row universal-card-detail-row">
-                      <span className="detail-label universal-card-detail-label">Medium:</span>
-                      <span className="detail-value universal-card-detail-value">{artwork.medium}</span>
-                    </div>
-                    <div className="detail-row universal-card-detail-row">
-                      <span className="detail-label universal-card-detail-label">Year:</span>
-                      <span className="detail-value universal-card-detail-value">{artwork.year}</span>
-                    </div>
-                    <div className="detail-row universal-card-detail-row">
-                      <span className="detail-label universal-card-detail-label">Category:</span>
-                      <span className="detail-value universal-card-detail-value">{artwork.category}</span>
-                    </div>
+                    {artwork.medium && (
+                      <div className="detail-row universal-card-detail-row">
+                        <span className="detail-label universal-card-detail-label">Medium:</span>
+                        <span className="detail-value universal-card-detail-value">{artwork.medium}</span>
+                      </div>
+                    )}
+                    {artwork.year && (
+                      <div className="detail-row universal-card-detail-row">
+                        <span className="detail-label universal-card-detail-label">Year:</span>
+                        <span className="detail-value universal-card-detail-value">{artwork.year}</span>
+                      </div>
+                    )}
+                    {artwork.category && (
+                      <div className="detail-row universal-card-detail-row">
+                        <span className="detail-label universal-card-detail-label">Category:</span>
+                        <span className="detail-value universal-card-detail-value">{artwork.category}</span>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="artwork-actions universal-card-actions">

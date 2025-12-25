@@ -315,45 +315,59 @@ const ArtworkDetail = () => {
                 }
               }}
             />
-            <div className="image-meta-badges">
-              <span className="badge category">{artwork.category}</span>
-              <span className="badge year">{artwork.year}</span>
-            </div>
+            {(artwork.category || artwork.year) && (
+              <div className="image-meta-badges">
+                {artwork.category && <span className="badge category">{artwork.category}</span>}
+                {artwork.year && <span className="badge year">{artwork.year}</span>}
+              </div>
+            )}
           </div>
           
           <div className="artwork-info-panel">
             <h1 className="artwork-title">{artwork.title}</h1>
             <p className="artwork-artist">by {artwork.artist}</p>
-            <div className="artwork-price">{artwork.price}</div>
+            {artwork.price && <div className="artwork-price">{artwork.price}</div>}
             
             {/* About This Artwork Section */}
-            <div className="artwork-about-section">
-              <h3>About This Artwork</h3>
-              <p className="artwork-description">{artwork.description}</p>
-            </div>
+            {artwork.description && (
+              <div className="artwork-about-section">
+                <h3>About This Artwork</h3>
+                <p className="artwork-description">{artwork.description}</p>
+              </div>
+            )}
             
             {/* Specifications */}
-            <div className="artwork-specifications">
-              <h3>Specifications</h3>
-              <div className="artwork-specs">
-                <div className="spec-item">
-                  <span className="label">Medium:</span>
-                  <span className="value">{artwork.medium}</span>
-                </div>
-                <div className="spec-item">
-                  <span className="label">Year:</span>
-                  <span className="value">{artwork.year}</span>
-                </div>
-                <div className="spec-item">
-                  <span className="label">Category:</span>
-                  <span className="value">{artwork.category}</span>
-                </div>
-                <div className="spec-item">
-                  <span className="label">Artist:</span>
-                  <span className="value">{artwork.artist}</span>
+            {(artwork.medium || artwork.year || artwork.category || artwork.artist) && (
+              <div className="artwork-specifications">
+                <h3>Specifications</h3>
+                <div className="artwork-specs">
+                  {artwork.medium && (
+                    <div className="spec-item">
+                      <span className="label">Medium:</span>
+                      <span className="value">{artwork.medium}</span>
+                    </div>
+                  )}
+                  {artwork.year && (
+                    <div className="spec-item">
+                      <span className="label">Year:</span>
+                      <span className="value">{artwork.year}</span>
+                    </div>
+                  )}
+                  {artwork.category && (
+                    <div className="spec-item">
+                      <span className="label">Category:</span>
+                      <span className="value">{artwork.category}</span>
+                    </div>
+                  )}
+                  {artwork.artist && (
+                    <div className="spec-item">
+                      <span className="label">Artist:</span>
+                      <span className="value">{artwork.artist}</span>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
             
             {/* Additional Info */}
             <div className="artwork-additional-info">
