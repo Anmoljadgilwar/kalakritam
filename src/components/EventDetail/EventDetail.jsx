@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useUsernameValidation } from '../ValidateUsername/ValidateUsername';
 import { toast } from '../../utils/notifications.js';
 import Header from '../Header';
@@ -9,6 +10,7 @@ import Particles from '../Particles';
 import LazyImage from '../LazyImage';
 import { config } from '../../config/environment';
 import { generateSlug } from '../../utils/seoHelpers';
+import { generateEventSEO } from '../../utils/dynamicSeo';
 import { 
   getMobileParticleConfig, 
   getOptimizedImageUrl, 
@@ -33,6 +35,7 @@ const EventDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [initializing, setInitializing] = useState(true);
+  const [seoMetadata, setSeoMetadata] = useState(null);
   
   // Mobile optimization states (matching Workshop/Gallery)
   const [isMobile, setIsMobile] = useState(shouldOptimizeForMobile());
@@ -173,27 +176,11 @@ const EventDetail = () => {
               mobilePerformanceMonitor.endLoadTime();
             }
             
-            // Basic SEO tag updates (client side)
-            document.title = `${found.title} - Kalakritam Events`;
-            const desc = found.description || `${found.title} event at ${found.venue}`;
-            let metaDesc = document.querySelector('meta[name="description"]');
-            if (!metaDesc) {
-              metaDesc = document.createElement('meta');
-              metaDesc.name = 'description';
-              document.head.appendChild(metaDesc);
-            }
-            metaDesc.content = desc;
+            // Generate comprehensive dynamic SEO metadata
+            const seo = generateEventSEO(found);
+            setSeoMetadata(seo);
+            console.log('Generated SEO metadata:', seo);
             
-            // Set canonical URL to non-user-specific path for SEO
-            const canonicalSlug = found.slug || slug;
-            const canonicalUrl = `https://kalakritam.in/events/${canonicalSlug}`;
-            let canonical = document.querySelector('link[rel="canonical"]');
-            if (!canonical) {
-              canonical = document.createElement('link');
-              canonical.rel = 'canonical';
-              document.head.appendChild(canonical);
-            }
-            canonical.href = canonicalUrl;
             toast.dataLoaded('Event loaded');
           } else {
             setError('Event not found');
@@ -290,6 +277,35 @@ const EventDetail = () => {
 
   return (
     <div className="event-detail-container" data-connection={networkOptimizations.lowerQuality ? 'slow' : 'fast'}>
+      {/* Dynamic SEO Meta Tags */}
+      {seoMetadata && (
+        <Helmet>
+          <title>{seoMetadata.title}</title>
+          <meta name="description" content={seoMetadata.description} />
+          <meta name="keywords" content={seoMetadata.keywords} />
+          <link rel="canonical" href={seoMetadata.canonical} />
+          
+          {/* Open Graph Tags */}
+          <meta property="og:title" content={seoMetadata.ogTitle} />
+          <meta property="og:description" content={seoMetadata.ogDescription} />
+          <meta property="og:image" content={seoMetadata.ogImage} />
+          <meta property="og:url" content={seoMetadata.ogUrl} />
+          <meta property="og:type" content={seoMetadata.ogType} />
+          <meta property="og:site_name" content="Kalakritam" />
+          
+          {/* Twitter Card Tags */}
+          <meta name="twitter:card" content={seoMetadata.twitterCard} />
+          <meta name="twitter:title" content={seoMetadata.twitterTitle} />
+          <meta name="twitter:description" content={seoMetadata.twitterDescription} />
+          <meta name="twitter:image" content={seoMetadata.twitterImage} />
+          
+          {/* Structured Data */}
+          <script type="application/ld+json">
+            {JSON.stringify(seoMetadata.structuredData)}
+          </script>
+        </Helmet>
+      )}
+      
       {/* Particles Background - Optimized for mobile (matching Workshop/Gallery) */}
       {particleConfig.particleCount > 0 && (
         <div className="event-detail-particles-background">
@@ -408,37 +424,51 @@ const EventDetail = () => {
               )}
             </div>
             
-            <p className="event-detail-venue">at {event.venue}</p>
-            <div className="event-detail-price">₹{event.ticketPrice}</div>
+            {event.venue && <p className="event-detail-venue">at {event.venue}</p>}
+            {event.ticketPrice && <div className="event-detail-price">₹{event.ticketPrice}</div>}
             
             {/* About This Event Section */}
-            <div className="event-about-section">
-              <h3>About This Event</h3>
-              <p className="event-detail-description">{event.description}</p>
-            </div>
+            {event.description && (
+              <div className="event-about-section">
+                <h3>About This Event</h3>
+                <p className="event-detail-description">{event.description}</p>
+              </div>
+            )}
             
             {/* Event Details */}
             <div className="event-detail-specifications">
               <h3>Event Details</h3>
               <div className="event-specs">
-                <div className="spec-item">
-                  <span className="label">Start Date:</span>
-                  <span className="value">{formatDate(event.startDate)}</span>
-                </div>
-                <div className="spec-item">
-                  <span className="label">End Date:</span>
-                  <span className="value">{formatDate(event.endDate)}</span>
-                </div>
+                {event.startDate && (
+                  <div className="spec-item">
+                    <span className="label">Start Date:</span>
+                    <span className="value">{formatDate(event.startDate)}</span>
+                  </div>
+                )}
+                {event.endDate && (
+                  <div className="spec-item">
+                    <span className="label">End Date:</span>
+                    <span className="value">{formatDate(event.endDate)}</span>
+                  </div>
+                )}
+                {event.category && (
+                  <div className="spec-item">
+                    <span className="label">Category:</span>
+                    <span className="value">{event.category}</span>
+                  </div>
+                )}
                 {event.venue && (
                   <div className="spec-item full-width">
                     <span className="label">Venue:</span>
                     <span className="value">{event.venue}</span>
                   </div>
                 )}
-                <div className="spec-item">
-                  <span className="label">Max Attendees:</span>
-                  <span className="value">{event.maxAttendees || 'No limit'}</span>
-                </div>
+                {event.maxAttendees && (
+                  <div className="spec-item">
+                    <span className="label">Max Attendees:</span>
+                    <span className="value">{event.maxAttendees}</span>
+                  </div>
+                )}
               </div>
             </div>
             

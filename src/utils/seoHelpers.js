@@ -1,4 +1,23 @@
 // SEO Utility Functions for Admin Portal
+import { generateEventSEO, generateWorkshopSEO } from './dynamicSeo';
+
+/**
+ * Detect event/workshop type from text
+ */
+const detectEventType = (title, description, category) => {
+  const combined = `${category || ''} ${title || ''} ${description || ''}`.toLowerCase();
+  
+  if (combined.includes('workshop')) return 'Workshop';
+  if (combined.includes('exhibition')) return 'Exhibition';
+  if (combined.includes('art show')) return 'Art Show';
+  if (combined.includes('masterclass')) return 'Masterclass';
+  if (combined.includes('seminar')) return 'Seminar';
+  if (combined.includes('festival')) return 'Festival';
+  if (combined.includes('performance')) return 'Performance';
+  if (combined.includes('cultural')) return 'Cultural Event';
+  
+  return 'Event';
+};
 
 /**
  * Generate URL-friendly slug from text
@@ -18,7 +37,7 @@ export const generateSlug = (text) => {
 /**
  * Generate optimized meta title
  */
-export const generateMetaTitle = (title, type = 'general', siteName = 'Kalakritam') => {
+export const generateMetaTitle = (title, type = 'general', siteName = 'Kalakritam', category = '', description = '') => {
   if (!title) return '';
   
   const maxLength = 60;
@@ -32,10 +51,14 @@ export const generateMetaTitle = (title, type = 'general', siteName = 'Kalakrita
       metaTitle = `${title} - Artist Profile | ${siteName}`;
       break;
     case 'event':
-      metaTitle = `${title} - Cultural Event | ${siteName}`;
+      // Detect actual event type
+      const eventType = detectEventType(title, description, category);
+      metaTitle = `${title} - ${eventType} | ${siteName}`;
       break;
     case 'workshop':
-      metaTitle = `${title} - Art Workshop | ${siteName}`;
+      // Detect actual workshop type
+      const workshopType = detectEventType(title, description, category);
+      metaTitle = `${title} - ${workshopType} | ${siteName}`;
       break;
     case 'blog':
       metaTitle = `${title} - Art Blog | ${siteName}`;
@@ -139,7 +162,7 @@ export const generateKeywords = (title, description, type = 'general', category 
 /**
  * Generate Open Graph title
  */
-export const generateOGTitle = (title, type = 'general') => {
+export const generateOGTitle = (title, type = 'general', category = '', description = '') => {
   if (!title) return '';
   
   const maxLength = 60;
@@ -153,10 +176,14 @@ export const generateOGTitle = (title, type = 'general') => {
       ogTitle = `${title} - Artist Showcase`;
       break;
     case 'event':
-      ogTitle = `${title} - Cultural Event`;
+      // Detect actual event type
+      const eventType = detectEventType(title, description, category);
+      ogTitle = `${title} - ${eventType}`;
       break;
     case 'workshop':
-      ogTitle = `${title} - Art Workshop`;
+      // Detect actual workshop type
+      const workshopType = detectEventType(title, description, category);
+      ogTitle = `${title} - ${workshopType}`;
       break;
     case 'blog':
       ogTitle = `${title} - Art & Culture Blog`;
@@ -217,11 +244,11 @@ export const generateSEOFields = (data) => {
   const { title, description, type = 'general', category = '', image = '' } = data;
   
   return {
-    metaTitle: generateMetaTitle(title, type),
+    metaTitle: generateMetaTitle(title, type, 'Kalakritam', category, description),
     metaDescription: generateMetaDescription(description, title, type),
     metaKeywords: generateKeywords(title, description, type, category),
     slug: generateSlug(title),
-    ogTitle: generateOGTitle(title, type),
+    ogTitle: generateOGTitle(title, type, category, description),
     ogDescription: generateOGDescription(description, title, type),
     ogImage: image || ''
   };

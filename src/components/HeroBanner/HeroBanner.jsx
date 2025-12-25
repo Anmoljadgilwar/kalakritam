@@ -137,47 +137,6 @@ const HeroBanner = () => {
             <h2 className="hero-banner-title">{currentBanner.title}</h2>
           </div>
         )}
-
-        {/* Navigation arrows for multiple banners */}
-        {banners.length > 1 && (
-          <>
-            <button 
-              className="hero-banner-arrow hero-banner-arrow-left"
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePrevious();
-              }}
-              aria-label="Previous banner"
-            >
-              ‹
-            </button>
-            <button 
-              className="hero-banner-arrow hero-banner-arrow-right"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleNext();
-              }}
-              aria-label="Next banner"
-            >
-              ›
-            </button>
-
-            {/* Dots indicator */}
-            <div className="hero-banner-dots">
-              {banners.map((_, index) => (
-                <button
-                  key={index}
-                  className={`hero-banner-dot ${index === currentIndex ? 'active' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDotClick(index);
-                  }}
-                  aria-label={`Go to banner ${index + 1}`}
-                />
-              ))}
-            </div>
-          </>
-        )}
       </div>
     </div>
   );

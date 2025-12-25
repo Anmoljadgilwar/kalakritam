@@ -514,7 +514,7 @@ const AdminEvents = () => {
             </button>
             <div className="gallery-stats">
               <span className="stat">Total: {events.length}</span>
-              <span className="stat">Upcoming: {events.filter(e => new Date(e.date) > new Date()).length}</span>
+              <span className="stat">Upcoming: {events.filter(e => new Date(e.start_date || e.startDate) > new Date()).length}</span>
             </div>
           </div>
         </section>
@@ -559,11 +559,12 @@ const AdminEvents = () => {
                     <td>
                       <span className="category-badge">{event.category}</span>
                     </td>
-                    <td className="price-cell">{event.price ? `₹${event.price}` : 'Free'}</td>
+                    <td className="price-cell">{(event.ticket_price || event.ticketPrice) ? `₹${event.ticket_price || event.ticketPrice}` : 'Free'}</td>
                     <td>
                       <div className="status-badges">
                         {event.active && <span className="status-badge available">Active</span>}
                         {new Date(event.start_date || event.startDate) > new Date() && <span className="status-badge upcoming">Upcoming</span>}
+                        {new Date(event.start_date || event.startDate) <= new Date() && <span className="status-badge past">Past</span>}
                       </div>
                     </td>
                     <td>
@@ -646,12 +647,12 @@ const AdminEvents = () => {
                       <span>{selectedEvent?.title}</span>
                     </div>
                     <div className="detail-item">
-                      <label>Date:</label>
-                      <span>{formatDate(selectedEvent?.date)}</span>
+                      <label>Start Date:</label>
+                      <span>{formatDate(selectedEvent?.start_date || selectedEvent?.startDate)}</span>
                     </div>
                     <div className="detail-item">
-                      <label>Time:</label>
-                      <span>{selectedEvent?.time}</span>
+                      <label>End Date:</label>
+                      <span>{formatDate(selectedEvent?.end_date || selectedEvent?.endDate)}</span>
                     </div>
                     <div className="detail-item">
                       <label>Venue:</label>
@@ -667,11 +668,11 @@ const AdminEvents = () => {
                     </div>
                     <div className="detail-item">
                       <label>Price:</label>
-                      <span>{selectedEvent?.price ? `₹${selectedEvent.price}` : 'Free'}</span>
+                      <span>{(selectedEvent?.ticket_price || selectedEvent?.ticketPrice) ? `₹${selectedEvent.ticket_price || selectedEvent.ticketPrice}` : 'Free'}</span>
                     </div>
                     <div className="detail-item">
                       <label>Max Attendees:</label>
-                      <span>{selectedEvent?.maxAttendees || 'No limit'}</span>
+                      <span>{(selectedEvent?.max_attendees || selectedEvent?.maxAttendees) || 'No limit'}</span>
                     </div>
                     <div className="detail-item full-width">
                       <label>Description:</label>
@@ -861,6 +862,7 @@ const AdminEvents = () => {
                     onSeoChange={handleSeoChange}
                     mainTitle={formData.title}
                     mainDescription={formData.description}
+                    mainCategory={formData.category}
                     type="event"
                     autoGenerate={true}
                   />

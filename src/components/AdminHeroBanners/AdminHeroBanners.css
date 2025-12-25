@@ -1,11 +1,24 @@
 /* Admin Hero Banners Management Styles */
-.admin-page-container {
-  min-height: 100vh;
-  background-color: #000000;
-  color: white;
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  width: 100%;
-  overflow-x: hidden;
+/* Import shared admin gallery styles for consistent table layout */
+@import '../AdminGallery/AdminGallery.css';
+
+/* Additional specific styles for hero banners */
+.link-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-preview {
+  color: #c38f21;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.link-preview:hover {
+  text-decoration: underline;
+  color: #d4af85;
 }
 
 .admin-hero-banners {
@@ -374,203 +387,9 @@
   margin-top: 1.5rem;
 }
 
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(5px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-}
-
-.modal-content {
-  background: linear-gradient(135deg, rgba(0, 24, 24, 0.98) 0%, rgba(0, 32, 32, 0.95) 100%);
-  border: 1px solid rgba(195, 143, 33, 0.3);
-  border-radius: 12px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(195, 143, 33, 0.2);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(195, 143, 33, 0.2);
-}
-
-.modal-header h2 {
-  margin: 0;
-  font-size: 1.8rem;
-  color: #c38f21;
-  font-family: 'The Seasons', 'Cinzel', serif;
-}
-
-.modal-close {
-  background: transparent;
-  border: 1px solid rgba(195, 143, 33, 0.3);
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-  color: #d4af85;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.modal-close:hover {
-  background: rgba(195, 143, 33, 0.1);
-  border-color: #c38f21;
-  color: #c38f21;
-}
-
-.banner-form {
-  padding: 1.5rem;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #c38f21;
-  font-family: 'The Seasons', 'Cinzel', serif;
-}
-
-.form-group input[type="text"],
-.form-group input[type="url"],
-.form-group input[type="number"],
-.form-group select {
-  width: 100%;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(195, 143, 33, 0.3);
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #d4af85;
-  transition: all 0.3s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #c38f21;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.form-group input[type="file"] {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px dashed rgba(195, 143, 33, 0.3);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  color: #d4af85;
-  cursor: pointer;
-}
-
-.form-group input[type="file"]:hover {
-  border-color: #c38f21;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.form-group small {
-  display: block;
-  margin-top: 0.5rem;
-  color: rgba(212, 175, 133, 0.7);
-  font-size: 0.85rem;
-}
-
-.media-preview {
-  margin-top: 1rem;
-  text-align: center;
-  border: 1px solid rgba(195, 143, 33, 0.2);
-  border-radius: 8px;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.checkbox-group label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-weight: normal;
-}
-
-.checkbox-group input[type="checkbox"] {
-  width: auto;
-  cursor: pointer;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(195, 143, 33, 0.2);
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-  .admin-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
+/* Responsive adjustments for banners table */
 @media (max-width: 768px) {
-  .admin-hero-banners {
-    padding: clamp(1.5rem, 4vw, 2rem) clamp(0.75rem, 3vw, 1rem);
-  }
-
-  .admin-header h1 {
-    font-size: clamp(2rem, 4vw, 2.5rem);
-  }
-  
-  .admin-header p {
-    font-size: clamp(1rem, 2vw, 1.1rem);
-  }
-
-  .banners-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-content {
-    max-height: 95vh;
-  }
-
-  .banner-form {
-    padding: 1rem;
-  }
-
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .form-actions button {
-    width: 100%;
-  }
-  
-  .admin-stats {
-    flex-wrap: wrap;
+  .link-cell {
+    max-width: 150px;
   }
 }

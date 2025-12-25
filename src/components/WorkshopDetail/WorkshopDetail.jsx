@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useUsernameValidation } from '../ValidateUsername/ValidateUsername';
 import Header from '../Header';
 import Footer from '../Footer';
@@ -9,6 +10,7 @@ import LazyImage from '../LazyImage';
 import { config } from '../../config/environment';
 import { generateSlug } from '../../utils/seoHelpers';
 import { toast } from '../../utils/notifications.js';
+import { generateWorkshopSEO } from '../../utils/dynamicSeo';
 import { 
   getMobileParticleConfig, 
   getOptimizedImageUrl, 
@@ -33,6 +35,7 @@ const WorkshopDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [initializing, setInitializing] = useState(true);
+  const [seoMetadata, setSeoMetadata] = useState(null);
   
   // Mobile optimization states (matching Gallery)
   const [isMobile, setIsMobile] = useState(shouldOptimizeForMobile());
@@ -169,27 +172,11 @@ const WorkshopDetail = () => {
               mobilePerformanceMonitor.endLoadTime();
             }
             
-            // Basic SEO tag updates (client side)
-            document.title = `${found.title} - Kalakritam Workshops`;
-            const desc = found.description || `${found.title} workshop by ${found.instructor}`;
-            let metaDesc = document.querySelector('meta[name="description"]');
-            if (!metaDesc) {
-              metaDesc = document.createElement('meta');
-              metaDesc.name = 'description';
-              document.head.appendChild(metaDesc);
-            }
-            metaDesc.content = desc;
+            // Generate comprehensive dynamic SEO metadata
+            const seo = generateWorkshopSEO(found);
+            setSeoMetadata(seo);
+            console.log('Generated Workshop SEO metadata:', seo);
             
-            // Set canonical URL to non-user-specific path for SEO
-            const canonicalSlug = found.slug || slug;
-            const canonicalUrl = `https://kalakritam.in/workshops/${canonicalSlug}`;
-            let canonical = document.querySelector('link[rel="canonical"]');
-            if (!canonical) {
-              canonical = document.createElement('link');
-              canonical.rel = 'canonical';
-              document.head.appendChild(canonical);
-            }
-            canonical.href = canonicalUrl;
             toast.dataLoaded('Workshop loaded');
           } else {
             setError('Workshop not found');
@@ -288,6 +275,35 @@ const WorkshopDetail = () => {
 
   return (
     <div className="workshop-detail-container" data-connection={networkOptimizations.lowerQuality ? 'slow' : 'fast'}>
+      {/* Dynamic SEO Meta Tags */}
+      {seoMetadata && (
+        <Helmet>
+          <title>{seoMetadata.title}</title>
+          <meta name="description" content={seoMetadata.description} />
+          <meta name="keywords" content={seoMetadata.keywords} />
+          <link rel="canonical" href={seoMetadata.canonical} />
+          
+          {/* Open Graph Tags */}
+          <meta property="og:title" content={seoMetadata.ogTitle} />
+          <meta property="og:description" content={seoMetadata.ogDescription} />
+          <meta property="og:image" content={seoMetadata.ogImage} />
+          <meta property="og:url" content={seoMetadata.ogUrl} />
+          <meta property="og:type" content={seoMetadata.ogType} />
+          <meta property="og:site_name" content="Kalakritam" />
+          
+          {/* Twitter Card Tags */}
+          <meta name="twitter:card" content={seoMetadata.twitterCard} />
+          <meta name="twitter:title" content={seoMetadata.twitterTitle} />
+          <meta name="twitter:description" content={seoMetadata.twitterDescription} />
+          <meta name="twitter:image" content={seoMetadata.twitterImage} />
+          
+          {/* Structured Data */}
+          <script type="application/ld+json">
+            {JSON.stringify(seoMetadata.structuredData)}
+          </script>
+        </Helmet>
+      )}
+      
       {/* Particles Background - Optimized for mobile (matching Gallery) */}
       {particleConfig.particleCount > 0 && (
         <div className="workshop-detail-particles-background">
@@ -346,7 +362,7 @@ const WorkshopDetail = () => {
                 }}
               />
               <div className="image-meta-badges">
-                <span className="badge duration">{workshop.duration}</span>
+                {workshop.duration && <span className="badge duration">{workshop.duration}</span>}
                 {workshop.active && <span className="badge active">Active</span>}
               </div>
             </div>
@@ -355,7 +371,7 @@ const WorkshopDetail = () => {
             <div className="workshop-additional-info">
               <div className="info-card">
                 <h4>What's Included</h4>
-                <p>All materials and guidance will be provided during the workshop session. Expert instruction from {workshop.instructor}.</p>
+                <p>All materials and guidance will be provided during the workshop session.{workshop.instructor && ` Expert instruction from ${workshop.instructor}.`}</p>
               </div>
               
               <div className="info-card">
@@ -368,49 +384,69 @@ const WorkshopDetail = () => {
           {/* Right Column - Workshop Info */}
           <div className="workshop-info-panel">
             <h1 className="workshop-title">{workshop.title}</h1>
-            <p className="workshop-instructor">by {workshop.instructor}</p>
-            <div className="workshop-price">₹{workshop.price}</div>
+            {workshop.instructor && <p className="workshop-instructor">by {workshop.instructor}</p>}
+            {workshop.price && <div className="workshop-price">₹{workshop.price}</div>}
             
             {/* About This Workshop Section */}
-            <div className="workshop-about-section">
-              <h3>About This Workshop</h3>
-              <p className="workshop-description">{workshop.description}</p>
-            </div>
+            {workshop.description && (
+              <div className="workshop-about-section">
+                <h3>About This Workshop</h3>
+                <p className="workshop-description">{workshop.description}</p>
+              </div>
+            )}
             
             {/* Workshop Details */}
             <div className="workshop-specifications">
               <h3>Workshop Details</h3>
               <div className="workshop-specs">
-                <div className="spec-item">
-                  <span className="label">Instructor:</span>
-                  <span className="value">{workshop.instructor}</span>
-                </div>
-                <div className="spec-item">
-                  <span className="label">Duration:</span>
-                  <span className="value">{workshop.duration}</span>
-                </div>
-                <div className="spec-item">
-                  <span className="label">Start Date:</span>
-                  <span className="value">{formatDate(workshop.startDate)}</span>
-                </div>
-                <div className="spec-item">
-                  <span className="label">End Date:</span>
-                  <span className="value">{formatDate(workshop.endDate)}</span>
-                </div>
+                {workshop.instructor && (
+                  <div className="spec-item">
+                    <span className="label">Instructor:</span>
+                    <span className="value">{workshop.instructor}</span>
+                  </div>
+                )}
+                {workshop.duration && (
+                  <div className="spec-item">
+                    <span className="label">Duration:</span>
+                    <span className="value">{workshop.duration}</span>
+                  </div>
+                )}
+                {workshop.startDate && (
+                  <div className="spec-item">
+                    <span className="label">Start Date:</span>
+                    <span className="value">{formatDate(workshop.startDate)}</span>
+                  </div>
+                )}
+                {workshop.endDate && (
+                  <div className="spec-item">
+                    <span className="label">End Date:</span>
+                    <span className="value">{formatDate(workshop.endDate)}</span>
+                  </div>
+                )}
                 {workshop.venue && (
                   <div className="spec-item full-width">
                     <span className="label">Venue:</span>
                     <span className="value">{workshop.venue}</span>
                   </div>
                 )}
-                <div className="spec-item">
-                  <span className="label">Max Participants:</span>
-                  <span className="value">{workshop.maxParticipants}</span>
-                </div>
-                <div className="spec-item">
-                  <span className="label">Current Participants:</span>
-                  <span className="value">{workshop.currentParticipants}</span>
-                </div>
+                {workshop.maxParticipants && (
+                  <div className="spec-item">
+                    <span className="label">Max Participants:</span>
+                    <span className="value">{workshop.maxParticipants}</span>
+                  </div>
+                )}
+                {(workshop.currentParticipants !== undefined && workshop.currentParticipants !== null) && (
+                  <div className="spec-item">
+                    <span className="label">Current Participants:</span>
+                    <span className="value">{workshop.currentParticipants}</span>
+                  </div>
+                )}
+                {workshop.maxParticipants && workshop.currentParticipants !== undefined && (
+                  <div className="spec-item">
+                    <span className="label">Available Spots:</span>
+                    <span className="value">{availableSpots > 0 ? availableSpots : 'Fully Booked'}</span>
+                  </div>
+                )}
               </div>
             </div>
             

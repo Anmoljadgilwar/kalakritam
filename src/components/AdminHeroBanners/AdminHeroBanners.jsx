@@ -250,30 +250,30 @@ const AdminHeroBanners = () => {
 
   if (error) {
     return (
-      <div className="admin-page-container">
+      <div className="admin-gallery-container">
         <VideoLogo />
         <AdminHeader currentPage="/admin/hero-banners" />
-        <main className="admin-hero-banners">
-        <section className="admin-header">
-          <div className="header-content">
-            <h1>Hero Banners</h1>
-          </div>
-        </section>
-        <div className="error-container">
-          <div className="error-icon">⚠️</div>
-          <h2>Setup Required</h2>
-          <p className="error-message">{error}</p>
-          {error.includes('table') && (
-            <div className="error-instructions">
-              <h3>Database Setup Instructions:</h3>
-              <ol>
-                <li>Open your PostgreSQL database</li>
-                <li>Run the SQL schema from <code>HERO_BANNERS_SETUP.md</code></li>
-                <li>Refresh this page after creating the table</li>
-              </ol>
-              <div className="sql-code">
-                <h4>Quick SQL:</h4>
-                <pre>{`CREATE TABLE hero_banners (
+        <main className="admin-gallery-content">
+          <section className="admin-gallery-header">
+            <div className="header-content">
+              <h1 className="admin-gallery-title">Hero Banner Management</h1>
+            </div>
+          </section>
+          <div className="error-container">
+            <div className="error-icon">⚠️</div>
+            <h2>Setup Required</h2>
+            <p className="error-message">{error}</p>
+            {error.includes('table') && (
+              <div className="error-instructions">
+                <h3>Database Setup Instructions:</h3>
+                <ol>
+                  <li>Open your PostgreSQL database</li>
+                  <li>Run the SQL schema from <code>HERO_BANNERS_SETUP.md</code></li>
+                  <li>Refresh this page after creating the table</li>
+                </ol>
+                <div className="sql-code">
+                  <h4>Quick SQL:</h4>
+                  <pre>{`CREATE TABLE hero_banners (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title VARCHAR(255),
   media_type VARCHAR(20) NOT NULL DEFAULT 'image',
@@ -287,18 +287,18 @@ const AdminHeroBanners = () => {
 
 CREATE INDEX idx_hero_banners_active ON hero_banners(active);
 CREATE INDEX idx_hero_banners_order ON hero_banners(order_index);`}</pre>
+                </div>
+                <button className="create-btn" onClick={fetchBanners}>
+                  Retry Connection
+                </button>
               </div>
-              <button className="btn-primary" onClick={fetchBanners}>
-                Retry Connection
+            )}
+            {!error.includes('table') && (
+              <button className="create-btn" onClick={fetchBanners}>
+                Retry
               </button>
-            </div>
-          )}
-          {!error.includes('table') && (
-            <button className="btn-primary" onClick={fetchBanners}>
-              Retry
-            </button>
-          )}
-        </div>
+            )}
+          </div>
         </main>
         <Footer />
       </div>
@@ -306,15 +306,15 @@ CREATE INDEX idx_hero_banners_order ON hero_banners(order_index);`}</pre>
   }
 
   return (
-    <div className="admin-page-container">
+    <div className="admin-gallery-container">
       <VideoLogo />
       <AdminHeader currentPage="/admin/hero-banners" />
       
-      <main className="admin-hero-banners">
-        <section className="admin-header">
+      <main className="admin-gallery-content">
+        <section className="admin-gallery-header">
           <div className="header-content">
-            <h1>Hero Banners</h1>
-            <p>Manage home page hero banners with images or videos</p>
+            <h1 className="admin-gallery-title">Hero Banner Management</h1>
+            <p className="admin-gallery-subtitle">Manage Home Page Hero Banners</p>
           </div>
           <div className="header-actions">
             <button className="create-btn" onClick={() => setShowModal(true)}>
@@ -327,152 +327,216 @@ CREATE INDEX idx_hero_banners_order ON hero_banners(order_index);`}</pre>
           </div>
         </section>
 
-      <div className="banners-grid">
-        {banners.length === 0 ? (
-          <div className="no-data">
-            <p>No hero banners found. Create your first banner!</p>
-          </div>
-        ) : (
-          banners.map(banner => (
-            <div key={banner.id} className="banner-card">
-              <div className="banner-media">
-                {banner.media_type === 'video' ? (
-                  <video src={banner.media_url} muted loop />
+        <section className="artworks-table-section">
+          <div className="table-container">
+            <table className="artworks-table">
+              <thead>
+                <tr>
+                  <th>Preview</th>
+                  <th>Title</th>
+                  <th>Type</th>
+                  <th>Order</th>
+                  <th>Link URL</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {banners.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
+                      No hero banners found. Create your first banner!
+                    </td>
+                  </tr>
                 ) : (
-                  <img src={banner.media_url} alt={banner.title || 'Banner'} />
+                  banners.map(banner => (
+                    <tr key={banner.id}>
+                      <td>
+                        <div className="artwork-image-cell">
+                          {banner.media_type === 'video' ? (
+                            <video 
+                              src={banner.media_url} 
+                              className="table-artwork-image"
+                              muted
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : (
+                            <img 
+                              src={banner.media_url} 
+                              alt={banner.title || 'Banner'}
+                              className="table-artwork-image"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                          )}
+                          <div className="image-placeholder" style={{ display: 'none' }}>
+                            <span>No Media</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="artwork-title-cell">{banner.title || 'Untitled'}</td>
+                      <td>
+                        <span className="category-badge">{banner.media_type}</span>
+                      </td>
+                      <td>{banner.order_index}</td>
+                      <td className="link-cell">
+                        {banner.link_url ? (
+                          <a href={banner.link_url} target="_blank" rel="noopener noreferrer" className="link-preview">
+                            {banner.link_url.length > 30 ? banner.link_url.substring(0, 30) + '...' : banner.link_url}
+                          </a>
+                        ) : (
+                          <span style={{ color: '#9ca3af' }}>No link</span>
+                        )}
+                      </td>
+                      <td>
+                        <div className="status-badges">
+                          {banner.active ? (
+                            <span className="status-badge available">Active</span>
+                          ) : (
+                            <span className="status-badge sold">Inactive</span>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          <button 
+                            onClick={() => handleEdit(banner)}
+                            className="action-btn edit-btn"
+                            title="Edit Banner"
+                          >
+                            ✏️
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(banner.id)}
+                            className="action-btn delete-btn"
+                            title="Delete Banner"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 )}
-                <div className="banner-overlay">
-                  <span className={`badge ${banner.active ? 'active' : 'inactive'}`}>
-                    {banner.active ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-              </div>
-              <div className="banner-info">
-                <h3>{banner.title || 'Untitled'}</h3>
-                <div className="banner-meta">
-                  <span>Type: {banner.media_type}</span>
-                  <span>Order: {banner.order_index}</span>
-                </div>
-                {banner.link_url && (
-                  <div className="banner-link">
-                    <small>🔗 {banner.link_url}</small>
-                  </div>
-                )}
-              </div>
-              <div className="banner-actions">
-                <button className="btn-edit" onClick={() => handleEdit(banner)}>
-                  Edit
-                </button>
-                <button className="btn-delete" onClick={() => handleDelete(banner.id)}>
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      {showModal && (
-        <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{editingBanner ? 'Edit Hero Banner' : 'Add Hero Banner'}</h2>
-              <button className="modal-close" onClick={handleCloseModal}>×</button>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="banner-form">
-              <div className="form-group">
-                <label>Title (Optional)</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  placeholder="Enter banner title"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Media Type *</label>
-                <select
-                  name="media_type"
-                  value={formData.media_type}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="image">Image</option>
-                  <option value="video">Video</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Upload Media * (16:9 ratio recommended)</label>
-                <input
-                  type="file"
-                  accept={formData.media_type === 'image' ? 'image/*' : 'video/mp4,video/webm'}
-                  onChange={handleFileUpload}
-                  disabled={uploading}
-                />
-                {uploading && <small>Uploading...</small>}
-                {formData.media_url && (
-                  <div className="media-preview">
-                    {formData.media_type === 'video' ? (
-                      <video src={formData.media_url} controls style={{maxWidth: '100%', maxHeight: '200px'}} />
-                    ) : (
-                      <img src={formData.media_url} alt="Preview" style={{maxWidth: '100%', maxHeight: '200px'}} />
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label>Link URL (Optional)</label>
-                <input
-                  type="url"
-                  name="link_url"
-                  value={formData.link_url}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com"
-                />
-                <small>Optional link when banner is clicked</small>
-              </div>
-
-              <div className="form-group">
-                <label>Display Order</label>
-                <input
-                  type="number"
-                  name="order_index"
-                  value={formData.order_index}
-                  onChange={handleInputChange}
-                  min="0"
-                />
-                <small>Lower numbers appear first</small>
-              </div>
-
-              <div className="form-group checkbox-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    name="active"
-                    checked={formData.active}
-                    onChange={handleInputChange}
-                  />
-                  Active (display on home page)
-                </label>
-              </div>
-
-              <div className="form-actions">
-                <button type="button" className="btn-secondary" onClick={handleCloseModal}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn-primary" disabled={uploading || !formData.media_url}>
-                  {editingBanner ? 'Update Banner' : 'Create Banner'}
-                </button>
-              </div>
-            </form>
+              </tbody>
+            </table>
           </div>
-        </div>
-      )}
+        </section>
+
+        {showModal && (
+          <div className="admin-modal-overlay" onClick={handleCloseModal}>
+            <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2 className="modal-title">{editingBanner ? 'Edit Hero Banner' : 'Add Hero Banner'}</h2>
+                <button className="modal-close-btn" onClick={handleCloseModal}>×</button>
+              </div>
+              
+              <div className="modal-content">
+                <form onSubmit={handleSubmit} className="artwork-form">
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label htmlFor="title">Title (Optional)</label>
+                      <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
+                        placeholder="Enter banner title"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="media_type">Media Type *</label>
+                      <select
+                        id="media_type"
+                        name="media_type"
+                        value={formData.media_type}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="image">Image</option>
+                        <option value="video">Video</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group full-width">
+                      <label>Upload Media * (16:9 ratio recommended)</label>
+                      <input
+                        type="file"
+                        accept={formData.media_type === 'image' ? 'image/*' : 'video/mp4,video/webm'}
+                        onChange={handleFileUpload}
+                        disabled={uploading}
+                      />
+                      {uploading && <small style={{ color: '#c38f21' }}>Uploading...</small>}
+                      {formData.media_url && (
+                        <div className="media-preview" style={{ marginTop: '1rem' }}>
+                          {formData.media_type === 'video' ? (
+                            <video src={formData.media_url} controls style={{maxWidth: '100%', maxHeight: '200px', borderRadius: '8px'}} />
+                          ) : (
+                            <img src={formData.media_url} alt="Preview" style={{maxWidth: '100%', maxHeight: '200px', borderRadius: '8px'}} />
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="form-group full-width">
+                      <label htmlFor="link_url">Link URL (Optional)</label>
+                      <input
+                        type="url"
+                        id="link_url"
+                        name="link_url"
+                        value={formData.link_url}
+                        onChange={handleInputChange}
+                        placeholder="https://example.com"
+                      />
+                      <small style={{ color: '#9ca3af', fontSize: '0.875rem' }}>Optional link when banner is clicked</small>
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="order_index">Display Order</label>
+                      <input
+                        type="number"
+                        id="order_index"
+                        name="order_index"
+                        value={formData.order_index}
+                        onChange={handleInputChange}
+                        min="0"
+                      />
+                      <small style={{ color: '#9ca3af', fontSize: '0.875rem' }}>Lower numbers appear first</small>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          name="active"
+                          checked={formData.active}
+                          onChange={handleInputChange}
+                        />
+                        Active (display on home page)
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="form-actions">
+                    <button type="button" className="cancel-btn" onClick={handleCloseModal}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="submit-btn" disabled={uploading || !formData.media_url}>
+                      {editingBanner ? 'Update Banner' : 'Create Banner'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
       
       <Footer />

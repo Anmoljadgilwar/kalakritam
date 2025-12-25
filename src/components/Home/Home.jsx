@@ -22,6 +22,17 @@ import SplitTextAnimation from '../SplitTextAnimation';
 import './Home.css';
 import '../../assets/fonts/fonts.css';
 
+// Background Images Configuration - Add your R2 URLs here
+const CARD_BACKGROUND_IMAGES = {
+  gallery: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/k1.jpeg', // Gallery background
+  workshops: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_16_01%20PM.png', // Workshops background
+  events: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_31_27%20PM.png', // Events background
+  artists: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_33_22%20PM.png', // Artists background
+  blogs: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_34_49%20PM.png', // Blogs background
+  contact: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_37_08%20PM.png', // Contact background
+  aboutBackground: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_47_58%20PM.png' // About section background
+};
+
 const Home = () => {
   const [showVideoLogo, setShowVideoLogo] = useState(false);
   const navigate = useNavigate();
@@ -297,8 +308,8 @@ const Home = () => {
 
             <p>
               Experience the finest <strong>art workshops in Hyderabad</strong> at Kalakritam, where weekend creativity 
-              meets the cozy ambiance of cafes and restaurants. Our distinguished workshop experiences blend traditional 
-              <strong>kala</strong> (art) and contemporary <strong>kritam</strong> (creation) through expertly-curated, 
+              meets the cozy ambiance of cafes and restaurants. Our distinguished workshop experiences blend traditional  
+              <strong> kala</strong> (art) and contemporary <strong>kritam</strong> (creation) through expertly-curated, 
               instructor-led sessions held in inspiring venues across the city. Join Hyderabad's most unique art community 
               and explore your creative potential through our weekend workshop programs, cultural experiences, and artistic 
               learning sessions that bring art to life in relaxed, social settings.
@@ -316,88 +327,108 @@ const Home = () => {
         <section className="features-section">
           <h2 className="section-title">Experience Indian Art at Kalakritam - Hyderabad's Premier Art Destination</h2>
           <div className="features-grid">
-            <article className="feature-card" onClick={() => handleNavigation('/gallery', 'Art Gallery')}>
-              <div className="card-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
+            <article className="feature-card" data-card="gallery" onClick={() => handleNavigation('/gallery', 'Art Gallery')}>
+              <div className="card-background-image" style={{ backgroundImage: CARD_BACKGROUND_IMAGES.gallery ? `url(${CARD_BACKGROUND_IMAGES.gallery})` : 'none' }}></div>
+              <div className="card-content-wrapper">
+                <div className="card-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                </div>
+                <h3>Traditional Kala Gallery</h3>
+                <p>Explore our curated collection of traditional Indian art forms including Madhubani, Warli, 
+                Tanjore paintings, and classical sculptures. Each piece represents centuries of artistic heritage 
+                and cultural significance in Indian art history.</p>
+                <button className="card-cta">Explore Gallery</button>
               </div>
-              <h3>Traditional Kala Gallery</h3>
-              <p>Explore our curated collection of traditional Indian art forms including Madhubani, Warli, 
-              Tanjore paintings, and classical sculptures. Each piece represents centuries of artistic heritage 
-              and cultural significance in Indian art history.</p>
-              <button className="card-cta">Explore Gallery</button>
             </article>
 
-            <article className="feature-card" onClick={() => navigateWithLoading('/workshops')}>
-              <div className="card-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
+            <article className="feature-card" data-card="workshops" onClick={() => navigateWithLoading('/workshops')}>
+              <div className="card-background-image" style={{ backgroundImage: CARD_BACKGROUND_IMAGES.workshops ? `url(${CARD_BACKGROUND_IMAGES.workshops})` : 'none' }}></div>
+              <div className="card-content-wrapper">
+                <div className="card-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                </div>
+                <h3>Art Workshops Hyderabad</h3>
+                <p>Join our unique weekend <strong>art workshops in Hyderabad</strong> featuring traditional Indian techniques, 
+                contemporary painting, and creative expressions. Our workshops mainly happen on weekends in cozy cafes and 
+                restaurants, perfect for beginners and advanced artists seeking to explore creativity while manifesting through art.</p>
+                <button className="card-cta">Join Workshops</button>
               </div>
-              <h3>Art Workshops Hyderabad</h3>
-              <p>Join our unique weekend <strong>art workshops in Hyderabad</strong> featuring traditional Indian techniques, 
-              contemporary painting, and creative expressions. Our workshops mainly happen on weekends in cozy cafes and 
-              restaurants, perfect for beginners and advanced artists seeking to explore creativity while manifesting through art.</p>
-              <button className="card-cta">Join Workshops</button>
             </article>
 
-            <article className="feature-card" onClick={() => navigateWithLoading('/events')}>
-              <div className="card-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-                </svg>
+            <article className="feature-card" data-card="events" onClick={() => navigateWithLoading('/events')}>
+              <div className="card-background-image" style={{ backgroundImage: CARD_BACKGROUND_IMAGES.events ? `url(${CARD_BACKGROUND_IMAGES.events})` : 'none' }}></div>
+              <div className="card-content-wrapper">
+                <div className="card-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                  </svg>
+                </div>
+                <h3>Cultural Events & Exhibitions</h3>
+                <p>Attend exclusive art exhibitions, cultural festivals, and artist meetups in Hyderabad. 
+                Experience live demonstrations, art competitions, and networking events that celebrate 
+                Indian artistic traditions and contemporary innovations.</p>
+                <button className="card-cta">View Events</button>
               </div>
-              <h3>Cultural Events & Exhibitions</h3>
-              <p>Attend exclusive art exhibitions, cultural festivals, and artist meetups in Hyderabad. 
-              Experience live demonstrations, art competitions, and networking events that celebrate 
-              Indian artistic traditions and contemporary innovations.</p>
-              <button className="card-cta">View Events</button>
             </article>
 
-            <article className="feature-card" onClick={() => navigateWithLoading('/artists')}>
-              <div className="card-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
+            <article className="feature-card" data-card="artists" onClick={() => navigateWithLoading('/artists')}>
+              <div className="card-background-image" style={{ backgroundImage: CARD_BACKGROUND_IMAGES.artists ? `url(${CARD_BACKGROUND_IMAGES.artists})` : 'none' }}></div>
+              <div className="card-content-wrapper">
+                <div className="card-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
+                <h3>Featured Artists Community</h3>
+                <p>Discover talented artists from Hyderabad and across India. Meet master craftsmen, 
+                contemporary creators, and emerging talents who are manifesting their vision through art. 
+                Connect with Kalakritam's vibrant artistic community.</p>
+                <button className="card-cta">Meet Artists</button>
               </div>
-              <h3>Featured Artists Community</h3>
-              <p>Discover talented artists from Hyderabad and across India. Meet master craftsmen, 
-              contemporary creators, and emerging talents who are manifesting their vision through art. 
-              Connect with Kalakritam's vibrant artistic community.</p>
-              <button className="card-cta">Meet Artists</button>
             </article>
 
-            <article className="feature-card" onClick={() => navigateWithLoading('/artblogs')}>
-              <div className="card-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-                </svg>
+            <article className="feature-card" data-card="blogs" onClick={() => navigateWithLoading('/artblogs')}>
+              <div className="card-background-image" style={{ backgroundImage: CARD_BACKGROUND_IMAGES.blogs ? `url(${CARD_BACKGROUND_IMAGES.blogs})` : 'none' }}></div>
+              <div className="card-content-wrapper">
+                <div className="card-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                  </svg>
+                </div>
+                <h3>Art Blogs & Learning Resources</h3>
+                <p>Read insightful articles about Indian art techniques, workshop tutorials, artist interviews, 
+                and cultural heritage stories. Enhance your artistic knowledge with our comprehensive blog 
+                covering traditional and contemporary art forms.</p>
+                <button className="card-cta">Read Blogs</button>
               </div>
-              <h3>Art Blogs & Learning Resources</h3>
-              <p>Read insightful articles about Indian art techniques, workshop tutorials, artist interviews, 
-              and cultural heritage stories. Enhance your artistic knowledge with our comprehensive blog 
-              covering traditional and contemporary art forms.</p>
-              <button className="card-cta">Read Blogs</button>
             </article>
 
-            <article className="feature-card" onClick={() => navigateWithLoading('/contact')}>
-              <div className="card-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 00 18.54 8H16.8l-.86-2.58A1.5 1.5 0 00 14.52 4h-5.04c-.66 0-1.26.42-1.42 1.42L7.2 8H5.46c-.66 0-1.26.42-1.42 1.37L1.5 16H4v6h16z"/>
-                </svg>
+            <article className="feature-card" data-card="contact" onClick={() => navigateWithLoading('/contact')}>
+              <div className="card-background-image" style={{ backgroundImage: CARD_BACKGROUND_IMAGES.contact ? `url(${CARD_BACKGROUND_IMAGES.contact})` : 'none' }}></div>
+              <div className="card-content-wrapper">
+                <div className="card-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 00 18.54 8H16.8l-.86-2.58A1.5 1.5 0 00 14.52 4h-5.04c-.66 0-1.26.42-1.42 1.42L7.2 8H5.46c-.66 0-1.26.42-1.42 1.37L1.5 16H4v6h16z"/>
+                  </svg>
+                </div>
+                  <h3>Join Kalakritam Community</h3>
+                <p>Connect with Hyderabad's most vibrant art community. Share your passion for Indian art, 
+                participate in collaborative projects, and discover opportunities for artistic growth 
+                in our supportive creative environment.</p>
+                <button className="card-cta">Get Connected</button>
               </div>
-              <h3>Join Kalakritam Community</h3>
-              <p>Connect with Hyderabad's most vibrant art community. Share your passion for Indian art, 
-              participate in collaborative projects, and discover opportunities for artistic growth 
-              in our supportive creative environment.</p>
-              <button className="card-cta">Get Connected</button>
             </article>
           </div>
         </section>
 
         <section className="about-section">
-          <h2>About Kalakritam - Hyderabad's Premier Art Workshop Center | Manifesting Through Art</h2>
+          <div className="about-background-image" style={{ backgroundImage: CARD_BACKGROUND_IMAGES.aboutBackground ? `url(${CARD_BACKGROUND_IMAGES.aboutBackground})` : 'none' }}></div>
+          <div className="about-content-wrapper">
+            <h2>About Kalakritam - Hyderabad's Premier Art Workshop Center | Manifesting Through Art</h2>
           <p>
             <strong>Kalakritam</strong>, derived from the Sanskrit words <em>kala</em> (art/skill) and <em>kritam</em> (creation/work), 
             represents our commitment to <strong>manifesting through art</strong> in Hyderabad's vibrant cultural landscape. 
@@ -409,7 +440,7 @@ const Home = () => {
             Our philosophy centers on the belief that art is not merely a skill but a transformative journey of self-discovery 
             and cultural appreciation. Through our carefully structured programs, we nurture artistic talent while preserving 
             the rich heritage of Indian art forms, ensuring that each student experiences the profound joy of 
-            <strong>manifesting through art</strong> in its purest form.
+            <strong> manifesting through art</strong> in its purest form.
           </p>
           <div className="cta-section">
             <button 
@@ -426,6 +457,7 @@ const Home = () => {
             >
               Enroll in Workshops
             </button>
+          </div>
           </div>
         </section>
       </main>

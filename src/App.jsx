@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import RequireAuth from './components/RequireAuth'
 import GuestOnly from './components/GuestOnly'
 import { LoadingProvider, useLoading } from './contexts/LoadingContext.jsx'
@@ -654,11 +655,13 @@ function App() {
   }, []);
 
   return (
-    <LoadingProvider>
-      <UserAuthProvider>
-        <AppContent />
-      </UserAuthProvider>
-    </LoadingProvider>
+    <HelmetProvider>
+      <LoadingProvider>
+        <UserAuthProvider>
+          <AppContent />
+        </UserAuthProvider>
+      </LoadingProvider>
+    </HelmetProvider>
   )
 }
 

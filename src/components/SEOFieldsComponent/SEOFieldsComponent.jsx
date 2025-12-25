@@ -7,6 +7,7 @@ const SEOFieldsComponent = ({
   onSeoChange, 
   mainTitle = '', 
   mainDescription = '',
+  mainCategory = '',
   autoGenerate = true,
   type = 'general' 
 }) => {
@@ -29,7 +30,7 @@ const SEOFieldsComponent = ({
     if (autoMode && (mainTitle || mainDescription)) {
       generateSEOFields();
     }
-  }, [mainTitle, mainDescription, autoMode]);
+  }, [mainTitle, mainDescription, mainCategory, autoMode]);
 
   const generateSEOFields = () => {
     // Use the utility functions to generate optimized SEO fields
@@ -37,7 +38,7 @@ const SEOFieldsComponent = ({
       seoGenerators[type]({
         title: mainTitle,
         description: mainDescription,
-        category: '', // Can be passed as prop if needed
+        category: mainCategory,
         image: seoFields.ogImage || ''
       }) : 
       seoGenerators.general({
