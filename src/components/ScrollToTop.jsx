@@ -4,8 +4,7 @@ import { useLocation } from 'react-router-dom';
 // Robust scroll restoration & reset on route changes.
 // - Scrolls window, documentElement, body, and known scrollable containers
 // - Avoids resetting when navigating to an in-page hash
-// - Can disable smooth for specific transitions by setting sessionStorage flag
-export default function ScrollToTop({ behavior = 'smooth' }) {
+export default function ScrollToTop() {
   const location = useLocation();
   const lastPathRef = useRef(location.pathname + location.search + location.hash);
 
@@ -20,46 +19,41 @@ export default function ScrollToTop({ behavior = 'smooth' }) {
       return;
     }
 
-    // Allow a flag to disable smooth for the very next navigation (set elsewhere)
-    const disableSmooth = sessionStorage.getItem('__forceInstantScroll');
-    if (disableSmooth) {
-      sessionStorage.removeItem('__forceInstantScroll');
-    }
-
-    const chosenBehavior = disableSmooth ? 'auto' : behavior;
+    // Force instant scroll behavior via CSS
+    document.documentElement.style.scrollBehavior = 'auto';
+    document.body.style.scrollBehavior = 'auto';
 
     const scrollTargets = [
       window,
       document.documentElement,
       document.body,
       document.querySelector('.app-content'),
-      document.querySelector('.app')
+      document.querySelector('.app'),
+      document.querySelector('#root')
     ].filter(Boolean);
 
     const doScroll = () => {
+      // Force scroll position to 0
       scrollTargets.forEach(t => {
         if (t === window) {
-          try {
-            window.scrollTo({ top: 0, left: 0, behavior: chosenBehavior });
-          } catch {
-            window.scrollTo(0, 0);
-          }
+          window.scrollTo(0, 0);
         } else {
-          try {
-            t.scrollTo({ top: 0, left: 0, behavior: chosenBehavior });
-          } catch {
-            t.scrollTop = 0;
-            t.scrollLeft = 0;
-          }
+          t.scrollTop = 0;
         }
       });
     };
 
-    // Perform after paint & again shortly after to override late layout shifts
+    // Perform immediately, synchronously - multiple times to ensure it sticks
+    doScroll();
     requestAnimationFrame(doScroll);
+    setTimeout(doScroll, 0);
+    setTimeout(doScroll, 10);
     setTimeout(doScroll, 50);
+    setTimeout(doScroll, 100);
     setTimeout(doScroll, 200);
-  }, [location, behavior]);
+    setTimeout(doScroll, 500);
+    setTimeout(doScroll, 1000);
+  }, [location]);
 
   return null;
 }

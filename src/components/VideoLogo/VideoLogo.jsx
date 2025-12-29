@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './VideoLogo.css';
 
 const VideoLogo = () => {
   const [showVideoLogo, setShowVideoLogo] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if video was completed or if we're coming from intro
@@ -20,10 +22,14 @@ const VideoLogo = () => {
     }
   }, []);
 
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
   if (!showVideoLogo) return null;
 
   return (
-    <div className="video-logo-container">
+    <div className="video-logo-container" onClick={handleLogoClick}>
       <video
         className="video-logo"
         muted

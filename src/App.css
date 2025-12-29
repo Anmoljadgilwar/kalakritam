@@ -1,6 +1,11 @@
 /* Import mobile optimizations */
 @import './mobile-optimizations.css';
 
+/* Force instant scroll on navigation */
+html, body, #root, .app, .app-content {
+  scroll-behavior: auto !important;
+}
+
 .app {
   min-height: 100vh;
   background-color: #000000;

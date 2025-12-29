@@ -1,12 +1,26 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { userAuthApi } from '../lib/adminApi';
 
-const UserAuthContext = createContext();
+const UserAuthContext = createContext(undefined);
 
 export const useUserAuth = () => {
   const context = useContext(UserAuthContext);
-  if (!context) {
-    throw new Error('useUserAuth must be used within a UserAuthProvider');
+  if (context === undefined) {
+    // During HMR or when context is not yet ready, return a safe default
+    console.warn('useUserAuth: Context not available, returning default state');
+    return {
+      user: null,
+      isAuthenticated: false,
+      isLoading: true,
+      token: null,
+      login: async () => ({ success: false, error: 'Context not ready' }),
+      signup: async () => ({ success: false, error: 'Context not ready' }),
+      googleLogin: async () => ({ success: false, error: 'Context not ready' }),
+      logout: () => {},
+      checkAuth: async () => {},
+      updateUser: () => {},
+      resetInactivityTimer: () => {},
+    };
   }
   return context;
 };
@@ -69,18 +83,24 @@ export const UserAuthProvider = ({ children }) => {
           
           console.log('UserAuthContext - User authenticated from localStorage:', parsedUser);
 
-          // Skip token verification if we just logged in (within last 5 seconds)
+          // Skip token verification if we just logged in (within last 30 seconds)
           const loginTime = localStorage.getItem('loginTime');
           const now = Date.now();
-          if (loginTime && (now - parseInt(loginTime)) < 5000) {
+          if (loginTime && (now - parseInt(loginTime)) < 30000) {
             console.log('Skipping token verification - just logged in');
             return;
           }
 
-          // Verify token is still valid
+          // Verify token is still valid (with delay to prevent race conditions)
           console.log('UserAuthContext - Verifying token...');
+          
+          // Add a small delay before verification to ensure localStorage is synced
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
           try {
             const result = await userAuthApi.verifyToken();
+            console.log('UserAuthContext - Token verification result:', result);
+            
             if (!result.success) {
               console.warn('Token verification returned unsuccessful:', result);
               // If user was deleted or token is invalid, clear everything
@@ -96,9 +116,19 @@ export const UserAuthProvider = ({ children }) => {
             }
           } catch (error) {
             console.error('Token verification failed:', error);
-            // Logout on any verification error to ensure deleted accounts are cleared
-            console.log('UserAuthContext - Logging out due to verification error');
-            logout();
+            
+            // Check if it's a network error vs auth error
+            if (error.message?.includes('fetch') || error.message?.includes('network') || error.name === 'TypeError') {
+              console.log('UserAuthContext - Network error, keeping user logged in');
+              // Don't logout on network errors - user might be offline
+            } else if (error.message?.includes('No token found')) {
+              console.log('UserAuthContext - No token found, logging out');
+              logout();
+            } else {
+              // For other auth errors (401, 403), logout
+              console.log('UserAuthContext - Auth error, logging out');
+              logout();
+            }
           }
         } catch (parseError) {
           console.error('Failed to parse stored user data:', parseError);

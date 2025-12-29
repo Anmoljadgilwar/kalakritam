@@ -7,16 +7,34 @@ export const useNavigationWithLoading = () => {
   const navigate = useNavigate();
 
   const navigateWithLoading = useCallback((path) => {
+    // Force scroll to top immediately and synchronously
+    const forceScrollTop = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      
+      const appContent = document.querySelector('.app-content');
+      if (appContent) appContent.scrollTop = 0;
+      
+      const app = document.querySelector('.app');
+      if (app) app.scrollTop = 0;
+    };
+    
+    // Scroll immediately
+    forceScrollTop();
+    
     setIsLoading(true);
     
-    // Show loading for at least 800ms for smooth transition
-    setTimeout(() => {
+    // Navigate immediately without delay
+    requestAnimationFrame(() => {
+      forceScrollTop();
       navigate(path);
-      // Hide loading after navigation
+      
+      // Hide loading after a short delay
       setTimeout(() => {
         setIsLoading(false);
-      }, 200);
-    }, 800);
+      }, 300);
+    });
   }, [navigate, setIsLoading]);
 
   return { isLoading, navigateWithLoading };

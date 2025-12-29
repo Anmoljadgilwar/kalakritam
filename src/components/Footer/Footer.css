@@ -68,24 +68,28 @@
 }
 
 .footer-links li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .footer-nav-btn {
   color: #d4af85;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
   font-size: 0.9rem;
   background: none;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   font-family: inherit;
-  padding: 0;
+  padding: 0.5rem 1rem;
   text-align: left;
+  border-radius: 8px;
+  display: inline-block;
 }
 
 .footer-nav-btn:hover {
   color: #c38f21;
+  background: rgba(195, 143, 33, 0.15);
+  border-color: rgba(195, 143, 33, 0.3);
 }
 
 .footer-text {
@@ -105,19 +109,25 @@
 .social-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
 }
 
 .social-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   color: #d4af85;
+  text-decoration: none;
   transition: all 0.3s ease;
   padding: 0.5rem;
-  flex-shrink: 0;
 }
 
 .social-link:hover {
   color: #c38f21;
   transform: translateY(-2px);
+}
+
+.social-link:hover .social-text {
+  color: #c38f21;
 }
 
 .social-text {

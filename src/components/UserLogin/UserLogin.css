@@ -961,3 +961,206 @@ input#email {
     transform: none;
   }
 }
+
+/* ============================================
+   OTP LOGIN STYLES
+   ============================================ */
+
+.otp-sent-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(195, 143, 33, 0.1);
+  border: 1px solid rgba(195, 143, 33, 0.3);
+  border-radius: 12px;
+  color: #d4af85;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.otp-sent-info svg {
+  color: #c38f21;
+  flex-shrink: 0;
+}
+
+.otp-sent-info strong {
+  color: #c38f21;
+  word-break: break-all;
+}
+
+.otp-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.otp-input {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(195, 143, 33, 0.3);
+  border-radius: 12px;
+  color: #c38f21;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.otp-input:focus {
+  border-color: #c38f21;
+  box-shadow: 0 0 0 3px rgba(195, 143, 33, 0.2);
+  background: rgba(195, 143, 33, 0.05);
+}
+
+.otp-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.otp-timer {
+  text-align: center;
+  margin-top: 1rem;
+  color: #d4af85;
+  font-size: 0.9rem;
+}
+
+.resend-otp-btn {
+  background: none;
+  border: none;
+  color: #c38f21;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.resend-otp-btn:hover {
+  color: #d4af85;
+  text-decoration: none;
+}
+
+.resend-otp-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.change-email-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background: transparent;
+  border: 1px solid rgba(195, 143, 33, 0.3);
+  border-radius: 12px;
+  color: #d4af85;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  margin-top: 0.5rem;
+}
+
+.change-email-btn:hover {
+  background: rgba(195, 143, 33, 0.1);
+  border-color: rgba(195, 143, 33, 0.5);
+}
+
+.change-email-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.alt-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  background: transparent;
+  border: 1px solid rgba(195, 143, 33, 0.3);
+  border-radius: 12px;
+  color: #d4af85;
+  font-size: 0.95rem;
+  font-family: 'The Seasons', 'Cinzel', serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.alt-login-btn:hover {
+  background: rgba(195, 143, 33, 0.1);
+  border-color: rgba(195, 143, 33, 0.5);
+  transform: translateY(-1px);
+}
+
+.alt-login-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.alt-login-btn svg {
+  color: #c38f21;
+}
+
+.forgot-password-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background: transparent;
+  border: none;
+  color: #c38f21;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  margin-top: 0.25rem;
+}
+
+.forgot-password-btn:hover {
+  color: #d4af85;
+  text-decoration: none;
+}
+
+.forgot-password-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Mobile responsiveness for OTP */
+@media (max-width: 480px) {
+  .otp-input {
+    width: 40px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+
+  .otp-inputs {
+    gap: 0.35rem;
+  }
+
+  .otp-sent-info {
+    font-size: 0.85rem;
+    padding: 0.85rem 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .otp-input {
+    width: 36px;
+    height: 44px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+  }
+
+  .otp-inputs {
+    gap: 0.25rem;
+  }
+}

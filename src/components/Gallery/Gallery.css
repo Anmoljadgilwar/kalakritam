@@ -866,7 +866,7 @@
   }
 
   .artwork-image-container {
-    height: 200px;
+    min-height: 150px;
   }
 
   .artwork-info {
