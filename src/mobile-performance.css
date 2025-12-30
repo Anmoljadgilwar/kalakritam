@@ -8,36 +8,31 @@
    GPU ACCELERATION & COMPOSITING
    ============================================ */
 @media (max-width: 768px) {
-  /* Force GPU acceleration on key elements - MINIMAL USE */
+  /* Force GPU acceleration on key elements */
+  .home-container,
+  .gallery-container,
+  .events-container,
+  .workshops-container,
+  .contact-container,
   .mobile-sidebar,
   .hero-banner {
     transform: translateZ(0);
     backface-visibility: hidden;
+    perspective: 1000px;
   }
   
-  /* REMOVE will-change on mobile - causes memory issues */
-  * {
-    will-change: auto !important;
-  }
-  
-  /* Only use will-change on actively animating elements */
-  .mobile-sidebar.opening,
-  .mobile-sidebar-overlay.active {
+  /* Optimize animations with will-change */
+  .mobile-sidebar,
+  .mobile-sidebar-overlay,
+  .hero-banner-media {
     will-change: transform, opacity;
   }
   
-  /* Contain layout thrashing - REDUCED for mobile */
+  /* Contain layout thrashing */
   .feature-card,
   .universal-card,
   .artwork-card {
-    contain: layout paint; /* Remove 'style' containment for better compatibility */
-  }
-  
-  /* Optimize rendering with simpler transforms */
-  .gallery-grid,
-  .events-grid,
-  .workshops-grid {
-    transform: translateZ(0); /* Promote to own layer */
+    contain: layout style paint;
   }
 }
 
@@ -94,25 +89,14 @@
   img {
     content-visibility: auto;
     image-rendering: -webkit-optimize-contrast;
-    max-width: 100%;
-    height: auto;
   }
   
-  /* Lazy load offscreen content MORE AGGRESSIVELY */
-  .artwork-card:nth-child(n+4),
-  .feature-card:nth-child(n+3),
-  .universal-card:nth-child(n+4),
-  .event-card:nth-child(n+3),
-  .workshop-card:nth-child(n+3) {
+  /* Lazy load offscreen content */
+  .artwork-card:nth-child(n+5),
+  .feature-card:nth-child(n+4),
+  .universal-card:nth-child(n+5) {
     content-visibility: auto;
     contain-intrinsic-size: 350px;
-  }
-}
-
-/* Reduce image quality on slow connections */
-@media (max-width: 768px) and (prefers-reduced-data: reduce) {
-  img {
-    image-rendering: optimizeSpeed;
   }
 }
 
@@ -120,7 +104,7 @@
    ANIMATION OPTIMIZATION
    ============================================ */
 @media (max-width: 768px) {
-  /* Reduce animation complexity */
+  /* Reduce animation complexity - but keep essential animations */
   * {
     animation-timing-function: ease-out !important;
   }
@@ -129,6 +113,25 @@
   .scrolling * {
     animation-play-state: paused !important;
     transition-duration: 0ms !important;
+  }
+  
+  /* KEEP loading animations alive - these are essential */
+  .loading-spinner,
+  .loading-container,
+  .skeleton-loader,
+  [class*="spinner"],
+  [class*="loader"],
+  [class*="loading"],
+  .loading-overlay,
+  .loading-content,
+  .loading-text,
+  .video-logo,
+  .video-logo-container,
+  .intro-video,
+  .intro-video-container {
+    animation-duration: 1s !important;
+    animation-iteration-count: infinite !important;
+    animation-play-state: running !important;
   }
 }
 
@@ -153,35 +156,29 @@
    MEMORY OPTIMIZATION
    ============================================ */
 @media (max-width: 768px) {
-  /* COMPLETELY HIDE particles on mobile for performance */
+  /* COMPLETELY HIDE particles on mobile - they cause severe lag */
   .home-particles-background,
   .gallery-particles-background,
   .events-particles-background,
   .workshops-particles-background,
   .contact-particles-background,
-  .artists-particles-background,
   .moments-particles-background,
+  .artists-particles-background,
   .artblogs-particles-background,
-  [class*="-particles-background"] {
-    display: none !important; /* Completely remove from render tree */
+  .artwork-detail-particles-background,
+  .workshop-detail-particles-background,
+  .event-detail-particles-background,
+  .app-particles-background,
+  [class*="-particles-background"],
+  .particles-container {
+    display: none !important;
     visibility: hidden !important;
-  }
-  
-  /* Remove ALL backdrop-filter on mobile - very expensive */
-  .home-blur-overlay,
-  .gallery-blur-overlay,
-  .events-blur-overlay,
-  .workshops-blur-overlay,
-  .workshop-detail-blur-overlay,
-  .event-detail-blur-overlay,
-  .artwork-detail-blur-overlay,
-  .contact-blur-overlay,
-  .moments-blur-overlay,
-  .artists-blur-overlay,
-  .artblogs-blur-overlay,
-  [class*="-blur-overlay"] {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    z-index: -999 !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
   }
 }
 

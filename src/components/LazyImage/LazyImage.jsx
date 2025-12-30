@@ -24,8 +24,8 @@ const LazyImage = ({
 
   // Use IntersectionObserver for better performance on slow connections
   useEffect(() => {
-    // For priority images or fast connections without save-data, load immediately
-    if (priority || (!networkOpts.delayNonCritical && !isMobile)) {
+    // For priority images or mobile, load more aggressively
+    if (priority || isMobile) {
       setIsInView(true);
       return;
     }
@@ -38,8 +38,8 @@ const LazyImage = ({
         }
       },
       {
-        threshold: lazyConfig.threshold,
-        rootMargin: isMobile ? '50px' : lazyConfig.rootMargin
+        threshold: 0.01, // Load almost immediately when entering viewport
+        rootMargin: isMobile ? '200px' : '150px' // Load earlier - 200px before visible on mobile
       }
     );
 
@@ -48,7 +48,7 @@ const LazyImage = ({
     }
 
     return () => observer.disconnect();
-  }, [priority, networkOpts.delayNonCritical, isMobile, lazyConfig]);
+  }, [priority, isMobile]);
 
   const handleLoad = () => {
     setIsLoaded(true);

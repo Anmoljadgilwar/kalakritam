@@ -25,14 +25,6 @@
   transform: translateY(0);
 }
 
-/* Disable parallax on mobile */
-@media (max-width: 768px) {
-  .parallax-container {
-    will-change: auto;
-    transform: none !important;
-  }
-}
-
 .home-container {
   min-height: 100vh;
   background-color: #000000;
@@ -510,30 +502,6 @@
 }
 
 @media (max-width: 768px) {
-  /* Remove expensive effects on mobile */
-  .home-blur-overlay {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(0, 0, 0, 0.5) !important;
-  }
-  
-  /* Hide particles completely on mobile */
-  .home-particles-background {
-    display: none !important;
-  }
-  
-  /* Remove parallax on mobile - causes jank */
-  .parallax-container {
-    will-change: auto !important;
-    transform: none !important;
-  }
-  
-  /* Disable hover effects on mobile */
-  .feature-card:hover,
-  .card-cta:hover {
-    transform: none !important;
-  }
-  
   .video-logo-container {
     width: clamp(50px, 12vw, 70px);
     height: clamp(50px, 12vw, 70px);

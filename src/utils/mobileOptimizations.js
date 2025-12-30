@@ -39,11 +39,13 @@ export const shouldOptimizeForMobile = () => {
 // Performance optimization for mobile
 export const getMobileParticleConfig = () => {
   const slowConnection = isSlowConnection();
+  const mobileDevice = isMobile();
   
-  // Disable particles completely on slow connections
-  if (slowConnection) {
+  // COMPLETELY DISABLE particles on mobile devices for maximum performance
+  // WebGL canvas rendering is extremely expensive on mobile and causes lag
+  if (mobileDevice || slowConnection) {
     return {
-      particleCount: 0, // Disabled on slow connections
+      particleCount: 0,
       particleSpread: 0,
       speed: 0,
       particleBaseSize: 0,
@@ -51,24 +53,10 @@ export const getMobileParticleConfig = () => {
       particleHoverFactor: 1,
       alphaParticles: false,
       disableRotation: true,
-      disabled: true
+      disabled: true // Completely disable - no WebGL context created
     };
   }
   
-  if (isMobile()) {
-    // COMPLETELY DISABLE particles on mobile for maximum performance
-    return {
-      particleCount: 0,   // No particles on mobile
-      particleSpread: 0,
-      speed: 0,
-      particleBaseSize: 0,
-      moveParticlesOnHover: false,
-      particleHoverFactor: 1,
-      alphaParticles: false,
-      disableRotation: true,
-      disabled: true  // Disabled on mobile
-    };
-  }
   return {
     particleCount: 1000,
     particleSpread: 10,
@@ -117,9 +105,11 @@ export const getOptimizedImageUrl = (url, isMobile = false) => {
 // Reduce CSS effects on mobile for better performance
 export const getMobileBlurConfig = () => {
   if (isMobile()) {
+    // COMPLETELY DISABLE backdrop-filter on mobile - it's extremely expensive
+    // Use solid background color instead for much better performance
     return {
-      backdropFilter: 'none', // Remove expensive blur on mobile
-      background: 'rgba(0, 0, 0, 0.5)' // Use solid background instead
+      backdropFilter: 'none', // Disabled completely on mobile
+      background: 'rgba(0, 0, 0, 0.5)' // More opaque to compensate for no blur
     };
   }
   return {

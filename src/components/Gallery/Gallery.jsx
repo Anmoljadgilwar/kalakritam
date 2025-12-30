@@ -200,7 +200,7 @@ const Gallery = () => {
 
   if (loading) {
     return (
-      <div className="gallery-container">
+      <div className="gallery-container gallery-loading">
         <VideoLogo />
         <Header currentPage="gallery" />
         <div className="gallery-page-content">
@@ -209,19 +209,89 @@ const Gallery = () => {
             <p className="gallery-subtitle">Discover India's Artistic Heritage</p>
           </header>
           
-          <section className="gallery-filters">
-            <h3>Filter by Category</h3>
-            <div className="category-filters">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="loading-skeleton" style={{ width: '80px', height: '36px', borderRadius: '20px' }} />
-              ))}
+          {/* Mobile: Simple circle loader, Desktop: Skeleton */}
+          <div className="loading-state-container">
+            {/* Simple circle loader for mobile */}
+            <div className="mobile-circle-loader">
+              <div className="circle-spinner"></div>
+              <p className="loading-text">Loading Gallery...</p>
             </div>
-          </section>
-          
-          <div className="gallery-grid">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="loading-skeleton" style={{ width: '100%', height: '300px', borderRadius: '12px' }} />
-            ))}
+            
+            {/* Skeleton loaders for desktop */}
+            <div className="desktop-skeleton-loader">
+              <section className="gallery-filters">
+                <h3>Filter by Category</h3>
+                <div className="category-filters">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div 
+                      key={i} 
+                      className="loading-skeleton skeleton-filter" 
+                      style={{ 
+                        width: '90px', 
+                        height: '38px', 
+                        borderRadius: '20px',
+                        margin: '0 0.5rem'
+                      }} 
+                    />
+                  ))}
+                </div>
+              </section>
+              
+              <div className="gallery-grid">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div 
+                    key={i} 
+                    className="artwork-card-skeleton"
+                    style={{ 
+                      width: '100%', 
+                      minHeight: '350px', 
+                      borderRadius: '16px',
+                      padding: '0',
+                      background: 'rgba(195, 143, 33, 0.03)',
+                      border: '1px solid rgba(195, 143, 33, 0.1)'
+                    }}
+                  >
+                    <div 
+                      className="loading-skeleton" 
+                      style={{ 
+                        width: '100%', 
+                        height: '250px', 
+                        borderRadius: '16px 16px 0 0',
+                        marginBottom: '1rem'
+                      }} 
+                    />
+                    <div style={{ padding: '1rem' }}>
+                      <div 
+                        className="loading-skeleton" 
+                        style={{ 
+                          width: '70%', 
+                          height: '24px', 
+                          borderRadius: '6px',
+                          marginBottom: '0.75rem'
+                        }} 
+                      />
+                      <div 
+                        className="loading-skeleton" 
+                        style={{ 
+                          width: '50%', 
+                          height: '18px', 
+                          borderRadius: '6px',
+                          marginBottom: '0.5rem'
+                        }} 
+                      />
+                      <div 
+                        className="loading-skeleton" 
+                        style={{ 
+                          width: '40%', 
+                          height: '16px', 
+                          borderRadius: '6px'
+                        }} 
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
         <Footer />

@@ -1,5 +1,31 @@
 /* Mobile-specific optimizations for better performance */
 
+/* COMPLETELY DISABLE PARTICLES ON MOBILE */
+@media (max-width: 768px) {
+  .home-particles-background,
+  .gallery-particles-background,
+  .events-particles-background,
+  .workshops-particles-background,
+  .contact-particles-background,
+  .moments-particles-background,
+  .artists-particles-background,
+  .artblogs-particles-background,
+  .artwork-detail-particles-background,
+  .workshop-detail-particles-background,
+  .event-detail-particles-background,
+  .app-particles-background,
+  [class*="-particles-background"],
+  .particles-container,
+  canvas[class*="particles"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
 /* AGGRESSIVE MOBILE PERFORMANCE OPTIMIZATIONS */
 @media (max-width: 768px) {
   /* REMOVE ALL backdrop-filter on mobile - extremely expensive */
@@ -52,20 +78,32 @@
     transform: none !important; /* Disable hover effects on mobile */
   }
   
-  /* Disable animations on mobile for performance */
-  *,
-  *::before,
-  *::after {
+  /* Disable animations on mobile for performance - EXCEPT loading animations */
+  *:not(.loading-spinner):not([class*="spinner"]):not([class*="loader"]):not([class*="loading"]):not(.video-logo):not(.video-logo-container):not(.intro-video):not(.intro-video-container),
+  *:not(.loading-spinner):not([class*="spinner"]):not([class*="loader"]):not([class*="loading"])::before,
+  *:not(.loading-spinner):not([class*="spinner"]):not([class*="loader"]):not([class*="loading"])::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
   
-  /* Keep loading animations - but simplify */
+  /* PRESERVE loading animations */
   .loading-spinner,
+  .loading-container,
+  .loading-overlay,
+  .loading-content,
+  .skeleton-loader,
   [class*="spinner"],
-  [class*="loader"] {
+  [class*="loader"]:not([class*="particles"]),
+  [class*="loading"],
+  .video-logo,
+  .video-logo-container,
+  .intro-video,
+  .intro-video-container {
     animation-duration: 1s !important;
+    animation-iteration-count: infinite !important;
+    animation-play-state: running !important;
+    transition-duration: 0.3s !important;
   }
   
   /* Optimize text rendering */
@@ -159,8 +197,31 @@
   
   /* Simplify loading states */
   .loading-skeleton {
-    background: rgba(255, 255, 255, 0.1) !important;
-    animation: none !important;
+    background: rgba(195, 143, 33, 0.1) !important;
+    animation: pulse 1s ease-in-out infinite !important;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Better skeleton on regular mobile devices */
+@media (max-width: 768px) and (min-resolution: 1.5dppx) {
+  .loading-skeleton {
+    animation-duration: 1s !important;
+    background: linear-gradient(
+      90deg,
+      rgba(195, 143, 33, 0.08) 0%,
+      rgba(195, 143, 33, 0.18) 50%,
+      rgba(195, 143, 33, 0.08) 100%
+    ) !important;
+    background-size: 200% 100% !important;
   }
 }
 
