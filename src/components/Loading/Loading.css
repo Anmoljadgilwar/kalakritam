@@ -327,3 +327,60 @@
     font-size: 1rem;
   }
 }
+
+/* ============================================
+   MOBILE-OPTIMIZED SIMPLE LOADING SCREEN
+   Lightweight spinner for better mobile performance
+   ============================================ */
+
+.loading-overlay-mobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #001a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-container-mobile {
+  text-align: center;
+  padding: 2rem;
+}
+
+.loading-title-mobile {
+  font-family: 'Samarkan', 'Cinzel', serif;
+  font-size: 2rem;
+  color: #c38f21;
+  font-weight: 700;
+  letter-spacing: 0px;
+  margin: 0 0 2rem 0;
+  text-transform: uppercase;
+}
+
+.loading-text-mobile {
+  font-size: 0.9rem;
+  color: #d4af85;
+  margin-top: 1.5rem;
+  opacity: 0.8;
+}
+
+/* Simple CSS Spinner - Minimal Performance Impact */
+.simple-spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  border: 3px solid rgba(195, 143, 33, 0.2);
+  border-top-color: #c38f21;
+  border-radius: 50%;
+  animation: simple-spin 0.8s linear infinite;
+}
+
+@keyframes simple-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

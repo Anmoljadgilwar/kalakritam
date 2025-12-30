@@ -2,6 +2,37 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { getMobileLazyConfig, shouldOptimizeForMobile, getNetworkOptimizations } from '../../utils/mobileOptimizations';
 import './LazyImage.css';
 
+// Check mobile once at module level to avoid repeated checks
+const IS_MOBILE = typeof window !== 'undefined' && (
+  window.innerWidth <= 768 || 
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+);
+
+// Mobile image component with immediate loading
+const MobileImage = ({ src, alt, className = '', aspectRatio, priority = false, ...props }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const style = aspectRatio ? { aspectRatio } : {};
+  
+  return (
+    <div 
+      className={`lazy-image-container ${className} ${isLoaded ? 'is-loaded' : ''}`} 
+      style={style} 
+      {...props}
+    >
+      <img
+        src={src || ''}
+        alt={alt}
+        className={`lazy-image ${isLoaded ? 'loaded' : 'loading'}`}
+        onLoad={() => setIsLoaded(true)}
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+    </div>
+  );
+};
+
 const LazyImage = ({ 
   src, 
   alt, 
@@ -9,69 +40,33 @@ const LazyImage = ({
   placeholder = null,
   onLoad = () => {},
   onError = () => {},
-  priority = false, // For critical above-fold images
-  aspectRatio, // Optional aspect ratio (e.g., '16/9', '4/3', '1/1')
-  blurPreview = true, // Show blur-up effect on load
-  showLoadingProgress = false, // Show loading percentage
-  retryOnError = true, // Retry loading on error
-  maxRetries = 2, // Max retry attempts
+  priority = false,
+  aspectRatio,
+  blurPreview = false,
+  showLoadingProgress = false,
+  retryOnError = true,
+  maxRetries = 2,
   ...props 
 }) => {
+  // For mobile - use viewport-based lazy loading
+  if (IS_MOBILE) {
+    return <MobileImage src={src} alt={alt} className={className} aspectRatio={aspectRatio} priority={priority} {...props} />;
+  }
+  
+  // Desktop version with immediate loading
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [loadProgress, setLoadProgress] = useState(0);
   const [retryCount, setRetryCount] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const imgRef = useRef();
   const containerRef = useRef();
-  
-  // Get mobile-optimized lazy loading configuration
-  const isMobile = shouldOptimizeForMobile();
-  const networkOpts = useMemo(() => getNetworkOptimizations(), []);
-  const lazyConfig = useMemo(() => getMobileLazyConfig(), []);
-
-  // Use IntersectionObserver for better performance on slow connections
-  useEffect(() => {
-    // For priority images or mobile, load more aggressively
-    if (priority || isMobile) {
-      setIsInView(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.disconnect();
-        }
-      },
-      {
-        threshold: 0.01, // Load almost immediately when entering viewport
-        rootMargin: isMobile ? '200px' : '150px' // Load earlier - 200px before visible on mobile
-      }
-    );
-
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [priority, isMobile]);
 
   const handleLoad = useCallback(() => {
-    setIsTransitioning(true);
-    // Smooth transition delay for blur-up effect
-    setTimeout(() => {
-      setIsLoaded(true);
-      setIsTransitioning(false);
-      onLoad && onLoad();
-    }, 50);
+    setIsLoaded(true);
+    onLoad && onLoad();
   }, [onLoad]);
 
   const handleError = useCallback(() => {
     if (retryOnError && retryCount < maxRetries) {
-      // Retry with exponential backoff
       setTimeout(() => {
         setRetryCount(prev => prev + 1);
         setHasError(false);
@@ -82,21 +77,11 @@ const LazyImage = ({
     }
   }, [retryOnError, retryCount, maxRetries, onError]);
 
-  // Optimize image URL for mobile/slow connections
   const optimizedSrc = useMemo(() => {
     if (!src) return '';
-    if (src.startsWith('data:') || src.startsWith('blob:')) return src;
-    
-    // For slow connections, use lower quality
-    if (networkOpts.lowerQuality && src.includes('r2.dev')) {
-      const separator = src.includes('?') ? '&' : '?';
-      return `${src}${separator}w=400&q=60`;
-    }
-    
     return src;
-  }, [src, networkOpts.lowerQuality, retryCount]); // Add retryCount to force re-fetch on retry
+  }, [src, retryCount]);
 
-  // Compute container styles
   const containerStyle = useMemo(() => {
     const styles = {};
     if (aspectRatio) {
@@ -108,42 +93,22 @@ const LazyImage = ({
   return (
     <div 
       ref={containerRef} 
-      className={`lazy-image-container ${className} ${isLoaded ? 'is-loaded' : ''} ${isTransitioning ? 'is-transitioning' : ''}`}
+      className={`lazy-image-container ${className} ${isLoaded ? 'is-loaded' : ''}`}
       style={containerStyle}
       {...props}
     >
-      {isInView && !hasError && (
+      {!hasError && (
         <img
           ref={imgRef}
           src={optimizedSrc}
           alt={alt}
-          className={`lazy-image ${isLoaded ? 'loaded' : 'loading'} ${blurPreview ? 'blur-up' : ''}`}
+          className={`lazy-image ${isLoaded ? 'loaded' : 'loading'}`}
           onLoad={handleLoad}
           onError={handleError}
-          loading={priority ? "eager" : "lazy"}
+          loading="eager"
           decoding="async"
-          fetchpriority={priority ? "high" : "low"}
+          fetchpriority="high"
         />
-      )}
-      
-      {(!isInView || !isLoaded) && !hasError && (
-        <div className={`lazy-image-placeholder ${isTransitioning ? 'fade-out' : ''}`}>
-          {placeholder || (
-            <div className="lazy-image-skeleton">
-              <div className="lazy-image-skeleton-shimmer"></div>
-              <div className="lazy-image-skeleton-icon">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 16L8.586 11.414C9.367 10.633 10.633 10.633 11.414 11.414L16 16M14 14L15.586 12.414C16.367 11.633 17.633 11.633 18.414 12.414L20 14M14 8H14.01M6 20H18C19.105 20 20 19.105 20 18V6C20 4.895 19.105 4 18 4H6C4.895 4 4 4.895 4 6V18C4 19.105 4.895 20 6 20Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              {showLoadingProgress && loadProgress > 0 && (
-                <div className="lazy-image-progress">
-                  <div className="lazy-image-progress-bar" style={{ width: `${loadProgress}%` }} />
-                </div>
-              )}
-            </div>
-          )}
-        </div>
       )}
       
       {hasError && (

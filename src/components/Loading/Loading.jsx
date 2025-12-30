@@ -9,8 +9,17 @@ const Loading = () => {
   ];
 
   const [currentMessage, setCurrentMessage] = useState(0);
+  
+  // Detect mobile for simpler loading animation
+  const isMobile = typeof window !== 'undefined' && (
+    window.innerWidth <= 768 || 
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  );
 
   useEffect(() => {
+    // Skip message rotation on mobile for better performance
+    if (isMobile) return;
+    
     const messageInterval = setInterval(() => {
       setCurrentMessage(prev => (prev + 1) % loadingMessages.length);
     }, 2000);
@@ -18,7 +27,20 @@ const Loading = () => {
     return () => {
       clearInterval(messageInterval);
     };
-  }, []);
+  }, [isMobile]);
+
+  // Simple mobile loading screen - minimal animations for performance
+  if (isMobile) {
+    return (
+      <div className="loading-overlay loading-overlay-mobile">
+        <div className="loading-container-mobile">
+          <h1 className="loading-title-mobile">Kalakritam</h1>
+          <div className="simple-spinner"></div>
+          <p className="loading-text-mobile">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="loading-overlay">

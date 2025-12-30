@@ -218,7 +218,7 @@ export const getBatteryOptimizations = async () => {
       if (isLowBattery && !isCharging) {
         return {
           reduceAnimations: true,
-          lowerQuality: true,
+          lowerQuality: false, // Disabled - keep original image quality for reliable loading
           disableParticles: true,
           simplifyEffects: true
         };
@@ -247,7 +247,7 @@ export const getNetworkOptimizations = () => {
       if (slowConnection || saveData) {
         return {
           preloadImages: false,
-          lowerQuality: true,
+          lowerQuality: false, // Disabled - keep original image quality for reliable loading
           delayNonCritical: true,
           disableAutoplay: true
         };

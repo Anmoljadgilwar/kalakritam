@@ -2,6 +2,24 @@
 
 /* AGGRESSIVE MOBILE PERFORMANCE OPTIMIZATIONS */
 @media (max-width: 768px) {
+  /* COMPLETELY HIDE all skeleton loading effects on mobile */
+  .loading-skeleton,
+  .lazy-image-skeleton,
+  .lazy-image-skeleton-shimmer,
+  .lazy-image-skeleton-icon,
+  .lazy-image-placeholder,
+  [class*="skeleton"],
+  [class*="Skeleton"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  
+  /* Simple background for image containers instead of skeleton */
+  .lazy-image-container:not(.is-loaded) {
+    background: #001a1a !important;
+  }
+  
   /* REMOVE ALL backdrop-filter on mobile - extremely expensive */
   *[class*="blur"],
   *[class*="Blur"],
