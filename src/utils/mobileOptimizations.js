@@ -9,18 +9,63 @@ export const isTouchDevice = () => {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 };
 
+// Check if user is on slow connection
+export const isSlowConnection = () => {
+  if (typeof navigator !== 'undefined' && 'connection' in navigator) {
+    const connection = navigator.connection;
+    if (connection) {
+      // Check for slow connection types
+      if (connection.effectiveType === '2g' || connection.effectiveType === 'slow-2g') {
+        return true;
+      }
+      // Check for save-data mode
+      if (connection.saveData) {
+        return true;
+      }
+      // Check if downlink is less than 1.5 Mbps
+      if (connection.downlink && connection.downlink < 1.5) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+// Check if we should optimize for mobile performance
+export const shouldOptimizeForMobile = () => {
+  return isMobile() || isSlowConnection();
+};
+
 // Performance optimization for mobile
 export const getMobileParticleConfig = () => {
+  const slowConnection = isSlowConnection();
+  
+  // Disable particles completely on slow connections
+  if (slowConnection) {
+    return {
+      particleCount: 0, // Disabled on slow connections
+      particleSpread: 0,
+      speed: 0,
+      particleBaseSize: 0,
+      moveParticlesOnHover: false,
+      particleHoverFactor: 1,
+      alphaParticles: false,
+      disableRotation: true,
+      disabled: true
+    };
+  }
+  
   if (isMobile()) {
     return {
-      particleCount: 300, // Reduced from 1000
-      particleSpread: 8,  // Reduced from 10
-      speed: 0.15,        // Reduced from 0.2
-      particleBaseSize: 150, // Reduced from 200
+      particleCount: 100, // Reduced further from 300
+      particleSpread: 6,  // Reduced from 8
+      speed: 0.1,         // Reduced from 0.15
+      particleBaseSize: 100, // Reduced from 150
       moveParticlesOnHover: false, // Disabled on mobile
       particleHoverFactor: 1, // Reduced from 2
-      alphaParticles: true,
-      disableRotation: true // Disable rotation on mobile for better performance
+      alphaParticles: false, // Disable alpha for better performance
+      disableRotation: true, // Disable rotation on mobile for better performance
+      disabled: false
     };
   }
   return {
@@ -31,7 +76,8 @@ export const getMobileParticleConfig = () => {
     moveParticlesOnHover: true,
     particleHoverFactor: 2,
     alphaParticles: true,
-    disableRotation: false
+    disableRotation: false,
+    disabled: false
   };
 };
 

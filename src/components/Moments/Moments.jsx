@@ -16,6 +16,7 @@ import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import Particles from '../Particles';
 import LazyImage from '../LazyImage';
+import { Skeleton } from '../Skeleton';
 import './Moments.css';
 
 const Moments = () => {
@@ -161,9 +162,25 @@ const Moments = () => {
         <VideoLogo />
         <Header currentPage="moments" />
         <div className="moments-page-content">
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Loading moments...</p>
+          <header className="moments-header">
+            <h1 className="moments-title">Moments</h1>
+            <p className="moments-subtitle">Captured Memories from Our Events</p>
+          </header>
+          
+          <div className="moments-skeleton-grid">
+            {[1, 2, 3, 4].map((col) => (
+              <div key={col} className="moments-skeleton-column">
+                {[1, 2, 3].map((item) => (
+                  <Skeleton 
+                    key={item} 
+                    width="100%" 
+                    height={`${150 + Math.random() * 100}px`} 
+                    borderRadius="12px" 
+                    className="moments-skeleton-item"
+                  />
+                ))}
+              </div>
+            ))}
           </div>
         </div>
         <Footer />

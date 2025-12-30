@@ -18,6 +18,7 @@ import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import Particles from '../Particles';
+import { WorkshopsGridSkeleton, Skeleton } from '../Skeleton';
 import { config } from '../../config/environment';
 import './Workshops.css';
 import '../Gallery/Gallery.css';
@@ -242,10 +243,24 @@ const Workshops = () => {
         <VideoLogo />
         <Header currentPage="workshops" />
         <div className="workshops-page-content">
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Loading workshops...</p>
-          </div>
+          <header className="workshops-page-header">
+            <h1 className="workshops-title">Workshops</h1>
+            <p className="workshops-subtitle">Learn from Expert Artists</p>
+          </header>
+          
+          <section className="workshops-filters">
+            <div className="view-toggle">
+              <Skeleton width="120px" height="40px" borderRadius="20px" />
+              <Skeleton width="120px" height="40px" borderRadius="20px" />
+            </div>
+            <div className="category-filters">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} width="90px" height="36px" borderRadius="18px" />
+              ))}
+            </div>
+          </section>
+          
+          <WorkshopsGridSkeleton count={6} />
         </div>
         <Footer />
       </div>

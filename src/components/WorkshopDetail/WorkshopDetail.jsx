@@ -7,6 +7,7 @@ import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import Particles from '../Particles';
 import LazyImage from '../LazyImage';
+import { Skeleton } from '../Skeleton';
 import { config } from '../../config/environment';
 import { generateSlug } from '../../utils/seoHelpers';
 import { toast } from '../../utils/notifications.js';
@@ -219,8 +220,25 @@ const WorkshopDetail = () => {
         <VideoLogo />
         <Header />
         <div className="workshop-detail-content loading-state">
-          <div className="loading-spinner" />
-          <p>{initializing ? 'Preparing workshop...' : 'Loading workshop...'}</p>
+          <div className="detail-skeleton-container">
+            <Skeleton width="100%" height="350px" borderRadius="16px" className="detail-hero-skeleton" />
+            <div className="detail-info-skeleton">
+              <Skeleton width="65%" height="36px" className="skeleton-title" />
+              <div className="detail-meta-skeleton">
+                <Skeleton width="130px" height="20px" />
+                <Skeleton width="160px" height="20px" />
+                <Skeleton width="110px" height="20px" />
+              </div>
+              <Skeleton width="100%" height="16px" />
+              <Skeleton width="100%" height="16px" />
+              <Skeleton width="90%" height="16px" />
+              <Skeleton width="75%" height="16px" />
+              <div className="detail-actions-skeleton">
+                <Skeleton width="140px" height="48px" borderRadius="24px" />
+                <Skeleton width="140px" height="48px" borderRadius="24px" />
+              </div>
+            </div>
+          </div>
         </div>
         <Footer />
       </div>

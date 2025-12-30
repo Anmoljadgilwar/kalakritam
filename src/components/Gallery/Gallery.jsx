@@ -20,6 +20,7 @@ import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import Particles from '../Particles';
 import LazyImage from '../LazyImage';
+import { GalleryGridSkeleton, Skeleton } from '../Skeleton';
 import './Gallery.css';
 
 const Gallery = () => {
@@ -204,10 +205,21 @@ const Gallery = () => {
         <VideoLogo />
         <Header currentPage="gallery" />
         <div className="gallery-page-content">
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Loading artworks...</p>
-          </div>
+          <header className="gallery-page-header">
+            <h1 className="gallery-title">Art Gallery</h1>
+            <p className="gallery-subtitle">Discover India's Artistic Heritage</p>
+          </header>
+          
+          <section className="gallery-filters">
+            <h3>Filter by Category</h3>
+            <div className="category-filters">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton key={i} width="80px" height="36px" borderRadius="20px" />
+              ))}
+            </div>
+          </section>
+          
+          <GalleryGridSkeleton count={6} />
         </div>
         <Footer />
       </div>

@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { getMobileLazyConfig, shouldOptimizeForMobile } from '../../utils/mobileOptimizations';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { getMobileLazyConfig, shouldOptimizeForMobile, getNetworkOptimizations } from '../../utils/mobileOptimizations';
 import './LazyImage.css';
 
 const LazyImage = ({ 
@@ -9,20 +9,27 @@ const LazyImage = ({
   placeholder = null,
   onLoad = () => {},
   onError = () => {},
+  priority = false, // For critical above-fold images
   ...props 
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(true); // Changed to true by default
+  const [isInView, setIsInView] = useState(false);
   const [hasError, setHasError] = useState(false);
   const imgRef = useRef();
   
   // Get mobile-optimized lazy loading configuration
-  const lazyConfig = getMobileLazyConfig();
   const isMobile = shouldOptimizeForMobile();
+  const networkOpts = useMemo(() => getNetworkOptimizations(), []);
+  const lazyConfig = useMemo(() => getMobileLazyConfig(), []);
 
-  // Removed IntersectionObserver - load images immediately
-  /*
+  // Use IntersectionObserver for better performance on slow connections
   useEffect(() => {
+    // For priority images or fast connections without save-data, load immediately
+    if (priority || (!networkOpts.delayNonCritical && !isMobile)) {
+      setIsInView(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -31,8 +38,8 @@ const LazyImage = ({
         }
       },
       {
-        threshold: 0,
-        rootMargin: '400px'
+        threshold: lazyConfig.threshold,
+        rootMargin: isMobile ? '50px' : lazyConfig.rootMargin
       }
     );
 
@@ -41,8 +48,7 @@ const LazyImage = ({
     }
 
     return () => observer.disconnect();
-  }, []);
-  */
+  }, [priority, networkOpts.delayNonCritical, isMobile, lazyConfig]);
 
   const handleLoad = () => {
     setIsLoaded(true);
@@ -54,18 +60,32 @@ const LazyImage = ({
     onError && onError();
   };
 
+  // Optimize image URL for mobile/slow connections
+  const optimizedSrc = useMemo(() => {
+    if (!src) return '';
+    if (src.startsWith('data:') || src.startsWith('blob:')) return src;
+    
+    // For slow connections, use lower quality
+    if (networkOpts.lowerQuality && src.includes('r2.dev')) {
+      const separator = src.includes('?') ? '&' : '?';
+      return `${src}${separator}w=400&q=60`;
+    }
+    
+    return src;
+  }, [src, networkOpts.lowerQuality]);
+
   return (
     <div ref={imgRef} className={`lazy-image-container ${className}`} {...props}>
       {isInView && !hasError && (
         <img
-          src={src}
+          src={optimizedSrc}
           alt={alt}
           className={`lazy-image ${isLoaded ? 'loaded' : 'loading'}`}
           onLoad={handleLoad}
           onError={handleError}
-          loading="lazy"
-          decoding={isMobile ? "sync" : "async"}
-          fetchPriority={isMobile ? "low" : "auto"}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          fetchpriority={priority ? "high" : "low"}
         />
       )}
       
@@ -73,7 +93,7 @@ const LazyImage = ({
         <div className="lazy-image-placeholder">
           {placeholder || (
             <div className="lazy-image-skeleton">
-              <div className="lazy-image-skeleton-text"></div>
+              <div className="lazy-image-skeleton-shimmer"></div>
             </div>
           )}
         </div>

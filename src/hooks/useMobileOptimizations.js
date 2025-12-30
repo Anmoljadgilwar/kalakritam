@@ -32,8 +32,8 @@ export const useMobileOptimizations = (pageName = 'page') => {
       
       // Update particle config based on optimizations
       const optimizedParticleConfig = getMobileParticleConfig();
-      if (batteryOpts.disableParticles || networkOpts.delayNonCritical) {
-        setParticleConfig({ ...optimizedParticleConfig, particleCount: 0 });
+      if (batteryOpts.disableParticles || networkOpts.delayNonCritical || optimizedParticleConfig.disabled) {
+        setParticleConfig({ ...optimizedParticleConfig, particleCount: 0, disabled: true });
         console.log(`⚡ Particles disabled for ${pageName} due to battery/network optimization`);
       } else {
         setParticleConfig(optimizedParticleConfig);

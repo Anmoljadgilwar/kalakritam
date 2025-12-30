@@ -10,6 +10,7 @@ import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import OptimizedParticles from '../OptimizedParticles';
+import { EventsGridSkeleton, Skeleton } from '../Skeleton';
 import { config } from '../../config/environment';
 import './Events.css';
 
@@ -170,10 +171,19 @@ const Events = () => {
         <VideoLogo />
         <Header currentPage="events" />
         <div className="events-page-content">
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Loading events...</p>
-          </div>
+          <header className="events-page-header">
+            <h1 className="events-title">Events</h1>
+            <p className="events-subtitle">Discover Art Experiences</p>
+          </header>
+          
+          <section className="events-filters">
+            <div className="view-toggle">
+              <Skeleton width="120px" height="40px" borderRadius="20px" />
+              <Skeleton width="120px" height="40px" borderRadius="20px" />
+            </div>
+          </section>
+          
+          <EventsGridSkeleton count={6} />
         </div>
         <Footer />
       </div>

@@ -8,6 +8,7 @@ import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import OptimizedParticles from '../OptimizedParticles';
+import { ArtistsGridSkeleton, Skeleton } from '../Skeleton';
 import { config } from '../../config/environment';
 import './Artists.css';
 import '../Gallery/Gallery.css'; // Import Gallery CSS for modal styles
@@ -112,10 +113,21 @@ const Artists = () => {
         <VideoLogo />
         <Header currentPage="artists" />
         <div className="artists-page-content">
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Loading artists...</p>
-          </div>
+          <header className="artists-page-header">
+            <h1 className="artists-title">Artists</h1>
+            <p className="artists-subtitle">Meet Our Master Creators</p>
+          </header>
+          
+          <section className="artists-filters">
+            <h3>Filter by Category</h3>
+            <div className="category-filters">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton key={i} width="100px" height="36px" borderRadius="18px" />
+              ))}
+            </div>
+          </section>
+          
+          <ArtistsGridSkeleton count={6} />
         </div>
         <Footer />
       </div>

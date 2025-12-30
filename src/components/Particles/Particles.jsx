@@ -88,12 +88,16 @@ const Particles = ({
   sizeRandomness = 1,
   cameraDistance = 20,
   disableRotation = false,
+  disabled = false, // New prop to completely disable particles
   className,
 }) => {
   const containerRef = useRef(null);
   const mouseRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    // If disabled, don't render anything
+    if (disabled || particleCount === 0) return;
+    
     const container = containerRef.current;
     if (!container) return;
 
@@ -221,7 +225,13 @@ const Particles = ({
     sizeRandomness,
     cameraDistance,
     disableRotation,
+    disabled,
   ]);
+
+  // Don't render anything if disabled
+  if (disabled || particleCount === 0) {
+    return null;
+  }
 
   return (
     <div

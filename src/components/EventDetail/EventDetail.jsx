@@ -8,6 +8,7 @@ import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import Particles from '../Particles';
 import LazyImage from '../LazyImage';
+import { DetailPageSkeleton, Skeleton } from '../Skeleton';
 import { config } from '../../config/environment';
 import { generateSlug } from '../../utils/seoHelpers';
 import { generateEventSEO } from '../../utils/dynamicSeo';
@@ -223,8 +224,25 @@ const EventDetail = () => {
         <VideoLogo />
         <Header />
         <div className="event-detail-content loading-state">
-          <div className="loading-spinner" />
-          <p>{initializing ? 'Preparing event...' : 'Loading event...'}</p>
+          <div className="detail-skeleton-container">
+            <Skeleton width="100%" height="350px" borderRadius="16px" className="detail-hero-skeleton" />
+            <div className="detail-info-skeleton">
+              <Skeleton width="60%" height="36px" className="skeleton-title" />
+              <div className="detail-meta-skeleton">
+                <Skeleton width="120px" height="20px" />
+                <Skeleton width="150px" height="20px" />
+                <Skeleton width="100px" height="20px" />
+              </div>
+              <Skeleton width="100%" height="16px" />
+              <Skeleton width="100%" height="16px" />
+              <Skeleton width="85%" height="16px" />
+              <Skeleton width="70%" height="16px" />
+              <div className="detail-actions-skeleton">
+                <Skeleton width="150px" height="48px" borderRadius="24px" />
+                <Skeleton width="150px" height="48px" borderRadius="24px" />
+              </div>
+            </div>
+          </div>
         </div>
         <Footer />
       </div>

@@ -8,6 +8,7 @@ import Header from '../Header';
 import Footer from '../Footer';
 import VideoLogo from '../VideoLogo';
 import OptimizedParticles from '../OptimizedParticles';
+import { BlogsGridSkeleton, Skeleton } from '../Skeleton';
 import { config } from '../../config/environment';
 import '../Gallery/Gallery.css';
 import './ArtBlogs.css';
@@ -66,10 +67,20 @@ const ArtBlogs = () => {
         <VideoLogo />
         <Header currentPage="artblogs" />
         <div className="artblogs-content">
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Loading blog posts...</p>
-          </div>
+          <header className="artblogs-header">
+            <h1 className="artblogs-title">Art Blogs</h1>
+            <p className="artblogs-subtitle">Stories & Insights from the Art World</p>
+          </header>
+          
+          <section className="artblogs-filters">
+            <div className="category-filters">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} width="90px" height="36px" borderRadius="18px" />
+              ))}
+            </div>
+          </section>
+          
+          <BlogsGridSkeleton count={6} />
         </div>
         <Footer />
       </div>

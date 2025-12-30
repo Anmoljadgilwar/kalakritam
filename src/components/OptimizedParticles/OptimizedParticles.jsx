@@ -7,8 +7,8 @@ const OptimizedParticles = ({
   networkOptimizations, 
   className = "particles-background" 
 }) => {
-  // Don't render particles if count is 0
-  if (particleConfig.particleCount === 0) {
+  // Don't render particles if disabled or count is 0
+  if (particleConfig.disabled || particleConfig.particleCount === 0) {
     return null;
   }
 
@@ -24,6 +24,7 @@ const OptimizedParticles = ({
         particleHoverFactor={particleConfig.particleHoverFactor}
         alphaParticles={particleConfig.alphaParticles}
         disableRotation={particleConfig.disableRotation}
+        disabled={particleConfig.disabled}
       />
     </div>
   );
