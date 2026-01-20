@@ -256,15 +256,10 @@
 
 /* Override global mobile scroll pause so Moments animations keep running on mobile */
 @media (max-width: 768px) {
-  .scrolling .moments-container .masonry-column,
-  .moments-container.scrolling .masonry-column,
-  .moments-container .masonry-column,
-  body.scrolling .masonry-column,
-  html.scrolling .masonry-column,
-  .masonry-column {
-    -webkit-animation-play-state: running !important;
+  .moments-container .masonry-column {
     animation-play-state: running !important;
-    transition-duration: initial !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
   }
 }
 
@@ -592,30 +587,25 @@
 
   .masonry-column {
     gap: 10px;
-    -webkit-animation-duration: 25s;
-    animation-duration: 25s;
-    -webkit-animation-timing-function: linear;
-    animation-timing-function: linear;
-    -webkit-animation-iteration-count: infinite;
-    animation-iteration-count: infinite;
-    -webkit-animation-fill-mode: forwards;
+    animation-duration: 25s !important;
+    animation-timing-function: linear !important;
+    animation-iteration-count: infinite !important;
     animation-fill-mode: forwards;
-    will-change: transform;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-animation-play-state: running !important;
     animation-play-state: running !important;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
   
   /* Fix animation for 2-column layout on mobile */
   .masonry-column:nth-child(1) {
-    -webkit-animation: scrollUpMobile 25s linear infinite;
-    animation: scrollUpMobile 25s linear infinite;
+    animation-name: scrollUpMobile !important;
   }
 
   .masonry-column:nth-child(2) {
-    -webkit-animation: scrollDownMobile 25s linear infinite;
-    animation: scrollDownMobile 25s linear infinite;
+    animation-name: scrollDownMobile !important;
   }
   
   .masonry-item {
@@ -683,29 +673,24 @@
   }
 
   .masonry-column {
-    -webkit-animation-duration: 20s;
-    animation-duration: 20s;
-    -webkit-animation-timing-function: linear;
-    animation-timing-function: linear;
-    -webkit-animation-iteration-count: infinite;
-    animation-iteration-count: infinite;
-    -webkit-animation-fill-mode: forwards;
+    animation-duration: 20s !important;
+    animation-timing-function: linear !important;
+    animation-iteration-count: infinite !important;
     animation-fill-mode: forwards;
-    will-change: transform;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-animation-play-state: running !important;
     animation-play-state: running !important;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
   
   .masonry-column:nth-child(1) {
-    -webkit-animation: scrollUpMobile 20s linear infinite;
-    animation: scrollUpMobile 20s linear infinite;
+    animation-name: scrollUpMobile !important;
   }
 
   .masonry-column:nth-child(2) {
-    -webkit-animation: scrollDownMobile 20s linear infinite;
-    animation: scrollDownMobile 20s linear infinite;
+    animation-name: scrollDownMobile !important;
   }
   
   .masonry-item {

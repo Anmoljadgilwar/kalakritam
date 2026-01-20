@@ -127,22 +127,17 @@
    ANIMATION OPTIMIZATION
    ============================================ */
 @media (max-width: 768px) {
-  /* Reduce animation complexity */
-  * {
-    animation-timing-function: ease-out !important;
+  /* Reduce animation complexity - but exclude masonry columns */
+  *:not(.masonry-column) {
+    animation-timing-function: ease-out;
   }
   
-  /* Disable non-essential animations on scroll - EXCEPT Moments masonry columns */
-  .scrolling *:not(.masonry-column) {
-    animation-play-state: paused !important;
-    transition-duration: 0ms !important;
-  }
-  
-  /* Keep Moments masonry column animations running on mobile */
-  .scrolling .masonry-column,
-  .moments-container .masonry-column {
+  /* Keep Moments masonry column animations running on mobile with full GPU acceleration */
+  .masonry-column {
     animation-play-state: running !important;
-    transition-duration: initial !important;
+    animation-timing-function: linear !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
 }
 
@@ -182,9 +177,9 @@
    BATTERY SAVER MODE
    ============================================ */
 @media (prefers-reduced-motion: reduce) and (max-width: 768px) {
-  /* Disable all non-essential visual effects */
-  *::before,
-  *::after {
+  /* Disable all non-essential visual effects - EXCEPT Moments masonry */
+  *:not(.masonry-column)::before,
+  *:not(.masonry-column)::after {
     animation: none !important;
     transition: none !important;
   }
