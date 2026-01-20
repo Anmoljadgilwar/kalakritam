@@ -38,35 +38,37 @@ const Moments = () => {
   useEffect(() => {
     if (!isMobile || loading || moments.length === 0) return;
     
-    let startTime = null;
-    const duration = 25000; // 25 seconds for one cycle
-    
-    const animate = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const progress = (elapsed % duration) / duration;
-      
-      // Iterate through all columns stored in the ref object
-      Object.entries(columnsRef.current).forEach(([key, column]) => {
-        if (!column) return;
-        
-        // Extract column index from key (format: eventId-colIndex)
-        const colIndex = parseInt(key.split('-').pop());
-        const direction = colIndex % 2 === 0 ? -1 : 1; // Alternate up/down
-        const translateY = direction === -1 
-          ? -33.333 * progress 
-          : -33.333 + (33.333 * progress);
-        
-        column.style.transform = `translateY(${translateY}%) translateZ(0)`;
-      });
-      
-      animationRef.current = requestAnimationFrame(animate);
-    };
-    
-    // Start animation after a short delay to ensure DOM is ready
+    // Wait for DOM to be fully rendered with all columns
     const timeoutId = setTimeout(() => {
+      let startTime = null;
+      const duration = 25000; // 25 seconds for one cycle
+      
+      const animate = (timestamp) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = (elapsed % duration) / duration;
+        
+        // Query all masonry grids and animate each grid's columns
+        const allGrids = document.querySelectorAll('.masonry-grid');
+        
+        allGrids.forEach((grid) => {
+          const columns = grid.querySelectorAll('.masonry-column.mobile-animated');
+          columns.forEach((column, colIndex) => {
+            // Alternate direction based on column index within each grid
+            const direction = colIndex % 2 === 0 ? -1 : 1; // Even columns go up, odd go down
+            const translateY = direction === -1 
+              ? -33.333 * progress 
+              : -33.333 + (33.333 * progress);
+            
+            column.style.transform = `translateY(${translateY}%) translateZ(0)`;
+          });
+        });
+        
+        animationRef.current = requestAnimationFrame(animate);
+      };
+      
       animationRef.current = requestAnimationFrame(animate);
-    }, 100);
+    }, 500); // Wait for images to start loading
     
     return () => {
       clearTimeout(timeoutId);

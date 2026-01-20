@@ -571,9 +571,14 @@
 
 @media (max-width: 768px) {
   .moments-page-content {
-    padding-top: 100px;
+    padding-top: 20px;
     padding-left: 15px;
     padding-right: 15px;
+  }
+
+  .moments-page-header {
+    padding: 1rem 0;
+    margin-bottom: 1.5rem;
   }
 
   .moments-events-list {
