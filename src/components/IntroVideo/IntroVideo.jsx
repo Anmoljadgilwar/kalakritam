@@ -150,7 +150,7 @@ const IntroVideo = () => {
             className={`intro-video ${isTransitioning ? 'shrinking' : ''}`}
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             autoPlay={false}
             crossOrigin="anonymous"
           >

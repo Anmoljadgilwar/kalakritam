@@ -117,7 +117,7 @@ export default defineConfig({
       }
     },
     // Optimize chunk size
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 500,
     // Target modern browsers for better performance
     target: 'es2020',
     // Use esbuild for minification (faster)
