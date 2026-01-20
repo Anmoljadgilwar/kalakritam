@@ -26,14 +26,11 @@ export default defineConfig({
         assetFileNames: 'assets/[name]-[hash].[ext]',
         // Manual chunk splitting for better caching and loading
         manualChunks(id) {
-          // React + MUI together - MUI needs React, so keep them together
+          // React core libraries - loaded on every page
           if (id.includes('node_modules/react/') || 
               id.includes('node_modules/react-dom/') || 
-              id.includes('node_modules/scheduler/') ||
-              id.includes('node_modules/@mui/') || 
-              id.includes('node_modules/@emotion/') ||
-              id.includes('node_modules/@babel/runtime')) {
-            return 'vendor-react-mui';
+              id.includes('node_modules/scheduler/')) {
+            return 'vendor-react';
           }
           
           // React Router - loaded on every page
@@ -41,6 +38,18 @@ export default defineConfig({
               id.includes('node_modules/react-router/') ||
               id.includes('node_modules/@remix-run/')) {
             return 'vendor-router';
+          }
+          
+          // MUI Core components - used across multiple pages
+          if (id.includes('node_modules/@mui/material/') || 
+              id.includes('node_modules/@mui/system/') ||
+              id.includes('node_modules/@emotion/')) {
+            return 'vendor-mui-core';
+          }
+          
+          // MUI Charts - only used in admin financials
+          if (id.includes('node_modules/@mui/x-charts/')) {
+            return 'vendor-mui-charts';
           }
           
           // Three.js and related - only used in specific components
@@ -117,26 +126,8 @@ export default defineConfig({
     sourcemap: process.env.NODE_ENV === 'development',
     // Optimize CSS
     cssMinify: true,
-    // Enable selective module preload for critical dependencies
-    modulePreload: {
-      polyfill: true,
-      resolveDependencies: (filename, deps, { hostId, hostType }) => {
-        // Always preload React before other chunks
-        if (filename.includes('vendor-react')) {
-          return deps;
-        }
-        // Preload router with react
-        if (filename.includes('vendor-router')) {
-          return deps.filter(dep => dep.includes('vendor-react'));
-        }
-        // Preload MUI with react
-        if (filename.includes('vendor-mui')) {
-          return deps.filter(dep => dep.includes('vendor-react'));
-        }
-        // Don't preload dependencies for other chunks
-        return [];
-      }
-    },
+    // Disable module preload to prevent loading all chunks upfront
+    modulePreload: false,
     // Ensure proper module initialization order
     commonjsOptions: {
       include: [/node_modules/],

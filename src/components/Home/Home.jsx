@@ -26,13 +26,13 @@ import '../../assets/fonts/fonts.css';
 // Background Images Configuration - LAZY LOADED, not preloaded
 // Images will load only when cards are visible in viewport
 const CARD_BACKGROUND_IMAGES = {
-  gallery: 'https://www.cdn.kalakritam.in/home/k1.jpeg',
-  workshops: 'https://www.cdn.kalakritam.in/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_16_01%20PM.png',
-  events: 'https://www.cdn.kalakritam.in/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_31_27%20PM.png',
-  artists: 'https://www.cdn.kalakritam.in/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_33_22%20PM.png',
-  blogs: 'https://www.cdn.kalakritam.in/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_34_49%20PM.png',
-  contact: 'https://www.cdn.kalakritam.in/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_37_08%20PM.png',
-  aboutBackground: 'https://www.cdn.kalakritam.in/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_47_58%20PM.png'
+  gallery: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/k1.jpeg',
+  workshops: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_16_01%20PM.png',
+  events: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_31_27%20PM.png',
+  artists: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_33_22%20PM.png',
+  blogs: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_34_49%20PM.png',
+  contact: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_37_08%20PM.png',
+  aboutBackground: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/ChatGPT%20Image%20Dec%2025%2C%202025%2C%2004_47_58%20PM.png'
 };
 
 const Home = () => {

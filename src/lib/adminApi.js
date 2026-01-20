@@ -723,7 +723,7 @@ export const uploadApi = {
     
     try {
       // Handle different URL formats
-      // Format 1: https://www.cdn.kalakritam.in/folder/filename.jpg
+      // Format 1: https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/folder/filename.jpg
       // Format 2: https://custom-domain.com/folder/filename.jpg
       const url = new URL(imageUrl);
       const pathname = url.pathname;

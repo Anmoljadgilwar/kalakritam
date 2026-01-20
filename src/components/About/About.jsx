@@ -14,13 +14,13 @@ import './About.css';
 
 // Background Images Configuration - Add your R2 URLs here
 const ABOUT_BACKGROUND_IMAGES = {
-  ourStory: 'https://www.cdn.kalakritam.in/home/about-us-hero-banner.png', // Our Story section background
-  ourMission: 'https://www.cdn.kalakritam.in/home/our-mission.png', // Our Mission section background
-  ourVision: 'https://www.cdn.kalakritam.in/home/our-vision.png', // Our Vision section background
-  authenticity: 'https://www.cdn.kalakritam.in/home/Authenticity%20Card.png', // Authenticity value card
-  innovation: 'https://www.cdn.kalakritam.in/home/Innovation%20Card.png', // Innovation value card
-  community: 'https://www.cdn.kalakritam.in/home/Community%20Card.png', // Community value card
-  excellence: 'https://www.cdn.kalakritam.in/home/Excellence%20Card.png' // Excellence value card
+  ourStory: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/about-us-hero-banner.png', // Our Story section background
+  ourMission: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/our-mission.png', // Our Mission section background
+  ourVision: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/our-vision.png', // Our Vision section background
+  authenticity: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/Authenticity%20Card.png', // Authenticity value card
+  innovation: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/Innovation%20Card.png', // Innovation value card
+  community: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/Community%20Card.png', // Community value card
+  excellence: 'https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/home/Excellence%20Card.png' // Excellence value card
 };
 
 const About = () => {

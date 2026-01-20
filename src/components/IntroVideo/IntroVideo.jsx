@@ -154,7 +154,7 @@ const IntroVideo = () => {
             autoPlay={false}
             crossOrigin="anonymous"
           >
-            <source src="https://www.cdn.kalakritam.in/intro-video-compressed.mp4" type="video/mp4" />
+            <source src="https://pub-9cdd84716e0341ba9fa9c0b6875b5572.r2.dev/intro-video-compressed.mp4" type="video/mp4" />
             <p>Your browser does not support the video tag.</p>
           </video>
         </div>
