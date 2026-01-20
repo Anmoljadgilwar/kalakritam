@@ -26,11 +26,14 @@ export default defineConfig({
         assetFileNames: 'assets/[name]-[hash].[ext]',
         // Manual chunk splitting for better caching and loading
         manualChunks(id) {
-          // React core libraries - loaded on every page
+          // React + MUI together - MUI needs React, so keep them together
           if (id.includes('node_modules/react/') || 
               id.includes('node_modules/react-dom/') || 
-              id.includes('node_modules/scheduler/')) {
-            return 'vendor-react';
+              id.includes('node_modules/scheduler/') ||
+              id.includes('node_modules/@mui/') || 
+              id.includes('node_modules/@emotion/') ||
+              id.includes('node_modules/@babel/runtime')) {
+            return 'vendor-react-mui';
           }
           
           // React Router - loaded on every page
@@ -38,13 +41,6 @@ export default defineConfig({
               id.includes('node_modules/react-router/') ||
               id.includes('node_modules/@remix-run/')) {
             return 'vendor-router';
-          }
-          
-          // MUI and Emotion - MUST stay together to avoid circular dependency issues
-          if (id.includes('node_modules/@mui/') || 
-              id.includes('node_modules/@emotion/') ||
-              id.includes('node_modules/@babel/runtime')) {
-            return 'vendor-mui';
           }
           
           // Three.js and related - only used in specific components
