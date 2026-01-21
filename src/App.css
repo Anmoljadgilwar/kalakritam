@@ -7,12 +7,25 @@ html, body, #root, .app, .app-content {
   scroll-behavior: auto !important;
 }
 
+/* DevTools mobile simulation fix - ensure scrolling works */
+html {
+  overflow-y: scroll !important;
+  height: auto !important;
+}
+
+body {
+  overflow-y: scroll !important;
+  height: auto !important;
+  min-height: 100vh;
+}
+
 .app {
   min-height: 100vh;
   background-color: #000000;
   color: white;
   width: 100%;
   overflow-x: hidden;
+  overflow-y: visible;
   position: relative;
 }
 
@@ -23,6 +36,7 @@ html, body, #root, .app, .app-content {
   background-color: #000000;
   min-height: 100vh;
   overflow-x: hidden;
+  overflow-y: visible;
 }
 
 * {

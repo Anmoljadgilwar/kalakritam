@@ -180,18 +180,19 @@ button:focus-visible {
 }
 
 @media (max-width: 768px) {
-  /* CRITICAL: Mobile scroll fix */
+  /* CRITICAL: Mobile scroll fix - works in DevTools and real devices */
   html, body {
-    overflow-y: auto !important;
+    overflow-y: scroll !important;
     overflow-x: hidden !important;
     height: auto !important;
     min-height: 100% !important;
     -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-x pan-y !important;
+    touch-action: auto !important;
   }
   
   #root {
     overflow-y: visible !important;
+    overflow-x: hidden !important;
     height: auto !important;
     min-height: 100% !important;
   }
