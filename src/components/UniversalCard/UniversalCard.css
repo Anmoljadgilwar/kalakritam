@@ -1,13 +1,15 @@
 .universal-card {
   background: linear-gradient(135deg, rgba(195, 143, 33, 0.12) 0%, rgba(212, 175, 133, 0.08) 100%);
   border-radius: 20px;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid rgba(195, 143, 33, 0.25);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
-  width: 320px;
-  height: 480px;
+  width: 100%;
+  max-width: 320px;
+  min-height: 480px;
+  height: auto;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -41,9 +43,11 @@
   position: relative;
   width: 100%;
   height: 200px;
+  min-height: 200px;
   overflow: hidden;
   background: linear-gradient(135deg, #002f2f 0%, #001a1a 100%);
   flex-shrink: 0;
+  border-radius: 20px 20px 0 0;
 }
 
 .universal-card-image {
@@ -132,6 +136,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: visible;
+  border-radius: 0 0 20px 20px;
 }
 
 .universal-card-title {
@@ -235,6 +241,12 @@
   border-top: 1px solid rgba(195, 143, 33, 0.2);
   justify-content: center;
   align-items: center;
+  width: 100%;
+}
+
+.universal-card-actions .btn-view.universal-card-btn {
+  margin: 0 auto;
+  text-align: center;
 }
 
 .universal-card-btn {
@@ -281,7 +293,9 @@
 @media (max-width: 768px) {
   .universal-card {
     width: 100%;
-    height: 420px;
+    max-width: 100%;
+    min-height: auto;
+    height: auto;
     margin: 0 auto;
     border-radius: 16px;
   }
