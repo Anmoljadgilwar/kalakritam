@@ -324,7 +324,45 @@
   background: linear-gradient(135deg, #d4a124 0%, #e5c896 100%);
 }
 
-/* Responsive Design */
+/* Responsive Design - Tablet */
+@media (max-width: 1024px) {
+  .universal-card {
+    max-width: 280px;
+    min-height: 420px;
+  }
+  
+  .universal-card-image-container {
+    height: 180px;
+    min-height: 180px;
+  }
+  
+  .universal-card-content {
+    padding: 14px;
+  }
+  
+  .universal-card-title {
+    font-size: 0.95rem;
+  }
+  
+  .universal-card-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .universal-card-detail-label {
+    font-size: 0.7rem;
+  }
+  
+  .universal-card-detail-value {
+    font-size: 0.75rem;
+  }
+  
+  .universal-card-btn {
+    padding: 7px 14px;
+    font-size: 0.7rem;
+  }
+}
+
+/* Responsive Design - Mobile */
 @media (max-width: 768px) {
   .universal-card {
     width: 100%;
@@ -332,12 +370,18 @@
     min-height: auto;
     height: auto;
     margin: 0 auto;
-    border-radius: 16px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .universal-card::before,
+  .universal-card::after {
+    display: none;
   }
   
   .universal-card:hover {
     transform: none;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   }
   
   .universal-card:active {
@@ -345,174 +389,182 @@
   }
   
   .universal-card-image-container {
-    height: 160px;
+    height: 110px;
+    min-height: 110px;
+    border-radius: 10px 10px 0 0;
   }
   
   .universal-card-content {
-    padding: 1rem;
+    padding: 10px;
+    border-radius: 0 0 10px 10px;
   }
   
   .universal-card-title {
-    font-size: 1rem;
-    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    margin-bottom: 2px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
   }
   
   .universal-card-subtitle {
-    font-size: 0.85rem;
-    margin-bottom: 0.75rem;
-  }
-  
-  .universal-card-description {
-    font-size: 0.8rem;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    margin-bottom: 0.75rem;
+    font-size: 0.7rem;
+    margin-bottom: 6px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
   
   .universal-card-details {
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 8px;
+    margin-bottom: 6px;
+    border-radius: 6px;
   }
   
   .universal-card-detail-row {
-    padding: 5px 0;
-    min-height: 24px;
+    padding: 4px 0;
+    min-height: 18px;
+  }
+  
+  .universal-card-detail-row:hover {
+    background: none;
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
   }
   
   .universal-card-detail-label {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     flex: 0 0 40%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
   
   .universal-card-detail-value {
-    font-size: 0.75rem;
-    padding-left: 6px;
+    font-size: 0.7rem;
+    padding-left: 4px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
   
   .universal-card-actions {
-    flex-direction: column;
-    gap: 8px;
-    margin-top: auto;
-    padding-top: 10px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(195, 143, 33, 0.1);
   }
   
   .universal-card-btn {
-    width: 100%;
-    max-width: 100%;
-    padding: 10px 14px;
-    min-height: 40px;
-    font-size: 0.8rem;
+    padding: 6px 14px;
+    font-size: 0.65rem;
+    border-radius: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 28px;
   }
   
-  /* Image overlay adjustments */
+  /* Hide overlay on mobile for cleaner look */
   .universal-card-overlay {
-    opacity: 1;
-    transform: translateY(0);
-    padding: 20px 15px 15px;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
-  }
-  
-  .universal-card-overlay-content h3 {
-    font-size: 1.1rem;
-  }
-  
-  .universal-card-overlay-content p {
-    font-size: 0.9rem;
+    display: none;
   }
   
   .universal-card-logo-text {
-    font-size: 1.5rem;
+    font-size: 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
   
   .universal-card-image-not-available {
-    font-size: 0.8rem;
+    font-size: 0.6rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
+/* Small Mobile */
 @media (max-width: 480px) {
   .universal-card {
-    border-radius: 16px;
+    border-radius: 8px;
   }
   
   .universal-card-image-container {
-    min-height: 150px;
+    height: 100px;
+    min-height: 100px;
+    border-radius: 8px 8px 0 0;
   }
   
   .universal-card-content {
-    padding: 1rem;
+    padding: 8px;
+    border-radius: 0 0 8px 8px;
   }
   
   .universal-card-title {
-    font-size: 1.1rem;
+    font-size: 0.78rem;
+    line-height: 1.2;
   }
   
   .universal-card-subtitle {
-    font-size: 0.9rem;
+    font-size: 0.65rem;
+    margin-bottom: 5px;
   }
   
   .universal-card-details {
-    padding: 10px;
+    padding: 6px;
+    border-radius: 5px;
   }
   
   .universal-card-detail-row {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 0;
-    flex-wrap: nowrap;
+    padding: 3px 0;
+    min-height: 16px;
   }
   
   .universal-card-detail-label {
-    flex: 0 0 auto;
-    font-size: 0.8rem;
-    color: #c38f21;
-    white-space: nowrap;
+    font-size: 0.6rem;
   }
   
   .universal-card-detail-value {
-    flex: 1;
-    padding-left: 8px;
-    font-size: 0.85rem;
-    text-align: right;
+    font-size: 0.65rem;
+    padding-left: 3px;
+  }
+  
+  .universal-card-actions {
+    padding-top: 5px;
   }
   
   .universal-card-btn {
-    padding: 10px 14px;
-    font-size: 0.85rem;
-  }
-  
-  .universal-card-overlay-content h3 {
-    font-size: 1rem;
-  }
-  
-  .universal-card-overlay-content p {
-    font-size: 0.85rem;
+    padding: 5px 12px;
+    font-size: 0.6rem;
+    border-radius: 6px;
+    min-height: 26px;
   }
 }
 
 /* Extra small screens */
 @media (max-width: 360px) {
+  .universal-card-image-container {
+    height: 85px;
+    min-height: 85px;
+  }
+  
   .universal-card-content {
-    padding: 0.875rem;
+    padding: 6px;
   }
   
   .universal-card-title {
-    font-size: 1rem;
+    font-size: 0.72rem;
   }
   
-  .universal-card-description {
-    font-size: 0.8rem;
+  .universal-card-subtitle {
+    font-size: 0.6rem;
+    margin-bottom: 4px;
   }
   
   .universal-card-details {
-    padding: 8px;
+    padding: 5px;
+  }
+  
+  .universal-card-detail-label {
+    font-size: 0.55rem;
+  }
+  
+  .universal-card-detail-value {
+    font-size: 0.6rem;
   }
   
   .universal-card-btn {
-    padding: 9px 12px;
-    font-size: 0.8rem;
+    padding: 4px 10px;
+    font-size: 0.55rem;
+    min-height: 24px;
   }
 }
 
