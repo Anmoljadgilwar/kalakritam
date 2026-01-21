@@ -1,339 +1,6 @@
-/* From Uiverse.io by ZacharyCrespin */ 
-@keyframes square-animation {
- 0% {
-  left: 0;
-  top: 0;
- }
-
- 10.5% {
-  left: 0;
-  top: 0;
- }
-
- 12.5% {
-  left: 32px;
-  top: 0;
- }
-
- 23% {
-  left: 32px;
-  top: 0;
- }
-
- 25% {
-  left: 64px;
-  top: 0;
- }
-
- 35.5% {
-  left: 64px;
-  top: 0;
- }
-
- 37.5% {
-  left: 64px;
-  top: 32px;
- }
-
- 48% {
-  left: 64px;
-  top: 32px;
- }
-
- 50% {
-  left: 32px;
-  top: 32px;
- }
-
- 60.5% {
-  left: 32px;
-  top: 32px;
- }
-
- 62.5% {
-  left: 32px;
-  top: 64px;
- }
-
- 73% {
-  left: 32px;
-  top: 64px;
- }
-
- 75% {
-  left: 0;
-  top: 64px;
- }
-
- 85.5% {
-  left: 0;
-  top: 64px;
- }
-
- 87.5% {
-  left: 0;
-  top: 32px;
- }
-
- 98% {
-  left: 0;
-  top: 32px;
- }
-
- 100% {
-  left: 0;
-  top: 0;
- }
-}
-
-.loader {
- position: relative;
- width: 96px;
- height: 96px;
- transform: rotate(45deg);
- margin: 2rem auto;
-}
-
-.loader-square {
- position: absolute;
- top: 0;
- left: 0;
- width: 28px;
- height: 28px;
- margin: 2px;
- border-radius: 4px;
- background: linear-gradient(135deg, #c38f21, #e6b33a);
- background-size: cover;
- background-position: center;
- animation: square-animation 10s ease-in-out infinite both;
- box-shadow: 0 2px 8px rgba(195, 143, 33, 0.3);
-}
-
-.loader-square:nth-of-type(1) {
- animation-delay: 0s;
-}
-
-.loader-square:nth-of-type(2) {
- animation-delay: -1.4285714286s;
-}
-
-.loader-square:nth-of-type(3) {
- animation-delay: -2.8571428571s;
-}
-
-.loader-square:nth-of-type(4) {
- animation-delay: -4.2857142857s;
-}
-
-.loader-square:nth-of-type(5) {
- animation-delay: -5.7142857143s;
-}
-
-.loader-square:nth-of-type(6) {
- animation-delay: -7.1428571429s;
-}
-
-.loader-square:nth-of-type(7) {
- animation-delay: -8.5714285714s;
-}
-
-.loader-square:nth-of-type(8) {
- animation-delay: -10s;
-}
+/* Simple Loading Screen with Circle Spinner */
 
 .loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 26, 26, 0.6);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  z-index: 9999;
-  animation: fadeIn 0.6s ease;
-}
-
-.loading-container {
-  text-align: center;
-  animation: slideUp 0.8s ease;
-  background: rgba(0, 47, 47, 0.08);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(195, 143, 33, 0.15);
-  border-radius: 20px;
-  padding: 3rem 2.5rem;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.loading-logo {
-  margin-bottom: 3rem;
-}
-
-.loading-title {
-  font-family: 'Samarkan', 'Cinzel', serif;
-  font-size: 3.5rem;
-  color: #c38f21;
-  font-weight: 700;
-  letter-spacing: 0px;
-  margin: 0 0 1rem 0;
-  text-transform: uppercase;
-  animation: glow 3s ease-in-out infinite alternate;
-  text-shadow: 0 0 25px rgba(195, 143, 33, 0.6);
-}
-
-.loading-subtitle {
-  font-size: 1.1rem;
-  color: #d4af85;
-  font-weight: 300;
-  opacity: 0.9;
-  letter-spacing: 1.5px;
-  margin: 0 0 2rem 0;
-  animation: pulse 2.5s ease-in-out infinite;
-}
-
-.loading-status {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.loading-text {
-  font-size: 1.2rem;
-  color: #d4af85;
-  font-weight: 400;
-  opacity: 0.9;
-  animation: pulse 2.5s ease-in-out infinite;
-  letter-spacing: 0.8px;
-  text-shadow: 0 0 10px rgba(212, 175, 133, 0.3);
-  transition: all 0.5s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
-  }
-  to {
-    opacity: 1;
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes glow {
-  0% {
-    text-shadow: 0 0 25px rgba(195, 143, 33, 0.6);
-  }
-  50% {
-    text-shadow: 0 0 35px rgba(195, 143, 33, 0.8);
-  }
-  100% {
-    text-shadow: 0 0 25px rgba(195, 143, 33, 0.6);
-  }
-}
-
-@keyframes bounce {
-  0%, 80%, 100% {
-    transform: scale(0);
-    opacity: 0.5;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.9;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
-@media (max-width: 768px) {
-  .loading-title {
-    font-size: 2.8rem;
-    letter-spacing: 2px;
-  }
-  
-  .loading-subtitle {
-    font-size: 1rem;
-  }
-  
-  .loading-text {
-    font-size: 1.1rem;
-  }
-  
-  .progress-bar {
-    width: 220px;
-  }
-  
-  .progress-percentage {
-    font-size: 1.1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .loading-title {
-    font-size: 2.2rem;
-    letter-spacing: 1.5px;
-  }
-  
-  .loading-subtitle {
-    font-size: 0.9rem;
-  }
-  
-  .progress-bar {
-    width: 180px;
-    height: 5px;
-  }
-  
-  .loading-dots {
-    gap: 0.8rem;
-  }
-  
-  .loading-dots span {
-    width: 10px;
-    height: 10px;
-  }
-  
-  .loading-text {
-    font-size: 1rem;
-  }
-  
-  .progress-percentage {
-    font-size: 1rem;
-  }
-}
-
-/* ============================================
-   MOBILE-OPTIMIZED SIMPLE LOADING SCREEN
-   Lightweight spinner for better mobile performance
-   ============================================ */
-
-.loading-overlay-mobile {
   position: fixed;
   top: 0;
   left: 0;
@@ -346,41 +13,51 @@
   z-index: 9999;
 }
 
-.loading-container-mobile {
+.loading-container {
   text-align: center;
   padding: 2rem;
 }
 
-.loading-title-mobile {
-  font-family: 'Samarkan', 'Cinzel', serif;
-  font-size: 2rem;
-  color: #c38f21;
-  font-weight: 700;
-  letter-spacing: 0px;
-  margin: 0 0 2rem 0;
-  text-transform: uppercase;
-}
-
-.loading-text-mobile {
-  font-size: 0.9rem;
+.loading-text {
+  font-size: 1rem;
   color: #d4af85;
   margin-top: 1.5rem;
   opacity: 0.8;
+  font-family: 'Montserrat', sans-serif;
 }
 
-/* Simple CSS Spinner - Minimal Performance Impact */
+/* Simple Circle Spinner */
 .simple-spinner {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   margin: 0 auto;
   border: 3px solid rgba(195, 143, 33, 0.2);
   border-top-color: #c38f21;
   border-radius: 50%;
-  animation: simple-spin 0.8s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
-@keyframes simple-spin {
+@keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .simple-spinner {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .loading-text {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .simple-spinner {
+    width: 36px;
+    height: 36px;
   }
 }

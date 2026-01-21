@@ -393,7 +393,7 @@ const PageOptimizer = () => {
 };
 
 const AppContent = () => {
-  const { isLoading } = useLoading();
+  const { isLoading, loadingMessage } = useLoading();
   const [showParticles, setShowParticles] = useState(false);
   const [homeBlurred, setHomeBlurred] = useState(true);
   const [showHome, setShowHome] = useState(false);
@@ -477,7 +477,7 @@ const AppContent = () => {
 
   return (
     <>
-      {isLoading && <Loading />}
+      {isLoading && <Loading message={loadingMessage} />}
       <Router>
         <PageOptimizer />
         <div className="app">

@@ -153,26 +153,28 @@
 @media (max-width: 768px) {
   .hero-banner-container {
     width: 95%;
-    margin: 1rem auto;
+    margin: 0.75rem auto;
   }
 
   .hero-banner {
     border-radius: 8px;
+    aspect-ratio: 2 / 1;
+    max-height: 180px;
   }
 
   .hero-banner-content {
-    padding: 1.25rem;
+    padding: 1rem;
   }
 
   .hero-banner-title {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     line-height: 1.3;
   }
 
   .hero-banner-arrow {
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
     opacity: 0.85;
   }
 
@@ -185,33 +187,33 @@
   }
 
   .hero-banner-dots {
-    bottom: 1rem;
-    gap: 0.5rem;
+    bottom: 0.5rem;
+    gap: 0.4rem;
   }
 
   .hero-banner-dot {
-    width: 10px;
-    height: 10px;
-    min-width: 44px;
-    min-height: 44px;
-    padding: 17px;
+    width: 8px;
+    height: 8px;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 14px;
     background-clip: content-box;
   }
 
   .hero-banner-dot.active {
-    width: 24px;
-    padding: 17px 5px;
+    width: 20px;
+    padding: 14px 5px;
   }
   
   /* Swipe hint for mobile */
   .hero-banner::after {
     content: '';
     position: absolute;
-    bottom: 3rem;
+    bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
-    width: 40px;
-    height: 4px;
+    width: 30px;
+    height: 3px;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 2px;
     opacity: 0;
@@ -239,21 +241,23 @@
 
   .hero-banner {
     border-radius: 6px;
+    aspect-ratio: 2.5 / 1;
+    max-height: 140px;
   }
 
   .hero-banner-content {
-    padding: 0.875rem;
+    padding: 0.6rem;
   }
 
   .hero-banner-title {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     line-height: 1.2;
   }
 
   .hero-banner-arrow {
-    width: 36px;
-    height: 36px;
-    font-size: 1.2rem;
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
     opacity: 0.9;
   }
   
@@ -266,21 +270,21 @@
   }
 
   .hero-banner-dots {
-    gap: 0.35rem;
-    bottom: 0.75rem;
+    gap: 0.3rem;
+    bottom: 0.4rem;
   }
 
   .hero-banner-dot {
-    width: 8px;
-    height: 8px;
-    min-width: 40px;
-    min-height: 40px;
-    padding: 16px;
+    width: 6px;
+    height: 6px;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 13px;
   }
 
   .hero-banner-dot.active {
-    width: 18px;
-    padding: 16px 5px;
+    width: 14px;
+    padding: 13px 4px;
   }
 }
 
@@ -290,18 +294,40 @@
     margin: 0.25rem auto;
   }
   
+  .hero-banner {
+    aspect-ratio: 2.5 / 1;
+    max-height: 120px;
+  }
+  
   .hero-banner-content {
-    padding: 0.75rem;
+    padding: 0.5rem;
   }
   
   .hero-banner-title {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
   
   .hero-banner-arrow {
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
+    width: 24px;
+    height: 24px;
+    font-size: 0.9rem;
+  }
+  
+  .hero-banner-dots {
+    bottom: 0.3rem;
+  }
+  
+  .hero-banner-dot {
+    width: 5px;
+    height: 5px;
+    min-width: 28px;
+    min-height: 28px;
+    padding: 11px;
+  }
+  
+  .hero-banner-dot.active {
+    width: 12px;
+    padding: 11px 3px;
   }
 }
 

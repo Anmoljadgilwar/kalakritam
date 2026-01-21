@@ -163,11 +163,7 @@ const IntroVideo = () => {
       <div className={`video-fallback ${showFallback ? 'show' : ''}`}>
         <div className="logo-animation">
           <h1>Kalakritam</h1>
-          <div className="loading-dots">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
+          <div className="intro-spinner"></div>
         </div>
       </div>
     </div>

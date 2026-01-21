@@ -116,15 +116,19 @@
 }
 
 .loading-indicator {
-  color: #d4af85;
-  font-size: 1.5rem;
-  animation: loading-dots 1.5s infinite;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto;
+  border: 2px solid rgba(212, 175, 133, 0.2);
+  border-top-color: #d4af85;
+  border-radius: 50%;
+  animation: notification-spin 0.8s linear infinite;
 }
 
-@keyframes loading-dots {
-  0%, 20% { content: '.'; }
-  40% { content: '..'; }
-  60%, 100% { content: '...'; }
+@keyframes notification-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .notification-list {

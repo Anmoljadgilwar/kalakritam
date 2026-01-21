@@ -118,31 +118,21 @@
   animation: fadeInUp 1s ease 0.5s both;
 }
 
-.loading-dots {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.loading-dots span {
-  width: 12px;
-  height: 12px;
-  background-color: #66cccc;
+/* Simple spinner for intro video loading */
+.intro-spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 1rem;
+  border: 3px solid rgba(102, 204, 204, 0.2);
+  border-top-color: #66cccc;
   border-radius: 50%;
-  animation: bounce 1.4s ease-in-out infinite both;
+  animation: intro-spin 0.8s linear infinite;
 }
 
-.loading-dots span:nth-child(1) {
-  animation-delay: -0.32s;
-}
-
-.loading-dots span:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-.loading-dots span:nth-child(3) {
-  animation-delay: 0s;
+@keyframes intro-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeInUp {
@@ -156,15 +146,6 @@
   }
 }
 
-@keyframes bounce {
-  0%, 80%, 100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
-}
-
 @media (max-width: 768px) {
   .logo-animation h1 {
     font-size: 3rem;
@@ -173,5 +154,10 @@
   .video-fallback p {
     font-size: 1rem;
     padding: 0 1rem;
+  }
+  
+  .intro-spinner {
+    width: 32px;
+    height: 32px;
   }
 }

@@ -2,22 +2,18 @@
 
 /* AGGRESSIVE MOBILE PERFORMANCE OPTIMIZATIONS */
 @media (max-width: 768px) {
-  /* COMPLETELY HIDE all skeleton loading effects on mobile */
-  .loading-skeleton,
-  .lazy-image-skeleton,
-  .lazy-image-skeleton-shimmer,
-  .lazy-image-skeleton-icon,
-  .lazy-image-placeholder,
-  [class*="skeleton"],
-  [class*="Skeleton"] {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-  }
-  
-  /* Simple background for image containers instead of skeleton */
+  /* Simple background for image containers */
   .lazy-image-container:not(.is-loaded) {
     background: #001a1a !important;
+  }
+  
+  /* Keep spinner animations working */
+  .simple-spinner,
+  .loading-spinner,
+  .lazy-image-spinner,
+  [class*="spinner"] {
+    animation-duration: 0.8s !important;
+    animation-iteration-count: infinite !important;
   }
   
   /* REMOVE ALL backdrop-filter on mobile - extremely expensive */
@@ -52,7 +48,7 @@
   /* Optimize image containers */
   .artwork-image-container {
     height: 250px !important;
-    background: linear-gradient(135deg, #001a1a 0%, #002020 100%) !important;
+    background: #001a1a !important;
   }
   
   /* Simplify transitions on mobile */
@@ -61,29 +57,13 @@
   .feature-card,
   .event-card,
   .workshop-card {
-    transition: none !important; /* Remove transitions for better performance */
+    transition: none !important;
   }
   
   .artwork-card:hover,
   .universal-card:hover,
   .feature-card:hover {
-    transform: none !important; /* Disable hover effects on mobile */
-  }
-  
-  /* Disable animations on mobile for performance */
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-  
-  /* Keep loading animations - but simplify */
-  .loading-spinner,
-  [class*="spinner"],
-  [class*="loader"] {
-    animation-duration: 1s !important;
+    transform: none !important;
   }
   
   /* Optimize text rendering */
@@ -166,51 +146,20 @@
   }
 }
 
-/* Performance optimizations for slow devices */
-@media (max-width: 768px) and (max-resolution: 1.5dppx) {
-  /* Disable complex animations on lower resolution devices */
-  .loading-spinner {
-    animation: none !important;
-    border: 3px solid #c38f21 !important;
-    border-radius: 50% !important;
-  }
-  
-  /* Simplify loading states */
-  .loading-skeleton {
-    background: rgba(195, 143, 33, 0.1) !important;
-    animation: pulse 1s ease-in-out infinite !important;
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-/* Better skeleton on regular mobile devices */
-@media (max-width: 768px) and (min-resolution: 1.5dppx) {
-  .loading-skeleton {
-    animation-duration: 1s !important;
-    background: linear-gradient(
-      90deg,
-      rgba(195, 143, 33, 0.08) 0%,
-      rgba(195, 143, 33, 0.18) 50%,
-      rgba(195, 143, 33, 0.08) 100%
-    ) !important;
-    background-size: 200% 100% !important;
-  }
-}
-
 /* Battery saving mode optimizations */
 @media (prefers-reduced-motion: reduce) {
   .gallery-container * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  
+  /* Keep spinner working even with reduced motion */
+  .simple-spinner,
+  .loading-spinner,
+  .lazy-image-spinner {
+    animation-duration: 1.5s !important;
+    animation-iteration-count: infinite !important;
   }
   
   .gallery-particles-background {
