@@ -242,22 +242,23 @@
 @media (max-width: 768px) {
   .gallery-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: clamp(6px, 1.5vw, 10px) !important;
-    padding: 0.75rem !important;
-    align-items: stretch;
+    gap: 10px !important;
+    padding: 10px !important;
+    align-items: start;
     contain: layout style paint;
   }
   
   .gallery-grid .artwork-card.universal-card {
     min-height: auto;
-    height: 100%;
-    max-width: 170px;
-    margin: 0 auto;
+    height: auto;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
   }
   
   .gallery-grid .artwork-card .universal-card-image-container {
-    height: clamp(80px, 18vw, 120px);
-    min-height: clamp(80px, 18vw, 120px);
+    height: 110px;
+    min-height: 110px;
   }
   
   .gallery-grid .artwork-card .universal-card-actions {
@@ -269,32 +270,29 @@
   .gallery-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
-    padding: 0.5rem !important;
+    padding: 8px !important;
   }
   
   .gallery-grid .artwork-card.universal-card {
-    max-width: 155px;
+    width: 100%;
+    max-width: 100%;
   }
   
   .gallery-grid .artwork-card .universal-card-image-container {
-    height: clamp(70px, 20vw, 100px);
-    min-height: clamp(70px, 20vw, 100px);
+    height: 95px;
+    min-height: 95px;
   }
 }
 
 @media (max-width: 360px) {
   .gallery-grid {
     gap: 6px !important;
-    padding: 0.4rem !important;
-  }
-  
-  .gallery-grid .artwork-card.universal-card {
-    max-width: 140px;
+    padding: 6px !important;
   }
   
   .gallery-grid .artwork-card .universal-card-image-container {
-    height: clamp(60px, 22vw, 85px);
-    min-height: clamp(60px, 22vw, 85px);
+    height: 80px;
+    min-height: 80px;
   }
 }
 
