@@ -219,8 +219,15 @@
   gap: 24px;
   padding: 20px 0;
   justify-content: center;
+  align-items: stretch;
   /* Mobile optimization */
   contain: layout style;
+}
+
+.gallery-grid .artwork-card.universal-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Mobile-specific grid optimizations */
@@ -229,27 +236,33 @@
     grid-template-columns: repeat(2, minmax(140px, 1fr)) !important;
     gap: 12px !important;
     padding: 1rem 0 !important;
+    align-items: stretch;
     /* Use CSS containment for better performance */
     contain: layout style paint;
   }
   
   .gallery-grid .artwork-card.universal-card {
-    min-height: auto;
-    height: auto;
+    min-height: 380px;
+    height: 100%;
   }
   
   .gallery-grid .artwork-card .universal-card-content {
     padding: 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
   
   .gallery-grid .artwork-card .universal-card-title {
     font-size: 0.9rem;
     margin-bottom: 4px;
+    min-height: 2.2em;
   }
   
   .gallery-grid .artwork-card .universal-card-subtitle {
     font-size: 0.75rem;
     margin-bottom: 8px;
+    min-height: 1.2em;
   }
   
   .gallery-grid .artwork-card .universal-card-details {
@@ -275,6 +288,10 @@
   .gallery-grid .artwork-card .universal-card-image-container {
     height: 140px;
     min-height: 140px;
+  }
+  
+  .gallery-grid .artwork-card .universal-card-actions {
+    margin-top: auto;
   }
 }
 
