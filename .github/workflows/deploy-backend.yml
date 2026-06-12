@@ -74,6 +74,9 @@ jobs:
           # JWT_SECRET — required for token signing
           echo "${{ secrets.JWT_SECRET }}" | npx wrangler secret put JWT_SECRET $CFG --env $ENV
           
+          # BREVO_KEY — required for sending OTP and transactional emails
+          echo "${{ secrets.BREVO_KEY }}" | npx wrangler secret put BREVO_KEY $CFG --env $ENV
+          
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

@@ -3,7 +3,7 @@ export const config = {
   // Determine if we're in production
   isProduction: import.meta.env.PROD,
   
-  // API Base URL - now always uses production API
+  // API Base URL - hardcoded to production API
   apiBaseUrl: 'https://api.kalakritam.in',
   
   // App URL
@@ -24,15 +24,10 @@ export const config = {
   // Image URL transformation
   transformImageUrl: (url) => {
     if (!url) return url;
-    
-    // If the URL is pointing to localhost:5000, transform it to a placeholder or working URL
     if (url.includes('localhost:5000') || url.includes('http://localhost:5000')) {
-      // For now, return a placeholder since we don't have a production image service
-      // In production, this should point to your actual image CDN/service
       console.warn('Image URL pointing to localhost:', url);
-      return null; // This will trigger the fallback image logic
+      return null;
     }
-    
     return url;
   }
 };

@@ -11,6 +11,7 @@ zone_name = "kalakritam.in"
 # Required (set via `wrangler secret put`):
 # - DATABASE_URL: Neon PostgreSQL connection string
 # - JWT_SECRET: strong random secret for token signing
+# - BREVO_KEY: Brevo SMTP API key for sending emails (OTP, welcome, password reset)
 #
 # Optional (set via `wrangler secret put`):
 # (none required — NODE_ENV is set in [vars] below)

@@ -212,13 +212,18 @@ export class SEOManager {
     ];
 
     criticalResources.forEach(resource => {
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.href = resource.href;
-      link.as = resource.as;
-      if (resource.type) link.type = resource.type;
-      if (resource.crossorigin) link.crossOrigin = resource.crossorigin;
-      document.head.appendChild(link);
+      try {
+        if (document.querySelector(`link[rel="preload"][href="${resource.href}"]`)) return;
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.href = resource.href;
+        link.as = resource.as;
+        if (resource.type) link.type = resource.type;
+        if (resource.crossorigin) link.crossOrigin = resource.crossorigin;
+        document.head.appendChild(link);
+      } catch (e) {
+        // Silently ignore preload errors (e.g., Safari not supporting some as values)
+      }
     });
   }
 
