@@ -190,7 +190,7 @@
   .header-brand {
     align-self: center;
     flex-shrink: 0;
-    padding-left: clamp(90px, 10vw, 110px);
+    padding-left: clamp(76px, 8vw, 92px);
   }
 
   .header-navigation {
@@ -1534,18 +1534,18 @@
 /* Push header content right of the fixed VideoLogo (85px circle at left: 15px) */
 @media (max-width: 768px) {
   .header-content {
-    padding-left: clamp(80px, 15vw, 100px);
+    padding-left: clamp(68px, 13vw, 84px);
   }
 }
 
 @media (max-width: 480px) {
   .header-content {
-    padding-left: clamp(65px, 18vw, 80px);
+    padding-left: clamp(57px, 16vw, 68px);
   }
 }
 
 @media (max-width: 360px) {
   .header-content {
-    padding-left: clamp(55px, 20vw, 70px);
+    padding-left: clamp(49px, 18vw, 60px);
   }
 }
